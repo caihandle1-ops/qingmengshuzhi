@@ -1,0 +1,44 @@
+/* The native source drawer retains its identity and controls; only its reading layout changes. */
+[class*="st-key-answer_sources_panel_"]:has(.source-reading-marker) {width:min(1080px,calc(100vw - 310px));right:20px;top:76px;bottom:18px;max-height:calc(100dvh - 94px);padding:25px 28px;background:#f9faf7;border-radius:6px;border-color:#bfcdd6;box-shadow:-22px 12px 70px #18334330;backdrop-filter:none}
+.source-reading-marker {display:none}
+[class*="st-key-answer_sources_panel_"] [data-testid="stElementContainer"]:has(>.stHtml>.source-reading-marker) {display:none}
+[class*="st-key-source_reading_spread_"] > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] {gap:28px!important;align-items:start;flex-wrap:nowrap!important}
+[class*="st-key-source_reading_spread_"] > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child {min-width:220px;flex:0.78 1 0!important}
+[class*="st-key-source_reading_spread_"] > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:last-child {min-width:0;flex:1.5 1 0!important;border-left:1px solid #ccd6d9;padding-left:28px}
+.source-reading-context {position:relative;overflow:hidden;overflow-wrap:anywhere;padding:22px 0 0;color:#24384b}
+.source-reading-spine {position:absolute;left:0;right:0;top:0;height:4px;background:#245c75;transform-origin:left}
+.source-reading-kicker {display:block;font-size:10px;letter-spacing:.08em;color:#456d7d;font-weight:750;margin-bottom:15px}
+.source-reading-context h3 {font-size:clamp(19px,1.9vw,26px);font-weight:760;letter-spacing:-.035em;line-height:1.55;color:#183e54;margin:0 0 18px}
+.source-reading-answer {font-size:13px;line-height:1.95;color:#435a6a;margin:0 0 20px;white-space:pre-line}
+.source-reading-verdict {width:fit-content;padding:6px 9px;background:#f0e8d4;color:#775c29;border-left:3px solid #b59758;font-size:11px;font-weight:720}
+.source-reading-verdict.is-verified {background:#e4f1eb;color:#286850;border-color:#549b7b}
+.source-reading-note {font-size:11px;line-height:1.85;color:#728087;margin:12px 0 20px}
+.source-reading-values {background:#203f51;color:#f5fbfa;padding:18px 15px;display:grid;grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr);gap:10px;align-items:center;margin-bottom:18px}
+.source-reading-values span {display:block;font-size:10px;letter-spacing:.04em;color:#b7d0d9;margin-bottom:8px}
+.source-reading-values strong {display:block;font-size:22px;line-height:1.3;letter-spacing:-.025em;font-weight:740;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.source-reading-values small {display:block;font-size:11px;color:#d2e2e4;margin-top:6px}
+.source-reading-values>i {display:block;height:2px;width:18px;background:#deaa7c;transform-origin:left}
+.source-reading-excerpt-label {display:block;font-size:10px;font-weight:700;color:#63808d;letter-spacing:.06em;margin-bottom:8px}
+.source-reading-document {border-top:4px solid #d69b70;padding-top:19px;overflow-wrap:anywhere;margin:0 0 2px}
+.source-reading-document>span {font-size:10px;color:#8d6b50;letter-spacing:.12em;font-weight:750}
+.source-reading-document h3 {font-size:21px;line-height:1.5;color:#334955;font-weight:730;margin:10px 0 0}
+[class*="st-key-source_reading_spread_"] [data-testid="stImage"] {border:1px solid #cbd5da;background:white;padding:8px;box-shadow:0 5px 20px #233b4710}
+.source-cell-context {border:1px solid #d5d1c0;background:#fffdf4;margin-bottom:15px;padding:14px;overflow-wrap:anywhere}
+.source-cell-heading {display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;margin-bottom:12px}.source-cell-heading b {font-size:12px;color:#64502c}.source-cell-heading span {font-size:10px;color:#8c7c5f}
+.source-cell-scroll {overflow-x:auto;max-width:100%}.source-cell-context table {border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:11px;color:#4a545b;table-layout:auto}
+.source-cell-context th,.source-cell-context td {border:1px solid #dedccf;padding:8px 9px;text-align:left;min-width:45px;max-width:180px;overflow-wrap:anywhere;background:#fffefb}
+.source-cell-context th {font-size:10px;color:#8b8066;background:#f4f0e4;font-weight:650}.source-cell-context td.is-cited {background:#f5d789;color:#463715;outline:2px solid #b68838;outline-offset:-2px;font-weight:800}
+.source-cell-context p {font-size:10px;color:#8a7a61;line-height:1.8;margin:12px 0 0}
+.source-page-context {display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap;padding:11px 13px;background:#e8eff2;border-left:3px solid #61889b;font-size:12px;color:#3a5b70}
+@media(max-width:1150px) {
+ [class*="st-key-answer_sources_panel_"]:has(.source-reading-marker) {width:calc(100vw - 42px);right:21px;top:65px;bottom:16px;max-height:calc(100dvh - 81px)}
+}
+@media(max-width:720px) {
+ [class*="st-key-answer_sources_panel_"]:has(.source-reading-marker) {width:calc(100vw - 20px);right:10px;top:55px;bottom:10px;max-height:calc(100dvh - 65px);padding:18px}
+ [class*="st-key-source_reading_spread_"] > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] {flex-direction:column;gap:22px!important}
+ [class*="st-key-source_reading_spread_"] > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {width:100%!important;min-width:0!important;flex:1 1 auto!important}
+ [class*="st-key-source_reading_spread_"] > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:last-child {border-left:0;padding-left:0}
+ .source-reading-values {grid-template-columns:1fr 24px 1fr;gap:12px;align-items:center}.source-reading-values strong {font-size:21px}.source-reading-values>i {width:24px}.source-reading-context h3 {font-size:22px}.source-reading-answer {font-size:12px}
+}
+@media(prefers-reduced-motion:reduce) {.source-reading-context [data-result-piece] {animation:none!important;transition:none!important}}
+@media(forced-colors:active) {[class*="st-key-answer_sources_panel_"]:has(.source-reading-marker),.source-reading-values,.source-cell-context td,.source-cell-context th {background:Canvas;color:CanvasText;border-color:CanvasText}.source-cell-context td.is-cited {outline:2px solid Highlight}.source-reading-values span,.source-reading-values small,.source-reading-context h3,.source-reading-document h3 {color:CanvasText}}

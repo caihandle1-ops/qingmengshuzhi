@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>执行记录回放</title><link rel="stylesheet" href="replay.css?v=20261005.1"></head>
+<body><section id="replay" aria-label="本次执行记录回放">
+  <header><div><span class="eyebrow">FOLLOW THE RESEARCH</span><h3>让分析，有迹可循。</h3></div><span id="event-count"></span></header>
+  <div class="replay-stage"><div class="sweep" aria-hidden="true"></div><div class="event-index" aria-hidden="true" id="event-index">01</div><div class="event-copy"><span id="event-state"></span><h4 id="event-title">执行记录</h4><p id="event-detail"></p></div><div class="event-clock"><span>记录耗时</span><strong id="event-time">未记录</strong></div></div>
+  <ol id="stages" aria-label="回放位置对应的处理状态"></ol>
+  <div class="controls"><button type="button" id="previous" aria-label="上一步">←</button><button type="button" id="play">从头回放</button><button type="button" id="next" aria-label="下一步">→</button><input id="position" type="range" min="0" max="1" value="1" aria-label="选择执行事件"><button type="button" id="latest">实际结果</button></div>
+  <p id="position-label" aria-live="polite"></p><footer>回放每步约 1 秒；上方耗时来自实际记录。环节已执行，不代表依据已核验通过。</footer>
+</section><script src="replay-model.js?v=20261005.1"></script><script src="replay.js?v=20261005.1"></script></body></html>

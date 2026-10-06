@@ -1,0 +1,63 @@
+/* Answer canvas: values stay still; decorative scene pieces use shared WAAPI. */
+[class*="st-key-answer_summary_"] {--canvas-ink:#0b203f;--canvas-blue:#1458ef;--canvas-paper:#fbfaf5;--canvas-line:#c7d5e7;}
+.answer-canvas-heading {position:relative;isolation:isolate;display:flex;justify-content:space-between;align-items:center;gap:18px;min-height:72px;padding:20px 0;color:#0b203f;overflow:hidden;border-bottom:1px solid #c7d5e7;}
+.answer-canvas-heading-copy {display:flex;align-items:baseline;gap:20px;min-width:0;z-index:1;}
+.answer-canvas-heading-copy>span {font-size:12px;letter-spacing:.09em;white-space:nowrap;color:#3c5879;}
+.answer-canvas-heading-copy>strong {font-size:clamp(18px,1.8vw,25px);line-height:1.4;overflow-wrap:anywhere;}
+.answer-canvas-period {flex:none;font-size:13px;z-index:1;font-variant-numeric:tabular-nums;padding-right:18px;}
+.answer-canvas-ribbon {position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;}
+.answer-canvas-ribbon i {position:absolute;display:block;transform-origin:right center;}
+.answer-canvas-ribbon i:nth-child(1) {right:0;top:0;bottom:0;width:27%;background:#dbe7ff;clip-path:polygon(38% 0,100% 0,100% 100%,0 100%);}
+.answer-canvas-ribbon i:nth-child(2) {right:27%;bottom:0;height:3px;width:60%;background:#1458ef;}
+.answer-canvas-ribbon i:nth-child(3) {right:0;top:0;width:7px;height:100%;background:#1458ef;}
+[class*="st-key-answer_canvas_top_"] [data-testid="stHorizontalBlock"] {gap:0!important;align-items:stretch;}
+[class*="st-key-answer_canvas_lead_"], [class*="st-key-answer_canvas_compare_"] {box-sizing:border-box;min-height:240px;padding:27px 30px 22px;gap:6px;}
+[class*="st-key-answer_canvas_lead_"] {background:#0b203f;border-radius:16px 0 0 16px;color:#fff;}
+[class*="st-key-answer_canvas_compare_"] {background:#e8efff;border-radius:0 16px 16px 0;color:#123b82;border-left:5px solid #1458ef;}
+[class*="st-key-answer_summary_"] [class*="st-key-answer_canvas_lead_"] [data-testid="stMetric"],
+[class*="st-key-answer_summary_"] [class*="st-key-answer_canvas_compare_"] [data-testid="stMetric"] {background:transparent;border:0;border-radius:0;padding:2px 0 6px;}
+[class*="st-key-answer_summary_"] [class*="st-key-answer_canvas_lead_"] [data-testid="stMetricLabel"] p {color:#d4e2f7;font-size:16px;}
+[class*="st-key-answer_summary_"] [class*="st-key-answer_canvas_lead_"] [data-testid="stMetricValue"],
+[class*="st-key-answer_summary_"] [class*="st-key-answer_canvas_lead_"] [data-testid="stMetricValue"] p {color:#fff;font-size:clamp(34px,4.3vw,68px);font-weight:750;line-height:1.17;letter-spacing:-.045em;white-space:normal;overflow-wrap:anywhere;font-variant-numeric:tabular-nums;}
+[class*="st-key-answer_canvas_lead_"] [data-testid="stCaptionContainer"] p {color:#b9cbea!important;font-size:12px;line-height:1.6;}
+[class*="st-key-answer_summary_"] [class*="st-key-answer_canvas_compare_"] [data-testid="stMetricLabel"] p {color:#254775;font-size:14px;}
+[class*="st-key-answer_summary_"] [class*="st-key-answer_canvas_compare_"] [data-testid="stMetricValue"],
+[class*="st-key-answer_summary_"] [class*="st-key-answer_canvas_compare_"] [data-testid="stMetricValue"] p {color:#1458ef;font-size:clamp(30px,3vw,45px);line-height:1.2;letter-spacing:-.035em;white-space:normal;overflow-wrap:anywhere;}
+[class*="st-key-answer_canvas_compare_"] [data-testid="stCaptionContainer"] p {color:#3d5781!important;font-size:12px;}
+.answer-canvas-baseline {display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px 12px;padding-top:15px;border-top:1px solid #b9cbed;margin-top:7px;}
+.answer-canvas-baseline span {font-size:12px;color:#3d5781;}
+.answer-canvas-baseline strong {font-size:16px;color:#123b82;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;}
+[class*="st-key-answer_canvas_research_"] {padding:22px 0 6px;}
+[class*="st-key-answer_canvas_chart_"] {min-width:0;}
+[class*="st-key-answer_canvas_chart_"] .v4-section-heading {font-size:17px;color:#0b203f;}
+[class*="st-key-answer_canvas_chart_"] [role="radiogroup"] {gap:18px;}
+[class*="st-key-answer_canvas_evidence_"] {background:#fbfaf5;border-left:3px solid #1458ef;padding:19px 20px;gap:9px;}
+.answer-canvas-note-title {font-size:18px;font-weight:750;line-height:1.4;color:#0b203f;margin-bottom:3px;}
+.answer-canvas-note-rule {height:1px;background:#ccd5df;margin:5px 0;}
+[class*="st-key-answer_canvas_evidence_"] [data-testid="stMarkdownContainer"] p {font-size:13px;line-height:1.8;color:#32455f;overflow-wrap:anywhere;}
+[class*="st-key-answer_canvas_evidence_"] [data-testid="stCaptionContainer"] p {font-size:12px;line-height:1.75;color:#52647c;overflow-wrap:anywhere;}
+@media (max-width:850px) {
+  [class*="st-key-answer_canvas_research_"] [data-testid="stHorizontalBlock"] {flex-direction:column;gap:18px;}
+  [class*="st-key-answer_canvas_research_"] [data-testid="stColumn"] {width:100%!important;flex:1 1 100%!important;min-width:0!important;}
+}
+@media (max-width:640px) {
+  .answer-canvas-heading {gap:12px;padding:15px 0;align-items:flex-start;}
+  .answer-canvas-heading-copy {display:block;}
+  .answer-canvas-heading-copy>span {display:block;margin-bottom:5px;font-size:11px;}
+  .answer-canvas-heading-copy>strong {font-size:18px;}
+  .answer-canvas-period {font-size:11px;padding-top:3px;}
+  [class*="st-key-answer_canvas_top_"] [data-testid="stHorizontalBlock"] {flex-direction:column;}
+  [class*="st-key-answer_canvas_top_"] [data-testid="stColumn"] {width:100%!important;flex:1 1 100%!important;min-width:0!important;}
+  [class*="st-key-answer_canvas_lead_"], [class*="st-key-answer_canvas_compare_"] {min-height:0;padding:23px 21px;}
+  [class*="st-key-answer_canvas_lead_"] {border-radius:14px 14px 0 0;}
+  [class*="st-key-answer_canvas_compare_"] {border-radius:0 0 14px 14px;border-left:0;border-top:4px solid #1458ef;}
+  [class*="st-key-answer_summary_"] [class*="st-key-answer_canvas_lead_"] [data-testid="stMetricValue"],
+  [class*="st-key-answer_summary_"] [class*="st-key-answer_canvas_lead_"] [data-testid="stMetricValue"] p {font-size:clamp(31px,7.3vw,45px);}
+  [class*="st-key-answer_summary_"] [class*="st-key-answer_canvas_compare_"] [data-testid="stMetricValue"],
+  [class*="st-key-answer_summary_"] [class*="st-key-answer_canvas_compare_"] [data-testid="stMetricValue"] p {font-size:32px;}
+}
+@media (forced-colors:active) {
+  .answer-canvas-heading,[class*="st-key-answer_canvas_lead_"],[class*="st-key-answer_canvas_compare_"],[class*="st-key-answer_canvas_evidence_"] {background:Canvas;border:1px solid CanvasText;color:CanvasText;}
+  .answer-canvas-ribbon {display:none;}
+  [class*="st-key-answer_summary_"] [data-testid="stMetric"] :is(p,div),[class*="st-key-answer_summary_"] [data-testid="stCaptionContainer"] p {color:CanvasText!important;}
+}

@@ -1,0 +1,291 @@
+/* 2026-10-04: spacing belongs to content, not repeated card borders.
+   Component queries are local: never contain the main canvas or fixed drawer. */
+:root {
+  --qm-space-small:8px;
+  --qm-space-control:12px;
+  --qm-space-group:24px;
+  --qm-line:#d2dbe1;
+  --qm-focus:#2866cf;
+}
+[data-testid="stMainBlockContainer"] {padding-bottom:48px}
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {gap:26px}
+[data-testid="stAppViewContainer"] {background:#f1f4f5}
+[data-testid="stSidebar"] {background:#f9fbfc;border-color:#d7dfe5}
+[data-testid="stMarkdownContainer"] :is(h2,h3) {text-wrap:balance;overflow-wrap:break-word}
+[data-testid="stMarkdownContainer"] h2 {padding-bottom:12px;line-height:1.35}
+[class*="st-key-guided_intro_"] {border-bottom:1px solid #ccd6de;padding-bottom:16px}
+[class*="st-key-guided_intro_"] h2 {font-size:clamp(28px,3vw,38px);font-weight:700;letter-spacing:-.04em}
+[class*="st-key-guided_intro_"] .guided-intro-copy {font-size:15px;line-height:1.8;max-width:64ch;margin-bottom:0}
+/* Streamlit subtracts the ordinary paragraph's 16px bottom margin. Owned
+   HTML blocks have no such paragraph margin: keep their full layout height. */
+[data-testid="stMarkdownContainer"]:has(> :is([class^="studio-"],[class^="workspace-"],[class^="qa-"],[class^="guided-"],[class^="verification-"],[class^="v4-"],[class^="evidence-"],[class^="execution-"],[class^="fu-"],[class^="qm-"],[class^="brand-"],.context-bar)) {margin-bottom:0!important}
+/* Keep the native sidebar accessible without hover, including touch screens.
+   Its narrow-screen overlay remains native and can always be dismissed. */
+[data-testid="stSidebarHeader"] {height:auto!important;min-height:52px;padding:4px 12px!important}
+[data-testid="stSidebarCollapseButton"] {visibility:visible!important;display:flex!important}
+[data-testid="stSidebarCollapseButton"] button,[data-testid="stExpandSidebarButton"] button {width:44px;min-width:44px;min-height:44px}
+/* Keep the rail's internal canvas at its open width. Native sidebar motion
+   changes only its outer flex allocation and horizontal position: words,
+   icons and the selected item never squeeze into a moving narrow column. */
+[data-testid="stSidebar"] {
+  width:var(--fu-side-width)!important;
+  transition:transform 520ms cubic-bezier(.22,1,.36,1),min-width 520ms cubic-bezier(.22,1,.36,1),max-width 520ms cubic-bezier(.22,1,.36,1)!important;
+}
+[data-testid="stSidebar"][aria-expanded="false"] {transform:translateX(calc(-1 * var(--fu-side-width)))!important}
+[data-testid="stSidebarContent"] {
+  width:calc(var(--fu-side-width) - 1px)!important;
+  min-width:calc(var(--fu-side-width) - 1px)!important;
+  max-width:calc(var(--fu-side-width) - 1px)!important;
+  box-sizing:border-box;background:#f9fbfc;
+}
+.fu-brand {display:grid;grid-template-columns:42px minmax(0,1fr);column-gap:10px;row-gap:8px;align-items:center}
+.fu-brand-logo {width:42px!important;max-width:42px!important;grid-column:1}
+.fu-brand-text {display:contents}
+.fu-brand-name {grid-column:2;white-space:nowrap}
+.fu-brand-sub {grid-column:1 / -1;margin:0;line-height:1.7}
+.fu-brand-product,.fu-brand-description {display:block;white-space:nowrap}
+.fu-brand-product {font-weight:600;color:#355481;letter-spacing:.05em}
+.fu-brand-description {font-size:11px;color:#657384}
+.fu-brand:not(:has(.fu-brand-logo)) {grid-template-columns:minmax(0,1fr)}
+.fu-brand:not(:has(.fu-brand-logo)) .fu-brand-name {grid-column:1}
+.studio-nav-indicator {transition:transform 470ms cubic-bezier(.16,1,.3,1)}
+@media (prefers-reduced-motion:reduce) {
+  [data-testid="stSidebar"] {transition:none!important}
+}
+[data-testid="stHeader"] {height:60px!important}
+[data-testid="stAppDeployButton"] {display:none}
+[data-testid="stMainBlockContainer"] {padding-top:68px!important}
+/* Wrap before the 390px report illustration is squeezed into a narrow column.
+   Flex basis follows the actual content width, including an open sidebar. */
+.st-key-studio_hero_grid > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] {flex-wrap:wrap!important;gap:32px!important}
+.st-key-studio_hero_grid > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child {flex:.95 1 390px!important;width:auto!important;min-width:0!important}
+.st-key-studio_hero_grid > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:last-child {flex:1.15 1 480px!important;width:auto!important;min-width:0!important}
+.st-key-workspace_question_card [data-testid="stCaptionContainer"] {margin-bottom:0!important}
+.st-key-workspace_question_card [data-testid="stCaptionContainer"] p {font-size:12px!important;line-height:1.6!important;color:#bed0df}
+.st-key-scope_result_summary [data-testid="stCaptionContainer"] p {color:#53677b}
+[data-testid="stWidgetLabel"] {min-height:24px;margin-bottom:6px}
+[data-testid="stWidgetLabel"] p {line-height:1.6}
+/* A proper content row beneath the breadcrumb prevents returning controls
+   from visually colliding with titles or tooltip hit areas. */
+.st-key-app_header {container-type:inline-size;border-bottom:1px solid #d2dbe1;padding-bottom:20px}
+.st-key-header_location_group {padding-block:6px}
+.workspace-breadcrumb {row-gap:8px;line-height:1.7}
+.workspace-breadcrumb b {line-height:1.55;overflow-wrap:anywhere}
+/* Reserve the existing 44px toolbar while Streamlit streams its buttons.
+   The homepage uses a separate empty slot, so it gains no navigation gap. */
+.st-key-compact_navigation_slot {min-height:44px;box-sizing:content-box;padding-top:18px;margin-top:4px;border-top:1px solid #dce3e8}
+.st-key-layer_navigation {max-width:390px}
+.st-key-layer_navigation [data-testid="stHorizontalBlock"] {gap:12px!important;flex-wrap:nowrap!important}
+.st-key-layer_navigation [data-testid="stColumn"] {flex:1 1 0!important;width:auto!important;min-width:0!important}
+.st-key-compact_navigation_slot button {min-height:44px;padding:10px 12px;border-radius:10px;background:#fff;border-color:#b8cbdc;box-shadow:0 2px 4px #24395006}
+.st-key-compact_navigation_slot button p {font-size:14px;line-height:1.5;margin:0;white-space:normal}
+.st-key-header_context_group .context-bar {gap:7px;min-width:0}
+.fu-badge {white-space:normal;line-height:1.5}
+.fu-current-company {overflow-wrap:anywhere;line-height:1.65}
+.st-key-header_context_group button {min-height:44px}
+.st-key-header_search_desktop button {min-width:76px;min-height:44px}
+.st-key-header_search_desktop [data-testid="stHorizontalBlock"] {gap:12px}
+/* Readable labels on white surfaces. Home labels are scoped in their module. */
+.st-key-qa_composer {container-type:inline-size;padding:24px;background:#ffffffdd;border:1px solid #cfd9e2;border-radius:16px;box-shadow:0 8px 24px #21394c07}
+.st-key-qa_composer .studio-composer-label {display:flex;flex-wrap:wrap;gap:6px 16px;color:#142b43;font-size:17px;line-height:1.65;margin-bottom:12px}
+.st-key-qa_composer .studio-composer-label small {color:#5c6f80;font-size:13px;line-height:1.65;margin:0}
+.st-key-qa_composer [data-testid="stTextInputRootElement"]:focus-within {border-color:#2866cf;box-shadow:0 0 0 3px #2866cf19}
+.st-key-qa_composer button {min-height:48px}
+.st-key-qa_scope {container-type:inline-size;padding:8px 0 14px}
+.st-key-qa_scope [data-testid="stHorizontalBlock"] {gap:20px}
+.st-key-qa_shortcuts_head {margin-top:8px}
+.qa-shortcuts-heading {row-gap:8px;line-height:1.6}
+.qa-shortcuts-heading strong {font-size:15px}
+.qa-shortcuts-heading span {font-size:12px;color:#596e81}
+.st-key-qa_suggestions {max-width:680px;margin-bottom:8px;container-type:inline-size}
+.st-key-qa_suggestions [data-testid="stHorizontalBlock"] {gap:16px!important}
+.st-key-qa_suggestions button {min-height:52px;border-radius:12px;padding:12px 16px;gap:10px}
+.st-key-qa_suggestions button p {font-size:15px;line-height:1.5;white-space:normal;margin:0}
+.st-key-recommended_0 button {background:#e6eefc;border-color:#aec5e8;color:#2058aa}
+.st-key-recommended_1 button {background:#e0f2ec;border-color:#a5d4c5;color:#076f61}
+.st-key-qa_more_examples button {min-height:44px;padding:9px 14px;background:transparent;border-color:#cbd6df;color:#365a79}
+.st-key-qa_extra_examples,.st-key-qa_clarification {padding:22px;margin-top:8px;line-height:1.7}
+.guided-hint {padding:16px 20px;line-height:1.8;overflow-wrap:anywhere;background:#e7edf3;border-color:#839cb1;color:#435e74}
+/* Disclosures have a visible neutral/selected cycle and room for long labels. */
+[class*="st-key-guided_picker_"] {container-type:inline-size;padding:12px 0 16px;border-bottom:1px solid #cbd6df}
+[class*="st-key-guided_picker_"] [data-testid="stHorizontalBlock"] {flex-wrap:wrap!important;gap:12px!important}
+[class*="st-key-guided_picker_"] [data-testid="stColumn"] {flex:1 1 180px!important;width:auto!important;min-width:0!important}
+[class*="st-key-guided_picker_"] [class*="st-key-guided_card_"] button {min-height:48px;height:auto;justify-content:center;border:1px solid #bdcfe5;border-bottom-width:3px;border-radius:6px;padding:12px 14px;background:#f8fafc;color:#234f88;gap:10px}
+[class*="st-key-guided_picker_"] [class*="st-key-guided_card_"] button p {font-size:14px;line-height:1.65;margin:0;white-space:normal}
+[class*="st-key-guided_picker_"] [class*="st-key-guided_card_"] button [data-testid="stIconMaterial"] {font-size:21px;flex:none;color:inherit}
+[class*="st-key-guided_picker_"] [class*="st-key-guided_card_"] button[kind="primary"],
+[class*="st-key-guided_picker_"] [class*="st-key-guided_card_"] button[kind="primary"]:hover {background:#2454b5!important;color:#fff!important;border:1px solid #2454b5!important;border-bottom-width:3px!important}
+.st-key-guided_card_scope_detail_sources button {background:#ddf0e9!important;border-color:#a9d1c2!important;color:#076957!important}
+.st-key-guided_card_scope_detail_manual button {background:#ebe4f7!important;border-color:#c3b2df!important;color:#614196!important}
+.st-key-guided_card_scope_detail_sources button[kind="primary"],.st-key-guided_card_scope_detail_sources button[kind="primary"]:hover {background:#08766e!important;color:#fff!important}
+.st-key-guided_card_scope_detail_manual button[kind="primary"],.st-key-guided_card_scope_detail_manual button[kind="primary"]:hover {background:#6d49b1!important;color:#fff!important}
+[class*="st-key-guided_actions_"] [data-testid="stHorizontalBlock"] {flex-wrap:wrap;gap:16px}
+[class*="st-key-guided_actions_"] [data-testid="stColumn"] {flex:1 1 240px;width:auto;min-width:0}
+[class*="st-key-guided_card_"] button [data-testid="stIconMaterial"] {flex:none}
+[class*="st-key-guided_card_"] button [data-testid="stMarkdownContainer"] {min-width:0;overflow-wrap:anywhere}
+.st-key-workspace_verification_choices > [data-testid="stVerticalBlock"] {gap:16px}
+.st-key-workspace_verification_context {padding:12px 0 0 12px}
+.verification-current-question p,.verification-empty-guidance p {line-height:1.85;overflow-wrap:anywhere}
+.verification-steps li {padding:16px 0;gap:18px}
+/* Main result is an open typographic canvas; detailed forms are distinct. */
+:is(.st-key-scope_result_summary,.st-key-counter_result_summary,.st-key-replay_history_summary) {padding:24px;border:1px solid #cdd8e3;border-radius:14px;background:#ffffffd9}
+.st-key-scope_manual_panel {background:#f1ecf8;border:1px solid #d4c5e8;padding:24px}
+.st-key-counter_candidate_form {background:#f9fafb;border:1px solid #c8d6e2;padding:24px;border-radius:14px}
+.st-key-counter_correction {background:#e5f2ed;border-color:#a7cfc0;padding:24px}
+.st-key-scope_sources_panel {background:#edf6f2;border-color:#bfdacf}
+.st-key-scope_dimensions_panel {background:#eef3fc;border-color:#bdcfea}
+.v4-corrected-value {font-size:clamp(22px,2.3vw,32px);line-height:1.5;overflow-wrap:anywhere}
+.st-key-qa_results,.st-key-qa_quick_preview {padding:24px 0;border-top:1px solid #c5d2de}
+.st-key-qa_quick_preview > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] {gap:16px;flex-wrap:wrap}
+.st-key-qa_quick_preview > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child {flex:1 1 160px;min-width:0;width:auto}
+.st-key-qa_quick_preview > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:last-child {flex:0 0 116px;min-width:116px;width:116px}
+.st-key-qa_quick_close button {min-height:44px;padding:9px 12px;gap:8px}
+[class*="st-key-answer_actions_"] {container-type:inline-size;padding-block:18px}
+[class*="st-key-answer_actions_"] [data-testid="stHorizontalBlock"] {flex-wrap:wrap!important;gap:12px!important}
+[class*="st-key-answer_actions_"] [data-testid="stColumn"] {flex:1 1 180px!important;width:auto!important;min-width:0!important}
+[class*="st-key-answer_actions_"] button {min-height:48px;padding:12px 14px;gap:9px}
+[class*="st-key-answer_actions_"] button p {white-space:normal;overflow-wrap:anywhere;line-height:1.7;font-size:14px}
+[class*="st-key-answer_sources_toggle_"] button {background:#e7f1fb;color:#244f81;border-color:#acc9e3}
+[class*="st-key-answer_summary_"] [data-testid="stMetricValue"] p {font-size:clamp(32px,3.6vw,52px);line-height:1.3;letter-spacing:-.045em;font-variant-numeric:tabular-nums;white-space:normal;overflow-wrap:anywhere}
+[class*="st-key-answer_summary_"] [data-testid="stMetricLabel"] p {font-size:14px;line-height:1.65}
+[class*="st-key-answer_metrics_"] {container-type:inline-size;padding-block:12px}
+[class*="st-key-answer_metrics_"] > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] {flex-wrap:wrap!important;gap:20px!important}
+[class*="st-key-answer_metrics_"] > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {flex:1 1 210px!important;min-width:0!important;width:auto!important}
+[class*="st-key-answer_metrics_"] [data-testid="stMetric"] {padding:12px 0;background:transparent;border:0;border-top:2px solid #abc4de;border-radius:0}
+[class*="st-key-answer_metrics_"] [data-testid="stMetricValue"] p {font-size:clamp(28px,2.8vw,36px);white-space:normal;overflow-wrap:anywhere}
+/* A closing action with visible text needs its own slot, not a 42px circle. */
+[class*="st-key-answer_sources_panel_"] {padding:22px;scrollbar-gutter:stable;overscroll-behavior:contain}
+[class*="st-key-answer_sources_panel_"] > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"]:has([class*="st-key-answer_sources_close_"]),
+[class*="st-key-answer_check_panel_"] > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"]:has([class*="st-key-answer_check_close_"]) {flex-wrap:nowrap!important;gap:16px!important;align-items:center}
+[class*="st-key-answer_sources_panel_"] [data-testid="stColumn"]:has([class*="st-key-answer_sources_close_"]),
+[class*="st-key-answer_check_panel_"] [data-testid="stColumn"]:has([class*="st-key-answer_check_close_"]) {flex:0 0 84px!important;min-width:84px!important;width:84px!important}
+[class*="st-key-answer_sources_close_"] button,[class*="st-key-answer_check_close_"] button {width:84px;min-width:84px;min-height:44px;border-radius:10px;padding:10px 12px;gap:7px;font-size:13px}
+[class*="st-key-answer_sources_close_"] button p,[class*="st-key-answer_check_close_"] button p {font-size:13px;line-height:1.4;white-space:nowrap}
+[class*="st-key-answer_sources_panel_"] [data-testid="stVerticalBlock"] {gap:18px}
+[class*="st-key-answer_sources_panel_"] [data-testid="stMarkdownContainer"] {overflow-wrap:anywhere}
+.st-key-qa_results:has([class*="st-key-answer_sources_panel_"]),
+[class*="st-key-answer_workbench_"]:has([class*="st-key-answer_sources_panel_"]) {transform:none!important;filter:none!important;will-change:auto!important}
+.evidence-linked-value {padding:16px;border-left-width:4px;gap:8px}
+.evidence-linked-value span {font-size:12px;line-height:1.5}
+.evidence-linked-value strong {font-size:17px;line-height:1.6}
+.execution-progress-heading {flex-wrap:wrap;gap:8px 16px}
+.execution-progress-heading > span,.execution-stage-state,.execution-progress-note {font-size:12px!important;line-height:1.65}
+.execution-stage {gap:10px;min-width:0}
+.execution-stage-copy {min-width:0;overflow-wrap:anywhere}
+.execution-stage:not(:last-child)::after {display:none}
+/* Feedback follows the operation: stable text, border/fill change, clear focus.
+   Avoid large hover movement that lets adjacent hit areas appear to overlap. */
+[data-testid="stMain"] button:focus-visible,[data-testid="stMain"] :is(input,textarea):focus-visible {outline:3px solid var(--qm-focus);outline-offset:3px}
+@media (hover:hover) and (pointer:fine) {
+  [data-testid="stMain"] :is(.st-key-compact_navigation_slot,.st-key-qa_suggestions,[class*="st-key-answer_actions_"]) button:hover:not(:disabled) {transform:none;box-shadow:0 0 0 2px #27436012}
+  [data-testid="stMain"] [class*="st-key-guided_picker_"] button:hover:not(:disabled) {transform:none!important;box-shadow:0 0 0 2px #2866cf12}
+}
+@container (max-width:780px) {
+  .st-key-app_header > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] {flex-wrap:wrap!important;gap:16px!important;align-items:center}
+  .st-key-app_header > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {flex:1 1 100%!important;width:100%!important;min-width:0!important}
+  .st-key-app_header [data-testid="stColumn"]:has(.st-key-header_search_desktop) {display:none!important}
+  .st-key-mobile_workspace_search {display:block}
+  .st-key-header_context_group [data-testid="stColumn"]:has(.st-key-mobile_workspace_search) {display:block!important}
+  .st-key-header_context_group [data-testid="stHorizontalBlock"] {flex-wrap:wrap!important;gap:10px!important}
+  .st-key-header_context_group [data-testid="stColumn"]:has(.context-bar) {flex:1 1 100%!important;width:100%!important}
+  .st-key-header_context_group [data-testid="stColumn"]:has(.st-key-mobile_workspace_search),
+  .st-key-header_context_group [data-testid="stColumn"]:has(.st-key-header_help) {flex:0 0 96px!important;width:96px!important;min-width:96px!important}
+  .context-bar {flex-direction:row!important;flex-wrap:wrap;gap:8px 18px!important;align-items:center}
+  .fu-current-company {font-size:12px}
+}
+@container (max-width:460px) {
+  .st-key-qa_composer > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"],
+  .st-key-qa_scope > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] {flex-wrap:wrap!important;gap:14px!important}
+  .st-key-qa_composer > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"],
+  .st-key-qa_scope > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {flex:1 1 100%!important;width:100%!important;min-width:0!important}
+  [class*="st-key-guided_picker_"] [data-testid="stColumn"],
+  [class*="st-key-answer_actions_"] [data-testid="stColumn"],
+  [class*="st-key-answer_metrics_"] [data-testid="stColumn"] {flex:1 1 100%!important;width:100%!important}
+}
+/* With a sidebar, 1152–1280px viewports cannot reserve 440px and keep a
+   comfortable answer column. The drawer overlays at these widths. */
+@media (min-width:1101px) and (max-width:1399px) {
+  [data-testid="stMainBlockContainer"]:has([class*="st-key-answer_sources_panel_"]) {padding-right:32px}
+}
+@media (max-width:590px) {
+  [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {gap:22px}
+  .st-key-app_header {padding-bottom:18px}
+  .st-key-layer_navigation {max-width:none}
+  .st-key-qa_composer {padding:20px 18px}
+  .st-key-qa_scope [data-testid="stHorizontalBlock"] {gap:16px}
+  .st-key-qa_suggestions button {min-height:50px;padding:12px 10px;gap:8px}
+  .st-key-qa_suggestions button p {font-size:14px;line-height:1.65}
+  .st-key-workspace_verification_context {padding:14px 0}
+  :is(.st-key-scope_result_summary,.st-key-counter_result_summary,.st-key-replay_history_summary,.st-key-scope_manual_panel,.st-key-counter_candidate_form) {padding:20px 18px}
+  [class*="st-key-answer_sources_panel_"] {padding:18px}
+  .execution-progress-track {grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .fu-badge {font-size:12px}
+}
+/* Explicit task-condition rows, isolated from drawer title/close rows. */
+@media (max-width:1100px) {
+  [data-testid="stHorizontalBlock"]:has(> [data-testid="stColumn"] :is(.st-key-scope_company,.st-key-counter_company,.st-key-scope_manual_currency,.st-key-probe_companies,.st-key-counter_value)) {flex-wrap:wrap!important;gap:16px!important}
+  [data-testid="stHorizontalBlock"]:has(> [data-testid="stColumn"] :is(.st-key-scope_company,.st-key-counter_company,.st-key-scope_manual_currency,.st-key-probe_companies,.st-key-counter_value)) > [data-testid="stColumn"] {flex:1 1 180px!important;width:auto!important;min-width:0!important}
+}
+@media (max-width:590px) {
+  [data-testid="stHorizontalBlock"]:has(> [data-testid="stColumn"] :is(.st-key-scope_company,.st-key-counter_company,.st-key-scope_manual_currency,.st-key-probe_companies,.st-key-counter_value)) > [data-testid="stColumn"] {flex:1 1 100%!important;width:100%!important}
+}
+@media (max-width:359px) {
+  .st-key-studio_company_controls > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] {flex-wrap:wrap!important;gap:14px!important}
+  .st-key-studio_company_controls > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {flex:1 1 100%!important;width:100%!important;min-width:0!important}
+  .st-key-qa_suggestions [data-testid="stHorizontalBlock"] {flex-wrap:wrap!important}
+  .st-key-qa_suggestions [data-testid="stColumn"] {flex:1 1 100%!important;width:100%!important}
+  .st-key-compact_navigation_slot button p {font-size:13px}
+}
+@media (prefers-reduced-motion:reduce) {
+  [data-testid="stMain"] :is(.st-key-compact_navigation_slot,.st-key-qa_suggestions,[class*="st-key-answer_actions_"],[class*="st-key-guided_picker_"]) button:hover:not(:disabled) {transform:none!important;transition:none!important}
+}
+@media (prefers-reduced-transparency:reduce) {
+  .st-key-qa_composer,[class*="st-key-answer_sources_panel_"] {background:#fff;backdrop-filter:none}
+}
+@media (forced-colors:active) {
+  .st-key-qa_composer,.guided-hint,.st-key-scope_manual_panel,.st-key-counter_correction {background:Canvas;color:CanvasText;border-color:CanvasText}
+  [class*="st-key-guided_picker_"] [class*="st-key-guided_card_"] button,
+  [class*="st-key-guided_picker_"] [class*="st-key-guided_card_"] button[kind="primary"] {background:ButtonFace!important;color:ButtonText!important;border:1px solid ButtonText!important}
+  [class*="st-key-guided_picker_"] [class*="st-key-guided_card_"] button[kind="primary"] {border:2px solid Highlight!important}
+  .st-key-qa_composer .studio-composer-label,.st-key-qa_composer .studio-composer-label small {color:CanvasText}
+}
+/* Remaining native tool groups keep their own hierarchy, but can wrap by
+   available width. Only direct columns are resized, never nested drawer rows. */
+:is(.st-key-workspace_research_tools,.st-key-guided_secondary_tools) > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"],
+[data-testid="stHorizontalBlock"]:has(> [data-testid="stColumn"] :is(.st-key-guided_card_enterprise_data_entry,.st-key-guided_card_enterprise_tool_compare_arrows,.st-key-guided_card_enterprise_tool_shield,.st-key-guided_card_asset_import_entry)) {flex-wrap:wrap!important;gap:16px!important}
+:is(.st-key-workspace_research_tools,.st-key-guided_secondary_tools) > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"],
+[data-testid="stHorizontalBlock"]:has(> [data-testid="stColumn"] :is(.st-key-guided_card_enterprise_data_entry,.st-key-guided_card_enterprise_tool_compare_arrows,.st-key-guided_card_enterprise_tool_shield,.st-key-guided_card_asset_import_entry)) > [data-testid="stColumn"] {flex:1 1 240px!important;width:auto!important;min-width:0!important}
+.st-key-workspace_verification_hub > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] {flex-wrap:wrap!important;gap:24px!important}
+.st-key-workspace_verification_hub > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {flex:1 1 340px!important;width:auto!important;min-width:0!important}
+.st-key-qa_quick_toolbar > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"],
+[data-testid="stHorizontalBlock"]:has(> [data-testid="stColumn"] :is(.st-key-library_keyword,.st-key-disclosure_exchange,.st-key-enterprise_chart_type,.st-key-import_money,.st-key-validate_package,[class*="st-key-probe_select_"])) {flex-wrap:wrap!important;gap:16px!important}
+.st-key-qa_quick_toolbar > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"],
+[data-testid="stHorizontalBlock"]:has(> [data-testid="stColumn"] :is(.st-key-library_keyword,.st-key-disclosure_exchange,.st-key-enterprise_chart_type,.st-key-import_money,.st-key-validate_package,[class*="st-key-probe_select_"])) > [data-testid="stColumn"] {flex:1 1 180px!important;width:auto!important;min-width:0!important}
+.st-key-workspace_search_results > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"]:has(.st-key-workspace_search_close) {flex-wrap:nowrap!important;gap:16px!important;align-items:center}
+.st-key-workspace_search_results > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"]:has(.st-key-workspace_search_close) > [data-testid="stColumn"]:first-child {flex:1 1 0!important;width:auto!important;min-width:0!important}
+.st-key-workspace_search_results [data-testid="stColumn"]:has(.st-key-workspace_search_close) {flex:0 0 116px!important;width:116px!important;min-width:116px!important}
+.st-key-workspace_search_close button {min-height:44px;padding:10px 12px;gap:8px}
+.st-key-workspace_search_close button p {font-size:13px;line-height:1.5;white-space:nowrap}
+@media (max-width:590px) {
+  :is(.st-key-workspace_research_tools,.st-key-guided_secondary_tools,.st-key-workspace_verification_hub,.st-key-qa_quick_toolbar) > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"],
+  [data-testid="stHorizontalBlock"]:has(> [data-testid="stColumn"] :is(.st-key-guided_card_enterprise_data_entry,.st-key-guided_card_enterprise_tool_compare_arrows,.st-key-guided_card_enterprise_tool_shield,.st-key-guided_card_asset_import_entry,.st-key-library_keyword,.st-key-disclosure_exchange,.st-key-enterprise_chart_type,.st-key-import_money,.st-key-validate_package,[class*="st-key-probe_select_"])) > [data-testid="stColumn"] {flex:1 1 100%!important;width:100%!important}
+  .st-key-workspace_verification_context {padding-left:0}
+}
+/* Feedback for our buttons and popovers only. Native expanders own their
+   complete height/visibility lifecycle, including interrupted transitions. */
+:root {--qm-motion-feedback:220ms;--qm-motion-ease:cubic-bezier(.65,0,.45,1)}
+[data-baseweb="popover"] {animation:qm-popover-reveal 320ms cubic-bezier(.22,1,.36,1);transform-origin:50% 0}
+@keyframes qm-popover-reveal {from {opacity:.2;translate:0 -8px}to {opacity:1;translate:0 0}}
+@media (hover:hover) and (pointer:fine) {
+  [data-testid="stMain"] :is(.st-key-workspace_primary_actions,.st-key-qa_suggestions,[class*="st-key-guided_card_"]) button:hover:not(:disabled) [data-testid="stIconMaterial"],
+  [data-testid="stMain"] [class*="st-key-guided_card_"] button:hover:not(:disabled)::after {transform:translateX(5px)}
+  [data-testid="stMain"] :is([data-testid="stButton"],[data-testid="stFormSubmitButton"]) button:active:not(:disabled) {transform:none!important;transition-duration:100ms;box-shadow:inset 0 0 0 2px #14283d33}
+}
+/* Disclosure labels and hit areas stay anchored through native rerenders.
+   Filled state, chevrons and ripple provide feedback without a spring back. */
+[data-testid="stMain"] :is(.st-key-qa_suggestions,.st-key-qa_more_examples,.st-key-qa_quick_close,[class*="st-key-guided_picker_"],[class*="st-key-answer_actions_"],[class*="st-key-answer_sources_close_"],[class*="st-key-answer_check_close_"],[class*="st-key-qa_report_"]) button:is(:hover,:active) [data-testid="stIconMaterial"] {transform:none!important}
+.st-key-workspace_primary_actions button {transform:none!important}
+@media (prefers-reduced-motion:reduce) {
+  [data-baseweb="popover"] {animation:none;translate:none}
+  [data-testid="stMain"] :is([data-testid="stButton"],[data-testid="stFormSubmitButton"]) button:active:not(:disabled) {transform:none!important}
+}

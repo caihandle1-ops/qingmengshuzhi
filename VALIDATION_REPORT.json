@@ -1,0 +1,281 @@
+{
+  "release": "QingmengData_V4 online trial 2026-10-06",
+  "validated_at": "2026-10-06T15:17:49",
+  "deployment": {
+    "main_file": "app/main.py",
+    "python": "3.12",
+    "default_mode": "public",
+    "cloud_url_verified": false
+  },
+  "copy_integrity": {
+    "app_core_files": 123,
+    "all_source_bytes_identical": true,
+    "logos_identical": true,
+    "original_project_modified": false
+  },
+  "package_content": {
+    "private_runtime_data_included": false,
+    "private_absolute_paths_detected": false,
+    "allowed_data": [
+      "data/sample_*.csv",
+      "data/evaluation/benchmark_v1.json",
+      "data/examples/翻转探针演示数据_模拟.csv"
+    ],
+    "required_public_fixture": "tests/fixtures/byd_2024_key_financials.pdf"
+  },
+  "python_syntax": {
+    "files": 77,
+    "status": "passed",
+    "method": "ast.parse, no cache writes"
+  },
+  "javascript_syntax": {
+    "javascript_files_checked": 19,
+    "all_passed": true,
+    "checks": [
+      {
+        "file": "app/asset_gallery_motion.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/attribution_frontend/explorer.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/attribution_frontend/motion.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/chart_frontend/chart.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/enterprise_story.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/evidence_motion.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/execution_frontend/replay-model.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/execution_frontend/replay.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/hero_frontend/hero-runtime.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/hero_frontend/hero.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/metric_journey.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/motion.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/probe_visual.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/report_reader.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/risk_frontend/atlas.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/risk_frontend/motion.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/route_transition.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/source_dock.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/studio_motion.js",
+        "returncode": 0
+      }
+    ]
+  },
+  "secret_scan": {
+    "status": "no findings",
+    "method": "Heuristic scan for provider tokens, private key headers, and long literal credentials; no credential values recorded."
+  },
+  "tests": {
+    "files": [
+      "tests/test_public_session.py",
+      "tests/test_v1_regression.py",
+      "tests/test_unified_ui.py"
+    ],
+    "passed": 30,
+    "failed": 0,
+    "errors": 0,
+    "duration_seconds": 57.065,
+    "isolated_data": true,
+    "cache_disabled": true,
+    "cases": [
+      {
+        "class": "tests.test_public_session",
+        "name": "test_sessions_are_isolated_and_real_import_feeds_query"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_session_identifier_rejects_user_paths[../main]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_session_identifier_rejects_user_paths[]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_session_identifier_rejects_user_paths[main]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_session_identifier_rejects_user_paths[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_session_identifier_rejects_user_paths[GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_public_session_never_uses_legacy_overrides"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u6838\\u5fc3\\u8d22\\u52a1\\u6307\\u6807-metrics0]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u5173\\u952e\\u8d22\\u52a1\\u6307\\u6807-metrics1]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u5168\\u90e8\\u8d22\\u52a1\\u6307\\u6807-metrics2]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u8d22\\u52a1\\u6570\\u636e\\u4e00\\u89c8-metrics3]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u8d22\\u52a1\\u6307\\u6807\\u603b\\u89c8-metrics4]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u8425\\u4e1a\\u6536\\u5165-metrics5]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u51c0\\u8d44\\u4ea7\\u56de\\u62a5\\u7387-metrics6]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u7ecf\\u8425\\u51c0\\u73b0\\u91d1-metrics7]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u6bcf\\u80a1\\u76c8\\u5229-metrics8]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_public_disclosure_widgets_commit_then_query_and_isolate"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_explicit_readonly_mode_cannot_bind_writable_session"
+      },
+      {
+        "class": "tests.test_v1_regression",
+        "name": "test_local_qa_compare_risk_and_pdf_report_remain_available"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_search_feedback_persists_across_reruns[success-success-\\u68c0\\u7d22\\u5b8c\\u6210\\uff1a\\u5171\\u83b7\\u53d6 1 \\u6761]"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_search_feedback_persists_across_reruns[empty-info-\\u68c0\\u7d22\\u5b8c\\u6210\\uff1a\\u672a\\u83b7\\u53d6\\u5230]"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_search_feedback_persists_across_reruns[failed-error-\\u68c0\\u7d22\\u5931\\u8d25\\uff1a]"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_failed_search_and_changed_scope_clear_previous_preview"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_real_pdf_commit_refreshes_every_selector_query_and_source"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_direct_url_failure_or_document_only_never_claims_added[False]"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_direct_url_failure_or_document_only_never_claims_added[True]"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_failed_database_write_rolls_back_and_has_visible_error"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_deleted_imported_company_no_longer_selectable"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_new_url_and_failed_download_clear_old_commit_feedback"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_deleting_last_report_disables_historical_navigation"
+      }
+    ],
+    "initial_attempt": {
+      "passed": 17,
+      "failed": 2,
+      "cause": "Windows long-path limit when deep pytest folders combine with session and import identifiers; commit_import returned WinError 3 while creating the uploads import directory.",
+      "resolution": "Repeated unchanged code in a new short isolated data directory. Both initially failing public import cases and all additional UI import tests passed. No business code changed."
+    }
+  },
+  "streamlit_startup": {
+    "health_status": 200,
+    "health_body": "ok",
+    "root_status": 200,
+    "html_received": true,
+    "isolated_process_stopped": true
+  },
+  "linux_dependencies": {
+    "status": "passed as reported by parent deployment audit",
+    "resolved_packages": 52,
+    "actual_cloud_install_verified": false
+  },
+  "remaining_cloud_checks": [
+    "Actual GitHub upload and Streamlit Cloud deployment",
+    "Browser interaction on issued HTTPS URL",
+    "Public disclosure network availability from cloud",
+    "Cloud enhancement only with visitor-supplied credentials"
+  ],
+  "notes": [
+    "Default analysis needs no model key.",
+    "Private visitor data is not durable across refresh, disconnect, or instance restart.",
+    "Only the isolated verification server was stopped; the existing local service was not touched."
+  ]
+}

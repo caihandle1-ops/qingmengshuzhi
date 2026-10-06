@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="atlas.css?v=20261005.2"></head>
+<body><main id="atlas" aria-label="现有财务规则风险地图">
+  <header class="atlas-heading"><div><span class="eyebrow">RISK / OBSERVATORY</span><h3>六项规则，一张风险地图。</h3><p id="atlas-scope"></p></div><div class="score"><span>现有规则评分</span><strong id="score-value"></strong><small id="score-note"></small></div></header>
+  <div class="map-toolbar"><div class="map-legend"><span><i class="triggered"></i>已触发</span><span><i class="clear"></i>已检查 · 未触发</span><span><i class="unchecked"></i>未检查</span></div><button id="reset-camera" type="button" hidden>返回全图 ↙</button></div>
+  <div class="map-viewport"><section id="map-stage" aria-label="选择规则分区">
+    <div class="map-coordinate" aria-hidden="true"><span>01—06 / RULES</span><span>ANNUAL RECORD</span></div>
+    <div id="map-scene"><div class="map-grid" aria-hidden="true"></div><svg class="map-lines" viewBox="0 0 1000 430" preserveAspectRatio="none" aria-hidden="true"><path d="M60 102H916M42 217H960M80 337H940M218 46L135 386M512 46L429 386M806 46L723 386"/><path class="contour" d="M15 295C183 340 240 202 388 241S689 380 992 272M10 281C183 326 240 188 388 227S689 366 992 258M5 267C183 312 240 174 388 213S689 352 992 244"/></svg><div id="risk-zones"></div></div>
+    <div class="map-caption"><span id="coverage-label"></span><span>点击分区推进 · 再次点击收回</span></div>
+  </section></div>
+  <section id="risk-detail" aria-live="polite" aria-atomic="true">
+    <div id="overview"><span class="eyebrow">CURRENT COVERAGE</span><h4>先看触发，再检查依据。</h4><div id="coverage-counts"></div><p>点击任一分区，展开它对应的原始指标、现有规则和来源摘要。颜色只表示这六项规则的执行状态。</p></div>
+    <div id="selected-rule" hidden><div class="detail-title"><div><span class="eyebrow" id="rule-domain"></span><h4 id="rule-title"></h4></div><span id="rule-status"></span></div>
+      <div class="rule-context"><div><span>01 / 当前判断</span><p id="rule-reason"></p></div><div><span>02 / 现有规则</span><p id="rule-definition"></p></div></div>
+      <div class="facts-heading"><span>03 / 指标与来源</span><small>数值来自本次输入记录；缺失项不补零。</small></div><div id="rule-facts"></div><p id="rule-basis"></p>
+    </div>
+  </section>
+  <footer>未触发不代表不存在其他风险；未检查不代表正常。分区位置不表示风险概率或因果贡献。Tab、方向键选择，Esc 返回全图。</footer>
+</main><script src="motion.js?v=20261005.2"></script><script src="atlas.js?v=20261005.2"></script></body></html>

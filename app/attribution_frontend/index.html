@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="explorer.css?v=20261005.1"></head>
+<body><main id="explorer" aria-label="财务归因证据画布">
+  <header class="atlas-heading"><div><span class="eyebrow">ATTRIBUTION / EVIDENCE</span><h3>沿着变化，展开依据。</h3></div><p id="scope"></p></header>
+  <div class="canvas-viewport"><section id="canvas" aria-label="观察结果与分项线索">
+    <div class="canvas-grid" aria-hidden="true"></div><span class="canvas-caption" id="canvas-caption">点击观察结果，展开分项线索</span>
+    <svg id="connections" aria-hidden="true"><g id="branches"></g></svg><div id="nodes"></div>
+    <div class="canvas-footnote"><span id="branch-state">观察结果</span><span>连线表示线索关联</span></div>
+  </section></div>
+  <section id="detail" aria-label="当前节点记录" aria-live="polite" aria-atomic="true">
+    <div class="detail-head"><div><span class="eyebrow" id="detail-role"></span><h4 id="detail-title"></h4></div><span id="detail-status"></span></div>
+    <div class="detail-body"><div class="values"><div><span id="previous-year"></span><strong id="previous-value"></strong><small class="unit"></small></div><span class="value-arrow" aria-hidden="true">→</span><div><span id="current-year"></span><strong id="current-value"></strong><small class="unit"></small></div></div>
+      <div class="finding"><span>年度变化</span><strong id="delta"></strong><p id="growth"></p><p id="interpretation"></p><p id="reason"></p></div></div>
+    <div class="source-summary"><div><span class="eyebrow">本节点来源</span><ul id="source-list"></ul></div><button id="evidence-button" type="button" hidden>查看本节点依据 <span aria-hidden="true">↗</span></button></div>
+  </section>
+  <p class="hint">点击中心结果展开或收回分支；选择分项查看原值、差值和已有依据。Tab 与方向键可切换节点，Esc 收回。</p>
+  <p class="disclaimer">分项为量化变化与报告线索，不代表严格因果贡献率；缺失数据保持空缺。</p>
+</main><script src="motion.js?v=20261005.1"></script><script src="explorer.js?v=20261005.1"></script></body></html>

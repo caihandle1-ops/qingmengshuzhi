@@ -1,0 +1,9 @@
+.qm-route-stage {position:fixed;z-index:9996;pointer-events:none;overflow:hidden;contain:layout paint;transform-origin:0 0;border-radius:14px;background:var(--route-color,#1f4bd7);color:#fff;box-shadow:0 30px 100px #071b3c28;will-change:transform,opacity;isolation:isolate}
+.qm-route-stage-copy {position:absolute;inset:0;display:flex;justify-content:center;align-items:center;padding:24px;z-index:2}
+.qm-route-stage-title {font-size:clamp(40px,6vw,88px);font-weight:800;letter-spacing:-.055em;line-height:1.1;text-align:center;max-width:80%;overflow-wrap:anywhere}
+.qm-route-stage-index {position:absolute;left:35px;top:25px;font:600 11px/1.5 Consolas,monospace;letter-spacing:.14em;opacity:.7}
+.qm-route-stage-piece {position:absolute;pointer-events:none;transform-origin:center;opacity:.9}
+.qm-route-stage-piece.one {width:50%;height:150%;left:20%;top:-25%;background:#ffffff14;transform:rotate(24deg)}
+.qm-route-stage-piece.two {width:34%;height:150%;right:8%;top:-30%;border-left:1px solid #ffffff55;border-right:1px solid #ffffff33;transform:rotate(24deg)}
+.qm-route-stage-piece.three {width:230px;height:230px;right:-60px;bottom:-95px;border:32px solid #d8ee58;border-radius:50%;opacity:.8}
+@media(prefers-reduced-motion:reduce){.qm-route-stage{display:none!important}}

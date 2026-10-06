@@ -1,0 +1,48 @@
+# 擎梦数智｜财报智问 V4 · 在线试用
+
+这是当前桌面版的干净发布副本。公司名称、Logo、六个一级功能、现有业务逻辑和动画资源均保留；原本地项目及个人资料库未修改。
+
+## Streamlit Community Cloud 部署
+
+1. 将本目录内容上传到自己的 GitHub 仓库根目录。优先使用私有仓库，避免公开源码。
+2. 在 https://share.streamlit.io/ 创建应用，选择该仓库与部署分支。
+3. **Main file path：`app/main.py`**。
+4. 在 Advanced settings 中选 **Python 3.12**，与本次验证环境一致。
+5. 部署依赖由根目录 `requirements.txt` 安装，页面主题与上传上限来自 `.streamlit/config.toml`。
+6. 当前代码默认 `FINANCIAL_DEPLOYMENT=public`；无需改源码即可启用访客会话隔离。不要将公网试用配置为 `local`。
+7. 默认资料目录为 `data/workspaces/sessions/<服务端生成的会话ID>`。如需要自定义可写临时位置，可在平台 Secrets 的顶层配置 `FINANCIAL_DATA_DIR = "/tmp/qingmeng-v4-trial"`；顶层 `FINANCIAL_DEPLOYMENT = "public"` 可显式固定公开会话模式。这两项均不是 API 密钥。
+8. 部署完成后，以平台实际返回的 HTTPS 链接为准，依次验收首页、问数、口径核验、反证核验、证据复演、数据资产、CSV/PDF 导入、来源阅读与报告下载。
+
+## 试用数据与会话
+
+- 随包提供 10 家企业的既有内置指标样本、评测题集和明确标注模拟的翻转探针 CSV。
+- 访客的导入资料、会话 SQLite 数据库与生成记录不在发布包中；它们在运行时按浏览器会话建立。
+- 每个在线会话最多保存 20 个上传文件、合计 100 MB；单次上传上限是 30 MB。
+- 当前没有账号持久化。刷新、断线、实例重启或平台清理后，不保证恢复上传资料及研究记录；请保留原始文件并下载必要报告。
+- 公开披露检索和下载依赖外部站点，平台网络环境可能影响可用性。
+- 免费平台可能休眠，演示前提前打开并验证。
+
+## 模型模式
+
+默认“本地分析模式”不需要 API Key。这里的“本地”指程序自身的规则与查询引擎；部署后该引擎运行在云端服务器上。
+
+保留“云端增强模式”：访客可在侧栏“系统设置”中选择服务商并输入自己的 API Key，输入框为密码框。当前代码没有自动从平台 Secrets 读取模型密钥的逻辑；不要假设把模型 Key 放入 Secrets 就会自动启用。不要将密钥写入源码、示例文件或 Git 仓库。
+
+## 本地启动
+
+在本目录使用 Python 3.12：
+
+```sh
+python -m pip install -r requirements.txt
+python -m streamlit run app/main.py
+```
+
+## 验证与清单
+
+- `RELEASE_MANIFEST.json`：发布文件 SHA-256 与来源一致性。
+- `VALIDATION_REPORT.json`：本次语法、公共会话和核心回归验证结果。
+- 测试文件和公开年报摘页保留为发布验证及内置评测所需资料；不含个人上传文件。
+
+进行本地测试时，将 `FINANCIAL_DATA_DIR` 指向发布目录之外的专用临时目录，设置 `PYTHONDONTWRITEBYTECODE=1`，并使用 `pytest -p no:cacheprovider --basetemp <专用测试临时目录>`。不要对实际运行中的资料库执行测试。
+
+本次打包不代表已经完成远程部署；公开 URL 与云端环境仍需实际部署验证。

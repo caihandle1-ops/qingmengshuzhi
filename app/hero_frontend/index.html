@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="hero.css?v=20261005.3">
+  <title>财报研究立体装置 · 产品示意</title>
+</head>
+<body>
+<section class="hero-sculpture" id="hero" aria-label="财报研究立体装置，产品示意，非实时查询状态">
+  <header class="sculpture-heading"><span>EVIDENCE IN MOTION</span><h2>让依据，立体呈现。</h2></header>
+  <div id="sculpture-stage" class="sculpture-stage">
+    <div class="sculpture-halo" aria-hidden="true"></div>
+    <canvas id="sculpture" aria-hidden="true"></canvas>
+    <div class="sculpture-fallback" id="fallback" role="img" aria-label="年度报告、结构化数据与原始依据的分层示意">
+      <div class="fallback-sheet back"><span>原始记录</span></div>
+      <div class="fallback-sheet middle"><span>数据与口径</span><i></i><i></i><i></i></div>
+      <div class="fallback-sheet cover"><span>ANNUAL<br>REPORT</span><strong>年度报告</strong><b>有据可循</b></div>
+      <div class="fallback-index">EVIDENCE<br>原始依据</div>
+    </div>
+    <div class="sculpture-coordinate" aria-hidden="true"><span id="phase-number">02</span><i></i></div>
+    <button type="button" id="assembly-toggle" class="assembly-toggle" aria-pressed="true">聚合装置<span aria-hidden="true">↙</span></button>
+  </div>
+  <div class="phase-controls" role="group" aria-label="切换产品示意阶段">
+    <button type="button" data-phase="0" aria-pressed="false"><span>01</span>资料</button>
+    <button type="button" data-phase="1" aria-pressed="true"><span>02</span>结构</button>
+    <button type="button" data-phase="2" aria-pressed="false"><span>03</span>依据</button>
+  </div>
+  <p class="phase-description" id="phase-description" aria-live="polite">拆开报表，梳理企业、年度与指标。</p>
+  <footer class="sculpture-footer"><span>产品示意 · 非实时查询状态</span><span id="interaction-hint">移动鼠标探索空间</span></footer>
+</section>
+<script src="hero-runtime.js?v=20261005.1"></script>
+<script src="hero.js?v=20261005.2"></script>
+</body>
+</html>

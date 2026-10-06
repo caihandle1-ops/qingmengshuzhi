@@ -1,0 +1,51 @@
+/* Frozen comparison: broad color planes; shared motion touches empty decoration only. */
+.comparison-heading {position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px 32px;background:#102b58;color:#fff;border-radius:16px 16px 0 0;min-height:145px;}
+.comparison-heading>div:not(.comparison-decoration),.comparison-heading>p {position:relative;z-index:1;}
+.comparison-kicker {font-size:12px;letter-spacing:.09em;color:#c5d8f7;}
+.comparison-heading h3 {color:#fff!important;font-size:clamp(30px,3vw,43px)!important;line-height:1.25!important;margin:8px 0 0!important;padding:0!important;letter-spacing:-.04em;}
+.comparison-heading>p {color:#e2edfc!important;margin:0!important;font-size:14px!important;text-align:right;line-height:1.9;white-space:nowrap;}
+.comparison-heading>p strong {font-size:29px;color:#d1ef53;font-variant-numeric:tabular-nums;}
+.comparison-heading>p span {color:#839fc7;margin-inline:8px;}
+.comparison-heading>p small {display:block;font-size:11px;color:#bdd0ef;}
+.comparison-decoration {position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.comparison-decoration i {display:block;position:absolute;transform-origin:left center;}
+.comparison-decoration i:nth-child(1) {background:#195df0;right:17%;width:210px;top:-70px;bottom:-70px;transform:skewX(-28deg);opacity:.5;}
+.comparison-decoration i:nth-child(2) {height:2px;background:#92b4fa;left:40%;right:0;top:54%;opacity:.55;}
+.comparison-decoration i:nth-child(3) {border:2px solid #c9ea52;border-radius:50%;width:74px;height:74px;left:57%;top:35px;opacity:.4;}
+[class*="st-key-comparison_controls_"] {padding:18px 20px;background:#eef3fb;border-inline:1px solid #d3deef;border-bottom:1px solid #d3deef;border-radius:0 0 16px 16px;}
+[class*="st-key-comparison_controls_"] [data-testid="stWidgetLabel"] p {color:#29476f;font-size:12px;}
+[class*="st-key-comparison_cards_"] {padding-top:4px;}
+[class*="st-key-comparison_cards_"] [data-testid="stHorizontalBlock"] {align-items:stretch;}
+[class*="st-key-comparison_company_active_"],[class*="st-key-comparison_company_rest_"] {position:relative;min-height:215px;padding:21px 23px;border:1px solid #c7d6ec;border-top:5px solid #1b5aef;border-radius:12px;background:#fff;gap:10px;}
+[class*="st-key-comparison_company_active_"] {background:#e7efff;border-color:#1b5aef;box-shadow:inset 0 -4px #1b5aef;}
+[class*="st-key-comparison_cards_"] [data-testid="stMetric"] {background:transparent;border:0;border-radius:0;padding:3px 0 9px;}
+[class*="st-key-comparison_cards_"] [data-testid="stMetricValue"], [class*="st-key-comparison_cards_"] [data-testid="stMetricValue"] p {color:#102b58;font-size:clamp(28px,3.4vw,48px);font-weight:730;line-height:1.2;white-space:normal;overflow-wrap:anywhere;font-variant-numeric:tabular-nums;}
+[class*="st-key-comparison_cards_"] [data-testid="stMetricLabel"] p {color:#456085;font-size:12px;line-height:1.7;white-space:normal;}
+[class*="st-key-comparison_cards_"] [data-testid="stCaptionContainer"] p {font-size:15px;font-weight:650;color:#183b6a;line-height:1.65;overflow-wrap:anywhere;}
+[class*="st-key-comparison_pick_"] button {background:transparent!important;border:0!important;border-top:1px solid #c3d2ea!important;border-radius:0!important;box-shadow:none!important;color:#2454b5!important;padding:12px 0 3px!important;min-height:42px;transform:none!important;transition:background .15s ease,color .15s ease;}
+[class*="st-key-comparison_pick_"] button:hover {color:#123080!important;}
+[class*="st-key-comparison_workspace_"] {padding-top:12px;}
+[class*="st-key-comparison_focus_"] {background:#f7f7eb;border-left:5px solid #c9df52;padding:22px 24px;min-height:355px;border-radius:0 12px 12px 0;gap:11px;}
+.comparison-focus-title {display:flex;flex-direction:column;gap:9px;color:#173359;}
+.comparison-focus-title>span {font-size:11px;color:#5b6a5b;letter-spacing:.07em;}
+.comparison-focus-title>strong {font-size:21px;line-height:1.45;overflow-wrap:anywhere;}
+.comparison-focus-title>small {font-size:13px;color:#51657e;}
+[class*="st-key-comparison_focus_"] [data-testid="stMarkdownContainer"] p {color:#173359;font-size:17px;line-height:1.7;overflow-wrap:anywhere;}
+[class*="st-key-comparison_focus_"] [data-testid="stCaptionContainer"] p {color:#536477;font-size:12px;line-height:1.7;overflow-wrap:anywhere;}
+@media(max-width:1050px) {
+ [class*="st-key-comparison_workspace_"] [data-testid="stHorizontalBlock"] {flex-direction:column;}
+ [class*="st-key-comparison_workspace_"] [data-testid="stColumn"] {width:100%!important;flex:1 1 100%!important;min-width:0!important;}
+ [class*="st-key-comparison_focus_"] {min-height:0;}
+}
+@media(max-width:700px) {
+ .comparison-heading {padding:23px 21px;align-items:flex-start;gap:14px;}
+ .comparison-heading h3 {font-size:30px!important;}.comparison-kicker {font-size:10px;}
+ .comparison-heading>p {font-size:11px!important;}.comparison-heading>p strong {font-size:24px;}.comparison-heading>p small {max-width:95px;white-space:normal;}
+ [class*="st-key-comparison_controls_"] {padding:15px;}
+ [class*="st-key-comparison_controls_"] [data-testid="stHorizontalBlock"], [class*="st-key-comparison_cards_"] [data-testid="stHorizontalBlock"] {flex-direction:column;}
+ [class*="st-key-comparison_controls_"] [data-testid="stColumn"], [class*="st-key-comparison_cards_"] [data-testid="stColumn"] {width:100%!important;flex:1 1 100%!important;min-width:0!important;}
+ [class*="st-key-comparison_company_active_"],[class*="st-key-comparison_company_rest_"] {min-height:0;padding:20px;}
+ [class*="st-key-comparison_cards_"] [data-testid="stMetricValue"] p {font-size:36px;}
+}
+@media(prefers-reduced-motion:reduce) {[class*="st-key-comparison_pick_"] button {transition:none!important;}}
+@media(forced-colors:active) {.comparison-heading,[class*="st-key-comparison_controls_"],[class*="st-key-comparison_company_"],[class*="st-key-comparison_focus_"] {background:Canvas;color:CanvasText;border:1px solid CanvasText;}.comparison-decoration {display:none;}.comparison-heading h3,.comparison-heading p,.comparison-heading strong {color:CanvasText!important;}}
