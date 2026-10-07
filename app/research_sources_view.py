@@ -32,9 +32,9 @@ def render_research_sources(company='',year=None,expanded=False):
             st.dataframe(frame,hide_index=True,use_container_width=True,
                 column_config={'url':st.column_config.LinkColumn('原文链接')})
             st.download_button('下载来源清单 CSV',frame.to_csv(index=False).encode('utf-8-sig'),
-                '研究来源清单.csv',mime='text/csv',key='v3_sources_csv',on_click='ignore')
+                '研究来源清单.csv',mime='text/csv',key='v3_sources_csv')
         else:
             st.write('本次未返回记录，可调整关键词或在原站查阅。')
         st.download_button('下载查询记录 JSON',json.dumps(result,ensure_ascii=False,indent=2).encode('utf-8'),
-            '研究来源查询记录.json',mime='application/json',key='v3_sources_json',on_click='ignore')
+            '研究来源查询记录.json',mime='application/json',key='v3_sources_json')
         st.caption('需要研究全文时，请从原站下载 PDF / DOCX 后上传到资料库，系统会建立原文引用；清单标题不作全文证据。')

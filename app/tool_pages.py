@@ -244,7 +244,7 @@ def render_scope_page(analysis_names, data_map, name_to_id, selected_main, selec
                 render_source(sources[selected], f'scope_original_{selected}')
     elif detail == 'manual':
         st.download_button('下载口径核验与人工记录 JSON', json.dumps(report, ensure_ascii=False, indent=2, default=str).encode(),
-                           '指标口径核验记录.json', 'application/json', key='scope_record_download', on_click='ignore')
+                           '指标口径核验记录.json', 'application/json', key='scope_record_download')
 
 def render_counter_page(analysis_names, data_map, name_to_id, selected_main):
     page_intro('反证式财务核验', '候选数值由你填写；系统核对实际原件，不预设错误。', icon='shield', step='输入候选条件 → 查看结果 → 按需复核', scene='counter')
@@ -373,7 +373,7 @@ def render_counter_page(analysis_names, data_map, name_to_id, selected_main):
                 st.info(st.session_state.counter_review_feedback)
             from core.countercheck import countercheck_to_json_bytes
             st.download_button('下载本次核验记录 JSON', countercheck_to_json_bytes(result), '反证核验记录.json',
-                               'application/json', key='counter_download', on_click='ignore')
+                               'application/json', key='counter_download')
 
 def render_replay_page(data_map, on_save):
     page_intro('可复演证据包', '保存历史条件与来源，或导入已导出的 ZIP 进行复演。', icon='history', step='选择操作 → 选择记录或文件 → 核验与导出', scene='replay')
@@ -425,7 +425,7 @@ def render_replay_page(data_map, on_save):
             st.warning(public_message(warning))
         if package.get('zip_bytes'):
             st.download_button('下载 ZIP 证据包', package['zip_bytes'], '财报问数_证据包.zip', 'application/zip',
-                               key=f'download_package_{key}', width='stretch', on_click='ignore')
+                               key=f'download_package_{key}', width='stretch')
     view = _view_choices([
         ('answer', '冻结答案', '查看当时的答案及数值快照。', 'analytics', 'replay_detail_answer'),
         ('query', '冻结查询', '查看条件、SQL 或任务记录。', 'search', 'replay_detail_query'),

@@ -6,7 +6,6 @@ import streamlit as st
 
 from core.storage import resolve_stored_file
 from app.messages import NO_SOURCE, public_message
-from app.fragments import session_fragment
 
 
 def citation_location(source: dict) -> str:
@@ -46,7 +45,6 @@ def _preview_control(opened_key: str, button_key: str, label: str, close_label: 
     return bool(st.session_state[opened_key])
 
 
-@session_fragment
 def render_source(source: dict, key: str, *, default_page: int = 1,
                   preview_on_open: bool = False, allow_download: bool = True,
                   focus_location: bool = False):
@@ -73,7 +71,7 @@ def render_source(source: dict, key: str, *, default_page: int = 1,
     mime = {'pdf': 'application/pdf',
             'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}.get(path.suffix.lower().lstrip('.'), 'application/octet-stream')
     if allow_download:
-        st.download_button('下载原始文件', original, name, mime, key=f'source_download_{key}', on_click='ignore')
+        st.download_button('下载原始文件', original, name, mime, key=f'source_download_{key}')
     if path.suffix.lower() == '.docx':
         if source.get('location') or source.get('cell'):
             st.caption(f'对应位置：{source.get("location") or source.get("cell")}')

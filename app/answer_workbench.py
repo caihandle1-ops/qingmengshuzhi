@@ -15,9 +15,6 @@ from app.guided_ui import toggle_disclosure_record
 from core.analysis import METRIC_LABELS, METRIC_UNITS, explain_metric, safe_num
 from app.source_viewer import render_source, citation_location
 from app.research_chart import render_research_chart
-from app.data_identity import render_data_identity
-from core.data_identity import summarize_data_identity
-from app.messages import public_message
 
 
 def _section_heading(title, icon, *, kpi=False):
@@ -80,15 +77,12 @@ def _render_summary(snapshot, key, result=None):
     st.html(f'<style>{Path(__file__).with_name("answer_canvas.css").read_text(encoding="utf-8")}</style>')
     with st.container(key=f'answer_summary_{key}'):
         st.html(answer_canvas_header(snapshot, key))
-        render_data_identity(snapshot.get('records') or [], metrics=[metric],
-                             years=[year, snapshot.get('base_year')], title='本次回答与同比来源')
         with st.container(key=f'answer_canvas_top_{key}'):
             kpi, yoy = st.columns([1.8, 1], gap='small')
             with kpi.container(key=f'answer_canvas_lead_{key}'):
                 st.caption('目标年度 · 回答时记录')
                 st.metric(label, f'{value:,.2f} {unit}' if value is not None else '缺少目标年度数据')
                 st.caption(f'{year}年度 · 单位：{unit or "未标注"}')
-                st.caption('数据身份：' + summarize_data_identity([current], metrics=[metric], years=[year])['label'])
                 if value is None:
                     st.caption('暂无已冻结数值，缺失数据保持空缺。')
             with yoy.container(key=f'answer_canvas_compare_{key}'):
@@ -148,9 +142,8 @@ def _render_snapshot_source(snapshot, key):
     selected = st.selectbox('查看哪一年度的原始来源', years, key=selector)
     row = records[selected]
     source = (row.get('metric_provenance') or {}).get(metric) or {}
-    name = public_message(source.get('file_name') or row.get('raw_source'), fallback='来源文件未标注')
+    name = source.get('file_name') or row.get('raw_source') or '来源文件未标注'
     _section_heading('原始来源', 'source')
-    render_data_identity([row], metrics=[metric], years=[selected], compact=True)
     st.write(name)
     location = source.get('cell') or (citation_location(source) if source.get('page') is not None or source.get('location') else '定位未标注')
     st.caption(f'{selected}年 · {location}')
@@ -195,8 +188,6 @@ def render_simple_answer(result, key, *, show_details=True, view=None):
     metric, year = snapshot['metric'], snapshot['year']
     label, unit = METRIC_LABELS.get(metric, metric), METRIC_UNITS.get(metric, '')
     value, base, growth, current, previous = presentation_values(snapshot)
-    render_data_identity(snapshot.get('records') or [], metrics=[metric],
-                         years=[year, snapshot.get('base_year')], title='本次回答与同比来源')
     left, right = st.columns([1.7, 1], gap='small')
     with left.container(border=True, key=f'simple_result_left_{key}'):
         kpi, yoy = st.columns(2)
@@ -235,7 +226,7 @@ def render_simple_answer(result, key, *, show_details=True, view=None):
         st.divider()
         _section_heading('数据来源', 'source')
         source = (current.get('metric_provenance') or {}).get(metric) or {}
-        source_name = public_message(source.get('file_name') or current.get('raw_source'), fallback='来源文件未标注')
+        source_name = source.get('file_name') or current.get('raw_source') or '来源文件未标注'
         st.markdown(f'<div class="v4-source-name">{escape(str(source_name))}</div>', unsafe_allow_html=True)
         if source.get('page') or source.get('location'):
             st.caption(citation_location(source))

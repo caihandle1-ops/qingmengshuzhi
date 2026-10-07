@@ -2,56 +2,12 @@ from __future__ import annotations
 
 import json
 import re
-from contextlib import contextmanager
-from contextvars import ContextVar
-from typing import Any, Callable
+from typing import Any
 from urllib.parse import urlsplit
 
 import requests
 from core.storage import is_public_deployment
 from core.execution_budget import current_budget
-
-
-_call_observer: ContextVar[Callable | None] = ContextVar('llm_call_observer', default=None)
-
-# These are deliberately fixed messages: request exceptions can contain keys,
-# endpoint URLs or provider response bodies and must never reach saved traces.
-CONNECTION_MESSAGES = {
-    'configuration': '模型配置或服务地址不完整，请检查系统设置。',
-    'authentication': '服务商未接受当前凭据，请检查 API Key 与模型权限。',
-    'not_found': '服务商未找到该模型或接口，请检查模型名称。',
-    'rate_limit': '服务商暂时限制请求，请检查额度或稍后重试。',
-    'timeout': '本次模型请求超时，已继续使用本地分析。',
-    'network': '本次无法连接模型服务，已继续使用本地分析。',
-    'response': '模型未返回可用的文本响应，已继续使用本地分析。',
-    'service': '本次模型服务请求失败，已继续使用本地分析。',
-}
-
-
-class LLMRequestError(RuntimeError):
-    def __init__(self, code: str):
-        self.code = code if code in CONNECTION_MESSAGES else 'service'
-        super().__init__(CONNECTION_MESSAGES[self.code])
-
-
-@contextmanager
-def observe_llm_calls(callback: Callable):
-    """Observe this execution context only; never create a global/session cache."""
-    token = _call_observer.set(callback)
-    try:
-        yield
-    finally:
-        _call_observer.reset(token)
-
-
-def _notify_call(config: dict[str, str], *, ok: bool, code: str = '') -> None:
-    observer = _call_observer.get()
-    if observer is not None:
-        # Observability must not make an otherwise working analysis fail.
-        try:
-            observer(config, {'ok': ok, 'code': code})
-        except Exception:
-            pass
 
 PROVIDER_PRESETS: dict[str, dict[str, Any]] = {
     'DeepSeek': {
@@ -127,16 +83,21 @@ def build_llm_config(provider: str, api_key: str, model: str | None = None, base
     return {
         'provider': provider,
         'api_key': (api_key or '').strip(),
-        'model': (preset.get('default_model', '') if model is None else model).strip(),
-        'base_url': (preset.get('base_url', '') if base_url is None else base_url).strip().rstrip('/'),
+        'model': (model or preset.get('default_model') or '').strip(),
+        'base_url': (base_url or preset.get('base_url') or '').strip().rstrip('/'),
     }
 
 
 def _normalize_config(config_or_key: dict[str, str] | str | None) -> dict[str, str]:
     if isinstance(config_or_key, dict):
         provider = config_or_key.get('provider') or 'DeepSeek'
-        return build_llm_config(provider, config_or_key.get('api_key') or '',
-                                config_or_key.get('model'), config_or_key.get('base_url'))
+        preset = PROVIDER_PRESETS.get(provider, PROVIDER_PRESETS['DeepSeek'])
+        return {
+            'provider': provider,
+            'api_key': (config_or_key.get('api_key') or '').strip(),
+            'model': (config_or_key.get('model') or preset.get('default_model') or '').strip(),
+            'base_url': (config_or_key.get('base_url') or preset.get('base_url') or '').strip().rstrip('/'),
+        }
     return build_llm_config('DeepSeek', config_or_key or '')
 
 
@@ -145,66 +106,31 @@ def llm_enabled(config_or_key: dict[str, str] | str | None) -> bool:
     return bool(cfg.get('api_key') and cfg.get('base_url') and cfg.get('model'))
 
 
-def _post_chat(config_or_key: dict[str, str] | str, messages: list[dict[str, str]], temperature: float = 0.2, timeout: int = 45, *, max_tokens: int | None = None) -> str:
+def _post_chat(config_or_key: dict[str, str] | str, messages: list[dict[str, str]], temperature: float = 0.2, timeout: int = 45) -> str:
     cfg = _normalize_config(config_or_key)
-    try:
-        if not llm_enabled(cfg):
-            raise ValueError('incomplete configuration')
-        validate_api_endpoint(cfg)
-    except ValueError:
-        _notify_call(cfg, ok=False, code='configuration')
-        raise LLMRequestError('configuration') from None
+    if not llm_enabled(cfg):
+        raise ValueError('云端模型配置不完整')
+    validate_api_endpoint(cfg)
     payload = {
         'model': cfg['model'],
         'messages': messages,
         'temperature': temperature,
     }
-    if max_tokens is not None:
-        payload['max_tokens'] = max_tokens
     headers = {
         'Authorization': f"Bearer {cfg['api_key']}",
         'Content-Type': 'application/json',
     }
     budget = current_budget()
     network_timeout = budget.network_timeout(5, min(timeout, 60)) if budget else (5, min(timeout, 60))
-    try:
-        resp = requests.post(f"{cfg['base_url']}/chat/completions", headers=headers, json=payload,
-                             timeout=network_timeout, allow_redirects=False)
-        if resp.status_code in {401, 403}:
-            raise LLMRequestError('authentication')
-        if resp.status_code == 404:
-            raise LLMRequestError('not_found')
-        if resp.status_code == 429:
-            raise LLMRequestError('rate_limit')
-        if resp.status_code < 200 or resp.status_code >= 300:
-            raise LLMRequestError('service')
-        data = resp.json()
-        content = data['choices'][0]['message']['content']
-        if not isinstance(content, str) or not content.strip():
-            raise LLMRequestError('response')
-    except Exception as error:
-        if isinstance(error, LLMRequestError):
-            code = error.code
-        elif isinstance(error, requests.Timeout):
-            code = 'timeout'
-        elif isinstance(error, (ValueError, KeyError, IndexError, TypeError)):
-            code = 'response'
-        elif isinstance(error, requests.RequestException):
-            code = 'network'
-        else:
-            code = 'service'
-        _notify_call(cfg, ok=False, code=code)
-        raise LLMRequestError(code) from None
-    _notify_call(cfg, ok=True)
+    resp = requests.post(f"{cfg['base_url']}/chat/completions", headers=headers, json=payload,
+                         timeout=network_timeout, allow_redirects=False)
     if budget:
         budget.check('云端响应后校验')
-    return content.strip()
-
-
-def probe_llm_connection(config_or_key: dict[str, str] | str) -> None:
-    """One explicit, small request through the same transport used by analysis."""
-    _post_chat(config_or_key, [{'role': 'user', 'content': 'Reply with OK only.'}],
-               temperature=0, timeout=15, max_tokens=64)
+    if 300 <= resp.status_code < 400:
+        raise ValueError('模型API不允许重定向；请使用已验证的服务地址。')
+    resp.raise_for_status()
+    data = resp.json()
+    return data['choices'][0]['message']['content'].strip()
 
 
 def validate_api_endpoint(config_or_key: dict[str, str] | str) -> None:

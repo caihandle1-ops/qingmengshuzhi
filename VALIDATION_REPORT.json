@@ -1,29 +1,17 @@
 {
-  "release": "QingmengData_V4 online trial 2026-10-07",
-  "validated_at": "2026-10-07T20:41:05+08:00",
-  "base_commit": "63c8619c475b179d39618320423390d6ef8b4bd0",
-  "changes": [
-    "Observed model connection status and explicit probe",
-    "Scoped data identity in company, metric, answer, TXT, PDF and frozen evidence",
-    "Session-bound fragments for source reading, report reading, charts and presentation; downloads do not rerun",
-    "Desktop presentation with chapter selection, ordering, keyboard navigation and cancellable motion"
-  ],
+  "release": "QingmengData_V4 online trial 2026-10-06",
+  "validated_at": "2026-10-06T15:17:49",
   "deployment": {
     "main_file": "app/main.py",
     "python": "3.12",
-    "streamlit": "1.64.0",
     "default_mode": "public",
-    "url": "https://qingmeng-v4-trial.streamlit.app/",
-    "target_branch": "main",
-    "new_release_cloud_ui_verified": false,
-    "status_at_validation": "ready for GitHub push; cloud build and browser interaction not yet verified"
+    "cloud_url_verified": false
   },
   "copy_integrity": {
-    "comparison_base_commit": "63c8619c475b179d39618320423390d6ef8b4bd0",
-    "brand_name_module_identical": true,
+    "app_core_files": 123,
+    "all_source_bytes_identical": true,
     "logos_identical": true,
-    "original_project_modified": false,
-    "note": "The release copy has the documented feature changes; it is no longer byte-identical to the original project."
+    "original_project_modified": false
   },
   "package_content": {
     "private_runtime_data_included": false,
@@ -36,103 +24,258 @@
     "required_public_fixture": "tests/fixtures/byd_2024_key_financials.pdf"
   },
   "python_syntax": {
-    "files": 86,
+    "files": 77,
     "status": "passed",
     "method": "ast.parse, no cache writes"
   },
   "javascript_syntax": {
-    "files": 23,
-    "status": "passed",
-    "method": "node --check, includes two CJS tests"
+    "javascript_files_checked": 19,
+    "all_passed": true,
+    "checks": [
+      {
+        "file": "app/asset_gallery_motion.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/attribution_frontend/explorer.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/attribution_frontend/motion.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/chart_frontend/chart.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/enterprise_story.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/evidence_motion.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/execution_frontend/replay-model.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/execution_frontend/replay.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/hero_frontend/hero-runtime.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/hero_frontend/hero.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/metric_journey.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/motion.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/probe_visual.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/report_reader.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/risk_frontend/atlas.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/risk_frontend/motion.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/route_transition.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/source_dock.js",
+        "returncode": 0
+      },
+      {
+        "file": "app/studio_motion.js",
+        "returncode": 0
+      }
+    ]
   },
   "secret_scan": {
     "status": "no findings",
-    "method": "Heuristic scan of publishable text files for provider/GitHub tokens, private key headers and private user paths. Credential values are never recorded."
+    "method": "Heuristic scan for provider tokens, private key headers, and long literal credentials; no credential values recorded."
   },
   "tests": {
-    "passed": 79,
+    "files": [
+      "tests/test_public_session.py",
+      "tests/test_v1_regression.py",
+      "tests/test_unified_ui.py"
+    ],
+    "passed": 30,
     "failed": 0,
     "errors": 0,
-    "duration_seconds": 126.526,
-    "files": [
-      "tests/test_connection_status.py",
-      "tests/test_data_identity.py",
-      "tests/test_director_mode.py",
-      "tests/test_public_session.py",
-      "tests/test_trial_upgrade.py",
-      "tests/test_unified_ui.py",
-      "tests/test_v1_regression.py"
-    ],
+    "duration_seconds": 57.065,
     "isolated_data": true,
     "cache_disabled": true,
-    "model_requests": "Mocked; no new real model calls or charges for validation.",
-    "fragment_harness": "Streamlit AppTest with fragment-specific rerun requests and complete widget states; checks real fragment execution, not CSS layout."
-  },
-  "presentation_interaction": {
-    "status": "passed",
-    "scripts": [
-      "tests/test_director_model.cjs",
-      "tests/test_director_dom.cjs"
+    "cases": [
+      {
+        "class": "tests.test_public_session",
+        "name": "test_sessions_are_isolated_and_real_import_feeds_query"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_session_identifier_rejects_user_paths[../main]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_session_identifier_rejects_user_paths[]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_session_identifier_rejects_user_paths[main]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_session_identifier_rejects_user_paths[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_session_identifier_rejects_user_paths[GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_public_session_never_uses_legacy_overrides"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u6838\\u5fc3\\u8d22\\u52a1\\u6307\\u6807-metrics0]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u5173\\u952e\\u8d22\\u52a1\\u6307\\u6807-metrics1]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u5168\\u90e8\\u8d22\\u52a1\\u6307\\u6807-metrics2]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u8d22\\u52a1\\u6570\\u636e\\u4e00\\u89c8-metrics3]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u8d22\\u52a1\\u6307\\u6807\\u603b\\u89c8-metrics4]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u8425\\u4e1a\\u6536\\u5165-metrics5]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u51c0\\u8d44\\u4ea7\\u56de\\u62a5\\u7387-metrics6]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u7ecf\\u8425\\u51c0\\u73b0\\u91d1-metrics7]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_expanded_offline_questions_and_followups[\\u6bcf\\u80a1\\u76c8\\u5229-metrics8]"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_public_disclosure_widgets_commit_then_query_and_isolate"
+      },
+      {
+        "class": "tests.test_public_session",
+        "name": "test_explicit_readonly_mode_cannot_bind_writable_session"
+      },
+      {
+        "class": "tests.test_v1_regression",
+        "name": "test_local_qa_compare_risk_and_pdf_report_remain_available"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_search_feedback_persists_across_reruns[success-success-\\u68c0\\u7d22\\u5b8c\\u6210\\uff1a\\u5171\\u83b7\\u53d6 1 \\u6761]"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_search_feedback_persists_across_reruns[empty-info-\\u68c0\\u7d22\\u5b8c\\u6210\\uff1a\\u672a\\u83b7\\u53d6\\u5230]"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_search_feedback_persists_across_reruns[failed-error-\\u68c0\\u7d22\\u5931\\u8d25\\uff1a]"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_failed_search_and_changed_scope_clear_previous_preview"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_real_pdf_commit_refreshes_every_selector_query_and_source"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_direct_url_failure_or_document_only_never_claims_added[False]"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_direct_url_failure_or_document_only_never_claims_added[True]"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_failed_database_write_rolls_back_and_has_visible_error"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_deleted_imported_company_no_longer_selectable"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_new_url_and_failed_download_clear_old_commit_feedback"
+      },
+      {
+        "class": "tests.test_unified_ui",
+        "name": "test_deleting_last_report_disables_historical_navigation"
+      }
     ],
-    "coverage": [
-      "160 alternating navigation transitions",
-      "selection, reordering and active chapter preservation",
-      "all chapter types",
-      "keyboard controls and focus restoration",
-      "text escaping",
-      "single exit and unmount cleanup",
-      "reduced-motion and hidden-tab cancellation",
-      "fullscreen-exit/unmount race"
-    ],
-    "method": "Actual production JavaScript executed with a small DOM/event/animation fixture; not a real browser or visual layout test."
-  },
-  "pdf_render": {
-    "status": "passed",
-    "pages": 8,
-    "checked_pages": [
-      "cover",
-      "comparison sources",
-      "conclusion"
-    ],
-    "coverage": "Chinese text, separate main/comparison company data identities, source scopes and missing fields; no clipping or orphan conclusion heading in rendered sample."
+    "initial_attempt": {
+      "passed": 17,
+      "failed": 2,
+      "cause": "Windows long-path limit when deep pytest folders combine with session and import identifiers; commit_import returned WinError 3 while creating the uploads import directory.",
+      "resolution": "Repeated unchanged code in a new short isolated data directory. Both initially failing public import cases and all additional UI import tests passed. No business code changed."
+    }
   },
   "streamlit_startup": {
     "health_status": 200,
     "health_body": "ok",
     "root_status": 200,
     "html_received": true,
-    "bind_address": "127.0.0.1",
-    "port": 8506,
-    "isolated_data": true,
-    "process_left_running_for_preview": true,
-    "note": "HTTP health and shell are server startup checks, not evidence of rendered UI or cloud deployment."
+    "isolated_process_stopped": true
   },
-  "browser_validation": {
-    "new_release_local_visual_check": false,
-    "new_release_cloud_visual_check": false,
-    "blocker": "Official browser tools could not start because the Windows sandbox helper / trusted Node kernel exited unexpectedly.",
-    "external_web_open": "The online URL was not accessible through the web reader in this round."
-  },
-  "review": {
-    "status": "passed",
-    "scope": [
-      "model state invalidation and global refresh after report enhancement",
-      "per-visitor fragment storage rebinding",
-      "source identity consistency in TXT, PDF and evidence ZIP",
-      "download rerun behavior"
-    ],
-    "blocking_findings": 0
+  "linux_dependencies": {
+    "status": "passed as reported by parent deployment audit",
+    "resolved_packages": 52,
+    "actual_cloud_install_verified": false
   },
   "remaining_cloud_checks": [
-    "Confirm Streamlit has deployed the pushed commit",
-    "Real browser check of new presentation layout and motion",
-    "Real browser check of fragment collapse/expand position and global model badge",
-    "Live provider connectivity only with explicit visitor action"
+    "Actual GitHub upload and Streamlit Cloud deployment",
+    "Browser interaction on issued HTTPS URL",
+    "Public disclosure network availability from cloud",
+    "Cloud enhancement only with visitor-supplied credentials"
   ],
   "notes": [
-    "Company name, both Logo assets and all existing top-level functions are retained.",
-    "Mobile redesign, account persistence, feedback collection and workspace export are outside this four-part upgrade.",
-    "Private visitor data remains temporary and may not survive refresh, disconnect or instance restart.",
-    "Validation applies to the files in RELEASE_MANIFEST.json; pushing code is not browser acceptance."
+    "Default analysis needs no model key.",
+    "Private visitor data is not durable across refresh, disconnect, or instance restart.",
+    "Only the isolated verification server was stopped; the existing local service was not touched."
   ]
 }

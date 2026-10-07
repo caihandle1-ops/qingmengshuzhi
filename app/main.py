@@ -46,11 +46,6 @@ from app.research_chart import render_research_chart
 from app.execution_progress import execution_progress, progress_event, current_execution_progress, progress_html
 from app.execution_replay import render_execution_replay
 from app.tool_pages import render_scope_page, render_counter_page, render_replay_page
-from app.fragments import session_fragment
-from app.connection_status import (model_connection_status, render_model_connection_settings,
-                                   sync_model_connection, track_model_connection)
-from app.data_identity import render_data_identity
-from core.data_identity import attach_source_origins
 
 from core.analysis import (
     METRIC_LABELS,
@@ -239,8 +234,6 @@ def apply_styles() -> None:
         render_studio_motion()
         polish = (ROOT / 'app' / 'layout_polish.css').read_text(encoding='utf-8')
         st.markdown(f'<style>{polish}</style>', unsafe_allow_html=True)
-        upgrade = (ROOT / 'app' / 'trial_upgrade.css').read_text(encoding='utf-8')
-        st.markdown(f'<style>{upgrade}</style>', unsafe_allow_html=True)
 
 
 
@@ -254,8 +247,6 @@ def load_workspace():
             df['metric_provenance'] = [
                 {row['metric']: row for row in sources if row['year'] == int(year)} for year in df['year']
             ]
-            records = attach_source_origins(df, [dict(row) for row in fetch_report_files(name_to_id[name])])
-            df['metric_provenance'] = [row['metric_provenance'] for row in records]
     analysis_names = [name for name, df in data_map.items() if has_annual_metrics(df)]
     return companies, name_to_id, data_map, analysis_names
 
@@ -339,9 +330,6 @@ def render_sidebar(analysis_names: list[str]):
                     base_url = st.text_input('API Base URL', value=preset['base_url'], key=f'llm_base_{provider}', disabled=is_public_deployment())
                     api_key = st.text_input('API Key', type='password', key=f'llm_key_{provider}')
                     llm_config = build_llm_config(provider, api_key, model, base_url)
-                    render_model_connection_settings(llm_config)
-                else:
-                    sync_model_connection(None)
                 st.selectbox('分析偏好', ['稳健型', '平衡型', '成长型'], key='investor_profile')
     if not analysis_names:
         st.session_state.selected_main = None
@@ -351,9 +339,8 @@ def render_sidebar(analysis_names: list[str]):
 
 
 
-def render_header(page: str, selected_main: str, main_df: pd.DataFrame, llm_config=None):
+def render_header(page: str, selected_main: str, main_df: pd.DataFrame):
     mode = '云端增强' if st.session_state.engine_mode == '云端增强模式' else '本地分析'
-    connection = model_connection_status(llm_config)
     with st.container(key='app_header'):
         left, search, right = st.columns([2.2, 2.6, 1.8], gap='medium', vertical_alignment='center')
         location = page
@@ -391,12 +378,8 @@ def render_header(page: str, selected_main: str, main_df: pd.DataFrame, llm_conf
             with st.container(key='header_context_group'):
                 status, mobile_search, help_entry = st.columns([2.3, 1, 1.2], gap='small', vertical_alignment='center')
                 status.markdown(
-                    f'<div class="context-bar"><span class="fu-badge studio-mode">'
-                    f'{"数据已接入" if not main_df.empty else "数据待接入"}</span>'
-                    f'<span class="model-connection" data-state="{connection["status"]}" '
-                    f'title="{escape(connection["detail"], quote=True)}">'
-                    f'{"AI 模型 · " + connection["label"] if mode == "云端增强" else "基础分析 · 无需模型"}'
-                    '</span><span class="fu-current-company">'
+                    f'<div class="context-bar"><span class="fu-badge studio-mode"><span class="fu-dot"></span>'
+                    f'{mode} · {"已连接" if not main_df.empty else "待接入"}</span><span class="fu-current-company">'
                     f'{escape(selected_main.replace("股份有限公司", ""))} · {escape(period_label)}</span></div>', unsafe_allow_html=True,
                 )
                 with mobile_search.container(key='mobile_workspace_search'):
@@ -447,7 +430,7 @@ def budget_failure(error, parsed=None):
 
 
 def run_question(question, selected_main, selected_cmp, selected_period, all_names, data_map, llm_config):
-    with track_model_connection(llm_config), execution_budget(60), execution_progress(state=st.session_state, placeholder=st.empty()):
+    with execution_budget(60), execution_progress(state=st.session_state, placeholder=st.empty()):
         try:
             progress_event('understand', 'running', '识别问题中的企业、年度与指标。')
             check_budget('界面问数开始')
@@ -521,7 +504,7 @@ def _run_and_save_research(question, data_map, page_year=None):
 
 
 def execute_resolved_question(question, turn, selected_main, selected_cmp, all_names, data_map, llm_config):
-    with track_model_connection(llm_config), execution_budget(60), execution_progress(state=st.session_state, placeholder=st.empty()):
+    with execution_budget(60), execution_progress(state=st.session_state, placeholder=st.empty()):
         try:
             progress_event('understand', 'completed', '已使用确认后的企业、年度与指标。')
             check_budget('完整问数事实查询')
@@ -904,7 +887,7 @@ def render_answer_card(item: dict, data_map: dict, name_to_id: dict, index: int)
                                         st.session_state[f'qa_report_generated_{key}'] = True
                                 if result.get('research_task') and result.get('report_text'):
                                     st.download_button('下载研究任务报告 TXT', result['report_text'].encode('utf-8'),
-                                        '财报研究任务报告.txt', 'text/plain', key=f'research_report_{key}', on_click='ignore')
+                                        '财报研究任务报告.txt', 'text/plain', key=f'research_report_{key}')
                             elif export_view == '证据包':
                                 render_package_download(item, key, live_data_map, save_current_session)
                             elif export_view == '企业分析':
@@ -1057,8 +1040,7 @@ def render_qa_page(selected_main, selected_cmp, all_names, data_map, name_to_id,
 
 
 
-@session_fragment
-def report_downloads(company: str, df: pd.DataFrame, alerts: list[dict], compare_payload, key_prefix: str, llm_config, *, cache_base=True):
+def report_downloads(company: str, df: pd.DataFrame, alerts: list[dict], compare_payload, key_prefix: str, llm_config, *, cache_base=False):
     from app.deep_pages import render_export_cover
     from app.report_reader import render_report_reader
     from app.research_sources import financial_sources, render_research_sources
@@ -1080,32 +1062,20 @@ def report_downloads(company: str, df: pd.DataFrame, alerts: list[dict], compare
     stored = st.session_state.get(report_state_key, {})
     if stored.get('signature') == signature:
         report_text = stored['text']
-    feedback_key = f'{key_prefix}_enhance_feedback'
-    feedback = st.session_state.pop(feedback_key, None)
-    if feedback:
-        (st.success if feedback['ok'] else st.info)(feedback['message'])
     if llm_enabled(llm_config) and st.button('使用云端模型增强报告文字', key=f'{key_prefix}_enhance'):
         try:
-            with track_model_connection(llm_config):
-                report_text = enhance_report_with_llm(llm_config, report_text, company, st.session_state.investor_profile)
+            report_text = enhance_report_with_llm(llm_config, report_text, company, st.session_state.investor_profile)
             st.session_state[report_state_key] = {'signature': signature, 'text': report_text}
-            st.session_state[feedback_key] = {'ok': True, 'message': '报告事实保持不变，已处理云端阅读提示。'}
+            st.success('报告事实保持不变，已处理云端阅读提示。')
         except Exception:
-            st.session_state[feedback_key] = {'ok': False, 'message': '云端服务暂未返回有效结果，继续使用基础分析报告。'}
-        # Only an actual model request changes the global connection badge.
-        # Reading, source selection and downloading stay within this fragment.
-        st.rerun()
-    st.session_state['director_existing_report'] = {
-        'company': company, 'profile': profile, 'text': report_text,
-        'data_revision': hashlib.sha256(df.to_json(force_ascii=False, default_handler=str).encode()).hexdigest(),
-    }
+            st.info('云端服务暂未返回有效结果，继续使用可信本地报告。')
     score = score_company(df)
     render_export_cover(company, df, report_text, key_prefix)
     with st.container(key=f'deep_report_exports_{key_prefix}'):
         txt_col, pdf_col = st.columns(2)
     txt_col.download_button(
         '下载 TXT 报告', report_text.encode('utf-8'), f'{PRODUCT_NAME}_{company}_{REPORT_SUBTITLE}.txt', 'text/plain',
-        width='stretch', key=f'{key_prefix}_txt', on_click='ignore',
+        width='stretch', key=f'{key_prefix}_txt',
     )
     try:
         pdf_signature = hashlib.sha256((REPORT_LAYOUT_VERSION + report_text + company + df.to_json(force_ascii=False, default_handler=str)
@@ -1118,7 +1088,7 @@ def report_downloads(company: str, df: pd.DataFrame, alerts: list[dict], compare
         pdf_bytes = cache[pdf_signature]
         pdf_col.download_button(
             '下载图文 PDF 报告', pdf_bytes, f'{PRODUCT_NAME}_{company}_{REPORT_SUBTITLE}.pdf', 'application/pdf',
-            width='stretch', key=f'{key_prefix}_pdf', on_click='ignore',
+            width='stretch', key=f'{key_prefix}_pdf',
         )
     except Exception as exc:
         pdf_col.warning(f'PDF 报告生成失败：{public_message(exc)}')
@@ -1169,65 +1139,6 @@ def render_enterprise_metric_journey(company, df, metrics, view, key):
                                       key=key)
 
 
-@session_fragment
-def render_enterprise_chart(company, df):
-    # A journey deliberately leaves this fragment. Resolve it in main before
-    # destination widgets mount, while simple chart controls remain local.
-    if st.session_state.get('metric_journey_pending'):
-        st.rerun()
-    st.markdown('#### 自定义图表分析')
-    chart_col, metric_col = st.columns([1, 2])
-    if st.session_state.get('enterprise_chart_type') == '饼图':
-        st.session_state.enterprise_chart_type = '柱形图'
-    chart_type = chart_col.selectbox('图表类型', ['折线图', '柱形图'], key='enterprise_chart_type')
-    chart_metrics = metric_col.multiselect('分析指标', list(METRIC_LABELS), default=['revenue'],
-        format_func=lambda value: METRIC_LABELS.get(value, value), key='enterprise_chart_metrics')
-    render_data_identity(df, metrics=chart_metrics, compact=True, title='所选指标来源')
-    fig = make_metric_chart(df, chart_type, chart_metrics, f'{company} {chart_type}分析')
-    if fig is not None:
-        with st.container(key='enterprise_chart_canvas'):
-            st.plotly_chart(fig, width='stretch', key='enterprise_custom_chart')
-        render_enterprise_metric_journey(company, df, chart_metrics, '图表分析', 'enterprise_chart_journey')
-    else:
-        st.info('当前指标暂无足够数据，请更换指标。')
-
-
-def toggle_director_workspace(state_key):
-    opening = not st.session_state.get(state_key, False)
-    st.session_state[state_key] = opening
-    if opening:
-        st.session_state[state_key + '_visit'] = st.session_state.get(state_key + '_visit', 0) + 1
-
-
-@session_fragment
-def render_director_workspace(company, df):
-    from app.director_mode import render_director_mode
-
-    identity = hashlib.sha256((str(st.session_state.get('active_session_id')) + company).encode()).hexdigest()[:14]
-    state_key = 'director_open_' + identity
-    opened = bool(st.session_state.get(state_key))
-    with st.container(key='director_workspace'):
-        st.button('收起汇报舞台' if opened else '进入汇报导演模式',
-                  icon=':material/close_fullscreen:' if opened else ':material/slideshow:',
-                  key='director_toggle_' + identity, width='stretch',
-                  on_click=toggle_director_workspace, args=(state_key,),
-                  help='选择已有章节，编排顺序，用方向键逐页讲述当前研究。')
-        if not opened:
-            return
-        report = st.session_state.get('director_existing_report') or {}
-        revision = hashlib.sha256(df.to_json(force_ascii=False, default_handler=str).encode()).hexdigest()
-        report_text = report.get('text') if (report.get('company') == company
-                    and report.get('data_revision') == revision
-                    and report.get('profile') == st.session_state.get('investor_profile')) else None
-        event = render_director_mode(company, df,
-                    snapshots=st.session_state.get('chat_messages') or [],
-                    report_text=report_text,
-                    key=f'director_{identity}_{st.session_state.get(state_key + "_visit", 0)}')
-        if event:
-            st.session_state[state_key] = False
-            st.rerun(scope='fragment')
-
-
 def render_enterprise_page(analysis_names, data_map, llm_config):
     from app.deep_pages import render_deep_intro, render_enterprise_context
     from app.enterprise_story import render_enterprise_story
@@ -1243,8 +1154,6 @@ def render_enterprise_page(analysis_names, data_map, llm_config):
     df = data_map[selected_main]
     view = st.session_state.get('enterprise_view', '经营概览')
     render_enterprise_context(selected_main, df, view)
-    render_data_identity(df, title='当前企业数据')
-    render_director_workspace(selected_main, df)
     if view == '经营概览':
         latest = df.iloc[-1]
         st.caption(f'当前展示 {int(latest["year"])} 年数据。')
@@ -1253,9 +1162,7 @@ def render_enterprise_page(analysis_names, data_map, llm_config):
         for col, (label, metric) in zip(metrics, [('营业收入（亿元）', 'revenue'),
                                                   ('归母净利润（亿元）', 'net_profit'),
                                                   ('经营现金流（亿元）', 'operating_cashflow')]):
-            with col:
-                st.metric(label, display_value(latest.get(metric)))
-                render_data_identity(df, metrics=[metric], years=[int(latest['year'])], compact=True, title='指标来源')
+            col.metric(label, display_value(latest.get(metric)))
         render_enterprise_story(selected_main, df, compute_alerts(df), score_company(df))
         with st.container(key='enterprise_story_actions'):
             risk_action, report_action = st.columns(2)
@@ -1297,7 +1204,20 @@ def render_enterprise_page(analysis_names, data_map, llm_config):
         st.dataframe(df[[c for c in ['year'] + list(METRIC_LABELS) if c in df.columns]],
                      width='stretch', hide_index=True)
     elif view == '图表分析':
-        render_enterprise_chart(selected_main, df)
+        st.markdown('#### 自定义图表分析')
+        chart_col, metric_col = st.columns([1, 2])
+        if st.session_state.get('enterprise_chart_type') == '饼图':
+            st.session_state.enterprise_chart_type = '柱形图'
+        chart_type = chart_col.selectbox('图表类型', ['折线图', '柱形图'], key='enterprise_chart_type')
+        chart_metrics = metric_col.multiselect('分析指标', list(METRIC_LABELS), default=['revenue'],
+            format_func=lambda value: METRIC_LABELS.get(value, value), key='enterprise_chart_metrics')
+        fig = make_metric_chart(df, chart_type, chart_metrics, f'{selected_main} {chart_type}分析')
+        if fig is not None:
+            with st.container(key='enterprise_chart_canvas'):
+                st.plotly_chart(fig, width='stretch', key='enterprise_custom_chart')
+            render_enterprise_metric_journey(selected_main, df, chart_metrics, view, 'enterprise_chart_journey')
+        else:
+            st.info('当前指标暂无足够数据，请更换指标。')
     elif view == '风险预警':
         from app.risk_atlas import render_risk_atlas, close_risk_atlas_source
         from app.research_sources import financial_sources
@@ -1594,7 +1514,7 @@ def render_data_center(companies, name_to_id, data_map):
                             st.caption('表格可分别提供“合并净利润”和“归母净利润”列，两个口径独立保存及追溯。只有来源明确时才确认以下信息。')
                             template = '企业,年份,合并净利润(亿元),归母净利润(亿元)\n请填写真实企业,2024,,\n'
                             st.download_button('下载利润口径 CSV 模板', template.encode('utf-8-sig'),
-                                               '利润口径导入模板.csv', 'text/csv', key='profit_scope_template', on_click='ignore')
+                                               '利润口径导入模板.csv', 'text/csv', key='profit_scope_template')
                             currency = st.selectbox('探针币种补充（来源未标注时）', ['不补充', '人民币（CNY）'], key='probe_import_currency')
                             statement = st.selectbox('探针报表范围补充（来源未标注时）', ['不补充', '合并财务报表'], key='probe_import_statement')
                             scope_confirmed = st.checkbox('我已核对原始来源，确认上述补充的币种与报表范围。', key='probe_import_confirmed')
@@ -1814,7 +1734,7 @@ def render_evaluation_page():
                         '通过率': f'{item["pass_rate"] * 100:.2f}%', '样本量': item['total']}
                         for item in result['categories'].values()]), width='stretch', hide_index=True)
     st.download_button('下载 Benchmark JSON', json.dumps(result, ensure_ascii=False, indent=2).encode('utf-8'),
-        file_name=f'benchmark_{result["suite_version"]}.json', mime='application/json', icon=':material/download:', on_click='ignore')
+        file_name=f'benchmark_{result["suite_version"]}.json', mime='application/json', icon=':material/download:')
 
 
 
@@ -1882,7 +1802,7 @@ def main():
     if selected_cmp not in analysis_names or selected_cmp == selected_main:
         selected_cmp = next((name for name in analysis_names if name != selected_main), None)
         st.session_state.selected_cmp = selected_cmp
-    navigation_slot = render_header(st.session_state.page, selected_main or '暂无可分析企业', data_map.get(selected_main, pd.DataFrame()), llm_config)
+    navigation_slot = render_header(st.session_state.page, selected_main or '暂无可分析企业', data_map.get(selected_main, pd.DataFrame()))
     render_metric_journey_context(data_map)
     render_workspace_search_results(data_map, fetch_report_files(),
                                     sessions=st.session_state.get('saved_sessions', []), on_restore=restore_session)
