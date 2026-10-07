@@ -53,7 +53,7 @@ SOURCE_FIELDS = ('company', 'company_name', 'year', 'report_year', 'metric',
 SOURCE_FIELDS += ('location', 'location_type', 'sheet', 'metric_definition', 'currency',
                   'period', 'statement_scope', 'consolidation_scope', 'accounting_policy',
                   'report_version', 'restatement_version', 'reviewed', 'metric_label', 'scope_hint',
-                  'currency_hint', 'version_hint', 'metadata_basis')
+                  'currency_hint', 'version_hint', 'metadata_basis', 'source_origin', 'source_type')
 SECRET_QUERY_KEYS = {'key', 'api_key', 'apikey', 'token', 'access_token',
                      'password', 'secret', 'authorization', 'signature', 'sig'}
 

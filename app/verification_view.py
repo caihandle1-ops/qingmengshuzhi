@@ -56,7 +56,7 @@ def render_package_download(item, key, data_map, on_save):
                 st.warning(public_message(warning))
             if package.get('zip_bytes'):
                 st.download_button('下载 ZIP 证据包', package['zip_bytes'], '财报问数_证据包.zip', 'application/zip',
-                                   key=f'download_package_{key}', width='stretch')
+                                   key=f'download_package_{key}', width='stretch', on_click='ignore')
             manifest = package.get('manifest') or {}
             with st.expander('查看来源与完整性清单'):
                 st.json(manifest)
@@ -170,4 +170,4 @@ def render_research_result(item, key, available_years, run_with_year):
             render_source(citation, f'research_source_{key}_{number}')
     if result.get('report_text'):
         st.download_button('下载研究任务报告 TXT', result['report_text'].encode('utf-8'),
-                           '财报研究任务报告.txt', 'text/plain', key=f'research_report_{key}')
+                           '财报研究任务报告.txt', 'text/plain', key=f'research_report_{key}', on_click='ignore')
