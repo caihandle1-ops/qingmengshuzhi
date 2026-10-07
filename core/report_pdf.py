@@ -8,6 +8,7 @@ import math
 import pandas as pd
 from app.branding import PAGE_TITLE, REPORT_SUBTITLE
 from app.messages import NO_METRICS, NO_SOURCE, public_message
+from core.data_identity import summarize_data_identity, identity_count_text
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib.pagesizes import A4
@@ -23,7 +24,7 @@ _FONT_NAME = 'STSong-Light'
 # Tables and drawings share the actual available frame width, not page width.
 _SIDE_MARGIN = 1.8 * cm
 _CONTENT_WIDTH = A4[0] - 2 * _SIDE_MARGIN - 12
-REPORT_LAYOUT_VERSION = '2026-09-24-branding-wrapped-tables-v3'
+REPORT_LAYOUT_VERSION = '2026-10-07-comparison-data-identity-v4'
 try:
     pdfmetrics.registerFont(UnicodeCIDFont(_FONT_NAME))
 except Exception:
@@ -54,7 +55,7 @@ def _styles() -> dict[str, ParagraphStyle]:
     styles = {
         'title': ParagraphStyle('CNTitle', parent=base['Title'], fontName=_FONT_NAME, fontSize=20, leading=28, alignment=TA_CENTER, spaceAfter=10),
         'subtitle': ParagraphStyle('CNSubtitle', parent=base['Normal'], fontName=_FONT_NAME, fontSize=9, leading=14, textColor=colors.HexColor('#666666'), alignment=TA_CENTER, spaceAfter=10),
-        'h1': ParagraphStyle('CNHeading1', parent=base['Heading1'], fontName=_FONT_NAME, fontSize=14, leading=20, textColor=colors.HexColor('#16324F'), spaceBefore=8, spaceAfter=5),
+        'h1': ParagraphStyle('CNHeading1', parent=base['Heading1'], fontName=_FONT_NAME, fontSize=14, leading=20, textColor=colors.HexColor('#16324F'), spaceBefore=8, spaceAfter=5, keepWithNext=True),
         'body': ParagraphStyle('CNBody', parent=base['BodyText'], fontName=_FONT_NAME, fontSize=10.2, leading=16, alignment=TA_LEFT, spaceAfter=3),
         'body_big': ParagraphStyle('CNBodyBig', parent=base['BodyText'], fontName=_FONT_NAME, fontSize=11, leading=18, alignment=TA_LEFT, spaceAfter=5),
         'small': ParagraphStyle('CNSmall', parent=base['BodyText'], fontName=_FONT_NAME, fontSize=8.5, leading=13, textColor=colors.HexColor('#666666'), spaceAfter=3),
@@ -413,6 +414,7 @@ def report_text_to_pdf_bytes(report_text: str, company_name: str = '企业', sub
     story: list[Any] = []
     sub = subtitle or f'生成时间：{datetime.now().strftime("%Y-%m-%d %H:%M")}｜本报告仅供研究参考，不构成投资建议'
     score_value = (score or {}).get('score') if _has_complete_score(score) else None
+    identity = summarize_data_identity(df)
 
     # Page 1: cover and executive summary
     story.append(Spacer(1, 0.6*cm))
@@ -422,11 +424,15 @@ def report_text_to_pdf_bytes(report_text: str, company_name: str = '企业', sub
     story.append(_para(sub, styles['cover_subtitle']))
     story.append(Spacer(1, 0.55*cm))
     story.append(_info_table([
-        ('覆盖年度', _year_range(df)),
+        ('主企业数据身份', f'{identity["label"]} · {identity_count_text(identity)}'),
+        ('有效覆盖年度', identity['coverage_text']),
         ('最新年度', _latest_year(df)),
         ('综合评分', f'{score_value}分' if score_value is not None else '数据不足，暂不评分'),
         ('报告定位', '面向投资者的信息整理、风险识别、趋势研判和来源追溯辅助报告。'),
     ]))
+    story.append(_para(identity['note'], styles['small']))
+    if identity['missing_count']:
+        story.append(_para('缺失指标：' + identity['missing_text'], styles['small']))
     story.append(Spacer(1, 0.55*cm))
     summary_lines = _extract_section(report_text, '一、报告摘要', ('二、',))
     if summary_lines:

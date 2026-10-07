@@ -7,6 +7,7 @@ import math
 import pandas as pd
 from app.branding import PAGE_TITLE, REPORT_SUBTITLE
 from app.messages import NO_METRICS, NO_SOURCE, public_message
+from core.data_identity import summarize_data_identity, identity_report_lines, identity_count_text
 
 METRIC_LABELS = {
     'revenue': '营业收入',
@@ -466,8 +467,28 @@ def compare_companies(name_a: str, df_a: pd.DataFrame, name_b: str, df_b: pd.Dat
         for dim in ['盈利能力', '现金流质量', '偿债稳健性', '成长能力']:
             dimension_rows.append({'评分维度': dim, name_a: score_a['detail'].get(dim), name_b: score_b['detail'].get(dim)})
         dimension_rows.append({'评分维度': '综合得分', name_a: score_a['score'], name_b: score_b['score']})
+    # Keep companies separate and identify only facts actually shown or used.
+    # Comprehensive scores use five latest-year values plus revenue/profit in
+    # the adjacent common base year; unrelated older cells must not change the
+    # source label of this comparison.
+    identity_blocks = {}
+    for name, original, comparable in ((name_a, df_a, a), (name_b, df_b, b)):
+        if metrics:
+            blocks = [{'scope': '选定指标与展示年度',
+                       'summary': summarize_data_identity(original, metrics=keys, years=display_years)}]
+        else:
+            target = common_years[-1] if common_years else None
+            blocks = [{'scope': '共同年度内的当期对比指标',
+                       'summary': summarize_data_identity(comparable, metrics=keys,
+                                                          years=[target] if target is not None else [])}]
+            if target is not None:
+                blocks.append({'scope': '共同年度内的同比基期',
+                               'summary': summarize_data_identity(comparable, metrics=['revenue', 'net_profit'],
+                                                                  years=[target - 1])})
+        identity_blocks[name] = blocks
     return {'recommended': recommended, 'reasoning': reasoning, 'table': table,
             'score_table': pd.DataFrame(dimension_rows), 'score_a': score_a, 'score_b': score_b,
+            'data_identity_blocks': identity_blocks,
             'basis': {name_a: score_a.get('basis', []), name_b: score_b.get('basis', [])}}
 
 
@@ -561,11 +582,15 @@ def generate_report(company_name: str, df: pd.DataFrame, alerts: list[dict[str, 
     source = public_message(get_source_for_metric(df), fallback=NO_SOURCE) if not df.empty else NO_SOURCE
     years_text = _data_range_text(df)
     score_text = f'{score["score"]}分' if score['available'] else '数据不足，暂不评分'
+    identity = summarize_data_identity(df)
+    identity_lines = identity_report_lines(identity)
+    identity_lines[0] = '主企业' + identity_lines[0]
 
     lines = [
         PAGE_TITLE,
         REPORT_SUBTITLE,
         f'分析企业：{company_name}',
+        *identity_lines,
         '',
         '一、报告摘要',
         summary,
@@ -626,10 +651,22 @@ def generate_report(company_name: str, df: pd.DataFrame, alerts: list[dict[str, 
     if compare_payload:
         lines += ['', '八、企业对比参考']
         lines.append(compare_payload['reasoning'])
+        comparison_identities = compare_payload.get('data_identity_blocks') or {}
+        if comparison_identities:
+            for compared_name, blocks in comparison_identities.items():
+                lines.append(f'对比企业：{compared_name}')
+                for block in blocks:
+                    compared_identity = block['summary']
+                    lines.append(f'- {block["scope"]}：{compared_identity["label"]}（{identity_count_text(compared_identity)}）；'
+                                 f'覆盖年度：{compared_identity["coverage_text"]}；指标缺项：{compared_identity["missing_text"]}。')
+                lines.append('以上身份仅描述本次比较使用的数据来源，不代表原文或数值已核验。')
+        else:
+            lines.append('对比企业的逐指标来源身份未随本报告保留，仍待核验。')
 
     lines += [
         '',
         '九、数据来源与可追溯性',
+        *identity_lines,
         f'主要结构化数据来源：{source.rstrip("。")}。来源信息按本次已接入记录列示；缺失指标来源须补充核验。',
         '',
         '十、研究结论',

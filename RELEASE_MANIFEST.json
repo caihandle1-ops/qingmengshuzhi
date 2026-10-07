@@ -1,6 +1,8 @@
 {
-  "release": "QingmengData_V4 online trial 2026-10-06",
+  "release": "QingmengData_V4 online trial 2026-10-07",
+  "base_commit": "63c8619c475b179d39618320423390d6ef8b4bd0",
   "manifest_excludes_itself": true,
+  "source_reference": "Original QingmengData_V4 project before the online trial upgrades",
   "files": [
     {
       "path": ".gitignore",
@@ -13,6 +15,18 @@
       "bytes": 220,
       "sha256": "2e810cef8b76912aab6890050dfbce304c065fadd7ef37417db272f18fab2591",
       "matches_source": true
+    },
+    {
+      "path": "README.md",
+      "bytes": 4580,
+      "sha256": "a7b0da956501bf77f54946b75db26b10d08edfa2412bb38bb7fe0dc97760995e",
+      "matches_source": false
+    },
+    {
+      "path": "VALIDATION_REPORT.json",
+      "bytes": 5659,
+      "sha256": "d8585c8b2b5367f1ad19405c96493c3c704149863102addd612dc284cdced58b",
+      "matches_source": false
     },
     {
       "path": "app/answer_actions.py",
@@ -28,9 +42,9 @@
     },
     {
       "path": "app/answer_workbench.py",
-      "bytes": 15725,
-      "sha256": "9b9fd9e681d2d661395970d34acd1203b6f130e17f655aa45ed41c41fca912ad",
-      "matches_source": true
+      "bytes": 16494,
+      "sha256": "4d7e045d924db5bbf36af171175aa36fa4206404f2e2d7d88518d5ce18199a57",
+      "matches_source": false
     },
     {
       "path": "app/asset_gallery.css",
@@ -141,6 +155,18 @@
       "matches_source": true
     },
     {
+      "path": "app/connection_status.py",
+      "bytes": 5037,
+      "sha256": "d100688662803b7b6472bca3fc520b30b1e583d99c0524b0bc5f013a07dc39e0",
+      "matches_source": false
+    },
+    {
+      "path": "app/data_identity.py",
+      "bytes": 1422,
+      "sha256": "dc6bff0df246539f80bc938badb0e72e2449d20d3cd741fdf4875559b373d3e1",
+      "matches_source": false
+    },
+    {
       "path": "app/deep_pages.css",
       "bytes": 17137,
       "sha256": "5343966e952baf39644d265c8a17a437b68d435c01c350a2bc45d2d2d82430da",
@@ -151,6 +177,36 @@
       "bytes": 11355,
       "sha256": "1d569eb86fe722f86d3e0bfe2520aeb414fcf49da41bd2a1d518b6cedde1da94",
       "matches_source": true
+    },
+    {
+      "path": "app/director_frontend/director-model.js",
+      "bytes": 2944,
+      "sha256": "1e38ce1c38cb7348a476aaf7ce013c7ef11fab901c990b4362e73708f6e62e54",
+      "matches_source": false
+    },
+    {
+      "path": "app/director_frontend/director.css",
+      "bytes": 14351,
+      "sha256": "293ab85215c23a5c5e082df28ed5778d8d02d23f54423bf6d82c7dfac2e09f22",
+      "matches_source": false
+    },
+    {
+      "path": "app/director_frontend/director.js",
+      "bytes": 15052,
+      "sha256": "a1402ad0f2d24f508999a3b5d492b92b9b36b922a4025f9c881244dadf779530",
+      "matches_source": false
+    },
+    {
+      "path": "app/director_frontend/index.html",
+      "bytes": 2766,
+      "sha256": "f0df62e8809e25a9cfb8486a64cef6a36a6f599ea3f6ebafd7196cde7ec913c2",
+      "matches_source": false
+    },
+    {
+      "path": "app/director_mode.py",
+      "bytes": 10091,
+      "sha256": "be1d5edad5a5febb3b49fa357bd1aaa47f5be1c9af3cc5c7ac602d93069631c3",
+      "matches_source": false
     },
     {
       "path": "app/enterprise_story.css",
@@ -237,6 +293,12 @@
       "matches_source": true
     },
     {
+      "path": "app/fragments.py",
+      "bytes": 975,
+      "sha256": "c16cf7b445dcb30931fe8cf097e8945cbed41aed73df965493cafe7ac753bdcc",
+      "matches_source": false
+    },
+    {
       "path": "app/guided_ui.py",
       "bytes": 5816,
       "sha256": "bc01ddde92842920602d429dcc852d66f6c4801dc3562edb50bb11f1bef84a8f",
@@ -286,9 +348,9 @@
     },
     {
       "path": "app/main.py",
-      "bytes": 130099,
-      "sha256": "550e9b20a8bcd465fc2fc4283e659dfefb182f3339f6b11bd6106584028356e5",
-      "matches_source": true
+      "bytes": 134836,
+      "sha256": "c3299fc20385161f369d4f57797c0ffd775e41e9e31a76bd1b3e27fc684775b3",
+      "matches_source": false
     },
     {
       "path": "app/messages.py",
@@ -394,9 +456,9 @@
     },
     {
       "path": "app/research_sources_view.py",
-      "bytes": 2571,
-      "sha256": "30bdc7b10d55fa0e83fe6a8ff2b6b733cd01f675c97a3b96b509ac9db9a088ec",
-      "matches_source": true
+      "bytes": 2607,
+      "sha256": "3deab277a58d65a8d4be9c13ab93610a93615c09d0122e4a012b49f8911b8e1b",
+      "matches_source": false
     },
     {
       "path": "app/risk_atlas.py",
@@ -484,9 +546,9 @@
     },
     {
       "path": "app/source_viewer.py",
-      "bytes": 9200,
-      "sha256": "6ca64424b9c9c11aa791f8b92e5d11d8bc447fc522680503cfdcc0dadf561472",
-      "matches_source": true
+      "bytes": 9280,
+      "sha256": "0ed473d002ae30773ea1f7759c9bbf28b89687266a1456194e35beb23789f286",
+      "matches_source": false
     },
     {
       "path": "app/studio_motion.js",
@@ -514,9 +576,9 @@
     },
     {
       "path": "app/tool_pages.py",
-      "bytes": 35011,
-      "sha256": "4814e4f724aadd2afb6fa4d56abe0acbc9bef29197f0040039e28951ebd5d213",
-      "matches_source": true
+      "bytes": 35068,
+      "sha256": "adf25ce2333201f91dfd8b5660416631b6ade39bad7445497905c3791d2a6884",
+      "matches_source": false
     },
     {
       "path": "app/tool_results.css",
@@ -531,6 +593,12 @@
       "matches_source": true
     },
     {
+      "path": "app/trial_upgrade.css",
+      "bytes": 690,
+      "sha256": "557458c1f040420697e495b256f67e9d35e6da30ff40837327b1721ffccb59b6",
+      "matches_source": false
+    },
+    {
       "path": "app/ui_state.py",
       "bytes": 8304,
       "sha256": "d866ada1d45356cb757dfa8a6ae754ae1ce954f08eec3822b2304349366ac07a",
@@ -538,9 +606,9 @@
     },
     {
       "path": "app/verification_view.py",
-      "bytes": 11331,
-      "sha256": "d58ac1e15a43467c429e174562e94fb478c9b2678e16f6ca4866df6243e9ca50",
-      "matches_source": true
+      "bytes": 11369,
+      "sha256": "c8ee7cd27f4d66cffd91ce09ab07b1398cd95383a82a9cce4ae0a5fcdb9ee5e9",
+      "matches_source": false
     },
     {
       "path": "app/workbench_view.py",
@@ -562,9 +630,9 @@
     },
     {
       "path": "core/analysis.py",
-      "bytes": 33543,
-      "sha256": "87fa64ad9d4100e38c59d53c705292240a4747f8289cf4224020db477ca65a79",
-      "matches_source": true
+      "bytes": 36058,
+      "sha256": "b4d5f8401324d559d29b78318181f578fd0e3b9d48d9ea214eb2b038e4dbb779",
+      "matches_source": false
     },
     {
       "path": "core/attribution.py",
@@ -597,6 +665,12 @@
       "matches_source": true
     },
     {
+      "path": "core/data_identity.py",
+      "bytes": 10035,
+      "sha256": "873314131b12334494b4dd4f726ca07e17c19974a9cf9b03278ff1ce89034431",
+      "matches_source": false
+    },
+    {
       "path": "core/db.py",
       "bytes": 28437,
       "sha256": "7fa0f157544d915d64a848a2adf7ce360100988437d483ef1227336e09f72b52",
@@ -622,9 +696,9 @@
     },
     {
       "path": "core/evidence_package.py",
-      "bytes": 54767,
-      "sha256": "70701a2d0d798cde5982501b49eaaf6ecdb2c6353851c728d2193c140b3bb960",
-      "matches_source": true
+      "bytes": 54799,
+      "sha256": "dda7846a2834b46b5700e6edf2fb82e2ac09894deabe3165f4e3e40205ca856d",
+      "matches_source": false
     },
     {
       "path": "core/execution_budget.py",
@@ -646,9 +720,9 @@
     },
     {
       "path": "core/llm.py",
-      "bytes": 10504,
-      "sha256": "858554a5e99c455fc479d2f2f7c36fbb8f57301d2b93f3ff9e61c148053efd20",
-      "matches_source": true
+      "bytes": 13681,
+      "sha256": "7bd5dcfca721f1fff3da0397ee1f62d844cc0ddbf44a8ac397b21ac742b7e29c",
+      "matches_source": false
     },
     {
       "path": "core/online_disclosure.py",
@@ -676,9 +750,9 @@
     },
     {
       "path": "core/report_pdf.py",
-      "bytes": 30086,
-      "sha256": "31a0c4aeb219dac539f7abfdce0ecc3c26daa3b8927f5e5c6662615f521ab17e",
-      "matches_source": true
+      "bytes": 30519,
+      "sha256": "839c592428b4e45bfa461f19254522b886f1208bdb76f41a68a742372ca6f10c",
+      "matches_source": false
     },
     {
       "path": "core/research_sources.py",
@@ -831,12 +905,6 @@
       "matches_source": true
     },
     {
-      "path": "README.md",
-      "bytes": 3441,
-      "sha256": "1a2537e260bd60193df5722f24ea8cfe6cf7d0f162c25927bc02def48ecdfa6e",
-      "matches_source": false
-    },
-    {
       "path": "requirements-dev.txt",
       "bytes": 34,
       "sha256": "3c3ad6730cf0c0417b77bae38e53c11fa8cd96a34f2f8956998bafc0aaf3ef17",
@@ -861,10 +929,46 @@
       "matches_source": true
     },
     {
+      "path": "tests/test_connection_status.py",
+      "bytes": 8057,
+      "sha256": "990bd9a1094673f9c648db6915ee7c200439539ebbcf338177804a6bfd774926",
+      "matches_source": false
+    },
+    {
+      "path": "tests/test_data_identity.py",
+      "bytes": 10506,
+      "sha256": "8c65696720e1b937fa4988f6e94db49869ab735e8448fb8ec33460b8dcad850f",
+      "matches_source": false
+    },
+    {
+      "path": "tests/test_director_dom.cjs",
+      "bytes": 12974,
+      "sha256": "c5f1d9a96ce330932d09b6699ab17c0452441ce7d697087d61ffd56657055618",
+      "matches_source": false
+    },
+    {
+      "path": "tests/test_director_mode.py",
+      "bytes": 5121,
+      "sha256": "966f5e4d532b0483c1b3ceb20fbd604c9d4e8e5bd32063a6113caaae9ba5fb71",
+      "matches_source": false
+    },
+    {
+      "path": "tests/test_director_model.cjs",
+      "bytes": 2166,
+      "sha256": "f2e3d513e989c3b6e7675c62dd321c8f58fcc19154691180f2a8bfe8766c2b24",
+      "matches_source": false
+    },
+    {
       "path": "tests/test_public_session.py",
       "bytes": 6294,
       "sha256": "72eac93b7af48f589f155b84ff2c19ba87bf2aee3b36420f75f5986d243e34a4",
       "matches_source": true
+    },
+    {
+      "path": "tests/test_trial_upgrade.py",
+      "bytes": 9527,
+      "sha256": "4496efdc1ebe1dbacecc1c29e4b9b35bfe4554af2ed01247d46a6ca824961c55",
+      "matches_source": false
     },
     {
       "path": "tests/test_unified_ui.py",
@@ -883,14 +987,6 @@
       "bytes": 6096,
       "sha256": "59422132709583676c1ce02aff32357821a171d1eee170d0a8743c6f4ff2e430",
       "matches_source": true
-    },
-    {
-      "path": "VALIDATION_REPORT.json",
-      "bytes": 9347,
-      "sha256": "18441217882cd3a2c55bb0ffa1e188293cae1503da28753a9026565843f35512",
-      "matches_source": false
     }
-  ],
-  "app_core_exact_copy": true,
-  "private_runtime_data_included": false
+  ]
 }
