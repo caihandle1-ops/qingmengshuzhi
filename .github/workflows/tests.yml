@@ -1,0 +1,44 @@
+name: Upgrade branch checks
+
+on:
+  push:
+    branches: ['upgrade/**']
+  pull_request:
+    branches: ['main', 'upgrade/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-and-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FINANCIAL_DEPLOYMENT: local
+      FINANCIAL_DATA_DIR: ${{ runner.temp }}/qingmeng-test-data
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Install unchanged application and test dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Validate release files and offline cold startup
+        run: python tools/check_release.py --cold-start
+      - name: Python regression tests
+        run: python -m pytest tests -q
+      - name: JavaScript regression tests
+        shell: bash
+        run: |
+          for test_file in tests/test_*.cjs; do
+            node "$test_file"
+          done

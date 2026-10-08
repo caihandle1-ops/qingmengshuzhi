@@ -34,4 +34,17 @@ assert.equal(deck.snapshot().payload.revision,'one');
 deck.dispose();const ended=history.length;
 deck.go('annual');deck.step(1);deck.reset();deck.move('overview',1);deck.toggle('sources');deck.setPayload({...payload,revision:'two'});
 assert.equal(history.length,ended,'disposed component must never publish');
+const focused=createDeck();
+focused.setPayload({...payload,focus:{metrics:[{id:'revenue'},{id:'net_profit'}],rows:[
+  {year:2022,metrics:[{id:'revenue',value:0},{id:'net_profit',value:null}]},
+  {year:2024,metrics:[{id:'revenue',value:73.6789},{id:'net_profit',value:-3.25}]}]}});
+assert.equal(focused.snapshot().fact.value,73.6789);
+focused.setFocus('net_profit',2022);assert.equal(focused.snapshot().fact.value,null);
+assert.equal(focused.setFocus('revenue',2023),false,'missing year cannot become a synthesized observation');
+assert.equal(focused.setFocus('invented',2024),false,'unknown metrics cannot be added by navigation');
+focused.setFocus('net_profit',2024);
+for(let i=0;i<40;i++){focused.go('annual');focused.go('sources');focused.go('metrics');assert.equal(focused.snapshot().fact.value,-3.25);}
+assert.equal(focused.snapshot().focus.year,2024);
+focused.move('metrics',1);focused.toggle('annual');assert.equal(focused.snapshot().fact.value,-3.25);
+focused.dispose();assert.equal(focused.setFocus('revenue',2024),false);
 console.log('director model: navigation, rerender stability, selection, reorder and cleanup passed');

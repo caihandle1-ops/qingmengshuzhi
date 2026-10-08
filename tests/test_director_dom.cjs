@@ -132,6 +132,39 @@ const payload={version:1,revision:'first',brand:'擎梦数智',company:'超长�
   race.document.exitFullscreen=()=>new Promise(resolve=>{finish=resolve;});
   const exiting=race.get('exit').click();await race.context.emit('pagehide');finish();await exiting;
   assert.equal(race.values().length,0,'unmounted frame cannot publish a late fullscreen exit');
+  // The actual DOM value node, selected year and source stay connected across
+  // three different scene compositions; no fake counter interpolation is used.
+  const continuity=environment();const ids=['revenue','net_profit','operating_cashflow'];
+  const focusedMetrics=metrics.map((metric,index)=>({...metric,id:ids[index],source:{...metric.source,file:`资料${index}.csv`,location:`${'BCD'[index]}3`,recorded:true}}));
+  const focusRows=[{year:2022,metrics:focusedMetrics.map(metric=>({...metric,value:metric.id==='revenue'?0:null,source:{...metric.source,location:metric.source.location.replace('3','2')}}))},{year:2024,metrics:focusedMetrics}];
+  const current={...payload,focus:{metrics:focusedMetrics.map(({id,label,unit})=>({id,label,unit})),rows:focusRows},chapters:payload.chapters.map(chapter=>
+    chapter.id==='annual'?{...chapter,rows:focusRows}:chapter.id==='metrics'?{...chapter,metrics:focusedMetrics}:chapter.id==='sources'?{...chapter,sources:focusRows.flatMap(row=>row.metrics.filter(metric=>metric.value!==null).map(metric=>({...metric.source,label:row.year+' '+metric.label,year:row.year,metric:metric.id,value:metric.value,unit:metric.unit})))}:chapter)};
+  await continuity.render(current);const focusNode=continuity.get('focus-value');
+  const go=async id=>{const control=continuity.get('chapters').querySelectorAll('button').find(button=>button.dataset.chapterId===id);await control.click();};
+  await go('metrics');assert.equal(focusNode.textContent,'123.45');
+  await continuity.get('metric-choices').querySelectorAll('button').find(button=>button.dataset.focusMetric==='net_profit').click();
+  assert.equal(focusNode.textContent,'-3.25');
+  for(let index=0;index<25;index++){
+    for(const id of ['annual','sources','metrics']){const priorAnimations=[...continuity.animations];await go(id);
+      assert.equal(continuity.get('focus-value'),focusNode);assert.equal(focusNode.textContent,'-3.25');
+      assert.equal(continuity.context.__qmDirector.deck.snapshot().focus.year,2024);
+      assert.ok(priorAnimations.every(animation=>animation.cancelled),'fast reverse cancels every previous scene/fact animation');
+      if(id==='sources'){assert.equal(continuity.get('stage').querySelector('.source-locator').textContent,'C3');assert.equal(continuity.get('stage').querySelector('.source-spotlight').dataset.metric,'net_profit');}
+    }
+  }
+  await go('annual');await continuity.get('stage').querySelectorAll('button').find(button=>button.dataset.year==='2022').click();
+  assert.equal(focusNode.textContent,'暂无数据');await go('sources');
+  assert.ok(continuity.get('stage').textContent.includes('不使用相邻年度或其它指标的出处替代'));
+  assert.equal(continuity.get('stage').querySelector('.source-locator').textContent,'独立定位待补充','missing values cannot promote stale metadata into a valid citation');
+  await continuity.get('metric-choices').querySelectorAll('button').find(button=>button.dataset.focusMetric==='revenue').click();assert.equal(focusNode.textContent,'0.00');
+  continuity.get('focus-year').value='2024';await continuity.get('focus-year').emit('change');assert.equal(focusNode.textContent,'123.45');
+  await continuity.get('motion-mode').click();assert.equal(continuity.get('director').dataset.motion,'light');
+  const afterLight=continuity.animations.length;await go('annual');assert.equal(continuity.animations.length-afterLight,1,'light mode only animates the scene');
+  continuity.media.matches=true;await continuity.media.emit('change');assert.equal(continuity.get('motion-mode').disabled,true);
+  const afterReduced=continuity.animations.length;await go('sources');assert.equal(continuity.animations.length,afterReduced);
+  assert.equal(continuity.values().length,0,'fact, year and motion choices do not rerun Streamlit');
+  continuity.context.__qmDirector.dispose();assert.ok(continuity.animations.every(animation=>animation.cancelled));
+  assert.equal(continuity.allNodes.reduce((sum,node)=>sum+node.listenerCount(),0),0);
   reduced.context.__qmDirector.dispose();hidden.context.__qmDirector.dispose();
   console.log('director DOM controller: every chapter, editor, keyboard, escaping, single exit, reduced/hidden motion and cleanup passed');
 })().catch(error=>{console.error(error);process.exitCode=1;});

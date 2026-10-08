@@ -11,7 +11,7 @@
 <main id="director" class="director" aria-label="汇报导演模式" tabindex="-1">
   <header class="topbar">
     <div class="brand"><img id="brand-logo" alt="擎梦数智 Logo" hidden><span><b id="brand-name">擎梦数智</b><small>财报智问 · 汇报导演</small></span></div>
-    <div class="top-actions"><button id="configure" type="button" aria-expanded="false" aria-controls="editor">编排章节</button><button id="fullscreen" type="button">全屏</button><button id="exit" type="button" class="exit">退出汇报 ↗</button></div>
+    <div class="top-actions"><button id="motion-mode" type="button" aria-pressed="true" title="切换轻量或增强动效">增强动效</button><button id="configure" type="button" aria-expanded="false" aria-controls="editor">编排章节</button><button id="fullscreen" type="button">全屏</button><button id="exit" type="button" class="exit">退出汇报 ↗</button></div>
   </header>
   <div class="workspace">
     <aside class="sidebar">
@@ -21,6 +21,12 @@
     </aside>
     <section class="viewport" id="viewport" aria-label="汇报画布">
       <div class="stage-grid" aria-hidden="true"></div><div class="stage-ring" aria-hidden="true"></div>
+      <div class="focus-light" aria-hidden="true"></div>
+      <section id="focusbar" class="focusbar" aria-label="贯穿汇报的当前指标" hidden>
+        <div class="focus-settings"><div id="metric-choices" class="metric-choices" role="group" aria-label="选择贯穿汇报的指标"></div><div class="focus-year-line"><label for="focus-year">观察年度</label><select id="focus-year" aria-label="观察年度"></select><span id="focus-origin"></span></div></div>
+        <div class="focus-fact" id="focus-fact"><span id="focus-label"></span><div><strong id="focus-value"></strong><span id="focus-unit"></span></div></div>
+        <div id="focus-journey" class="focus-journey" aria-label="当前指标的叙事进度"><span data-focus-chapter="metrics">量级</span><i></i><span data-focus-chapter="annual">年度</span><i></i><span data-focus-chapter="sources">出处</span></div>
+      </section>
       <div id="stage" class="stage"></div>
       <aside class="editor" id="editor" aria-label="选择与排列汇报章节" hidden>
         <div class="editor-title"><h2>排出你的汇报节奏。</h2><button id="close-editor" type="button" aria-label="关闭章节编排">×</button></div>

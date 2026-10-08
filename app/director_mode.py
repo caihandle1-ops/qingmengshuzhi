@@ -154,7 +154,8 @@ def director_payload(company, records, *, snapshots=None, report_text=None, aler
     if public_alerts:
         chapters.append({'id': 'signals', 'kind': 'signals', 'title': '风险依据', 'heading': '把信号和依据，一起带上。',
                          'alerts': public_alerts, 'identity': identity, 'status': '已有规则结果 · 不代表投资结论'})
-    sources = [{'label': f'{row["year"]} 年 {metric["label"]}', **metric['source']}
+    sources = [{'label': f'{row["year"]} 年 {metric["label"]}',
+                'year': row['year'], 'metric': metric['id'], 'value': metric['value'], 'unit': metric['unit'], **metric['source']}
                for row in rows for metric in row['metrics'] if metric['value'] is not None]
     chapters.append({'id': 'sources', 'kind': 'sources', 'title': '来源索引', 'heading': '每个数字，回到出处。',
                      'sources': sources, 'identity': identity, 'status': '来源定位记录 · 完整原件请回到工作台核对'})
@@ -162,7 +163,9 @@ def director_payload(company, records, *, snapshots=None, report_text=None, aler
         chapters.append({'id': 'report', 'kind': 'report', 'title': '已有报告', 'heading': '带着完整记录，结束这次汇报。',
                          'body': _text(report_text), 'identity': identity, 'status': '已生成文本 · 沿用原有结论和限定条件'})
     payload = {'company': company, 'brand': BRAND_NAME, 'product': PRODUCT_NAME,
-               'identity': identity, 'chapters': chapters, 'version': 1}
+               'identity': identity, 'chapters': chapters, 'version': 1,
+               'focus': {'rows': rows, 'metrics': [{'id': key, 'label': METRIC_LABELS[key], 'unit': METRIC_UNITS[key]} for key in METRICS],
+                         'initial': {'metric': METRICS[0], 'year': years[-1] if years else None}}}
     payload['revision'] = sha256(json.dumps(payload, ensure_ascii=False, sort_keys=True, allow_nan=False).encode()).hexdigest()[:24]
     payload['logo'] = logo_data_uri()
     return payload

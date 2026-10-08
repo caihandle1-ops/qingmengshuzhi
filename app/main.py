@@ -13,6 +13,9 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 
+from app.release_health import enforce_release_ready
+RELEASE_HEALTH = enforce_release_ready(ROOT)
+
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -51,6 +54,11 @@ from app.connection_status import (model_connection_status, render_model_connect
                                    sync_model_connection, track_model_connection)
 from app.data_identity import render_data_identity
 from core.data_identity import attach_source_origins
+from app.data_completion import (apply_pending_completion, render_completion_context,
+                                 render_gap_actions, disclosure_year_options)
+from app.reading_position import render_reading_position
+from app.research_archive import (apply_pending_archive_restore, render_research_archive,
+                                  render_archive_restore_notice)
 
 from core.analysis import (
     METRIC_LABELS,
@@ -241,6 +249,7 @@ def apply_styles() -> None:
         st.markdown(f'<style>{polish}</style>', unsafe_allow_html=True)
         upgrade = (ROOT / 'app' / 'trial_upgrade.css').read_text(encoding='utf-8')
         st.markdown(f'<style>{upgrade}</style>', unsafe_allow_html=True)
+        render_reading_position()
 
 
 
@@ -343,6 +352,7 @@ def render_sidebar(analysis_names: list[str]):
                 else:
                     sync_model_connection(None)
                 st.selectbox('分析偏好', ['稳健型', '平衡型', '成长型'], key='investor_profile')
+                st.caption('版本 ' + RELEASE_HEALTH['version'] + ' · 启动检查通过')
     if not analysis_names:
         st.session_state.selected_main = None
         st.session_state.selected_cmp = None
@@ -1244,6 +1254,7 @@ def render_enterprise_page(analysis_names, data_map, llm_config):
     view = st.session_state.get('enterprise_view', '经营概览')
     render_enterprise_context(selected_main, df, view)
     render_data_identity(df, title='当前企业数据')
+    render_gap_actions(selected_main, df, key='enterprise')
     render_director_workspace(selected_main, df)
     if view == '经营概览':
         latest = df.iloc[-1]
@@ -1641,7 +1652,7 @@ def render_data_center(companies, name_to_id, data_map):
                 c1, c2, c3 = st.columns(3)
                 source = c1.selectbox('公开披露来源', ['自动判断', '上交所', '深交所'], key='disclosure_exchange')
                 report_type = c2.selectbox('报告类型', ['年度报告', '半年度报告', '季度报告', '全部公告'], key='disclosure_type')
-                year = c3.selectbox('年份', ['2025', '2024', '2023', '2022', '2021'], key='disclosure_year')
+                year = c3.selectbox('年份', disclosure_year_options(st.session_state.get('disclosure_year')), key='disclosure_year')
                 remember_input_group('public_import', input_keys)
                 search_signature = (query, source, report_type, year)
                 if st.session_state.get('disclosure_search_signature') != search_signature:
@@ -1843,6 +1854,7 @@ def render_asset_hub():
                   on_click=navigate, args=('数据资产', '评测中心'), width='stretch')
         c2.button('待复核记录', key='asset_review_entry', icon=':material/rule:',
                   on_click=navigate, args=('数据资产', '待复核记录'), width='stretch')
+    render_research_archive()
 
 
 
@@ -1860,6 +1872,7 @@ def main():
 
     st.set_page_config(page_title=PAGE_TITLE, page_icon=page_icon(), layout='wide', initial_sidebar_state='auto')
     init_state()
+    apply_pending_archive_restore()
     preserve_inputs()
     restore_inputs()
     configure_workspace('main')
@@ -1871,6 +1884,7 @@ def main():
     seed_sample_data()
     apply_styles()
     companies, name_to_id, data_map, analysis_names = load_workspace()
+    apply_pending_completion(data_map)
     apply_pending_metric_journey(data_map)
     reconcile_company_selectors(analysis_names, companies)
     llm_config = render_sidebar(analysis_names)
@@ -1884,6 +1898,8 @@ def main():
         st.session_state.selected_cmp = selected_cmp
     navigation_slot = render_header(st.session_state.page, selected_main or '暂无可分析企业', data_map.get(selected_main, pd.DataFrame()), llm_config)
     render_metric_journey_context(data_map)
+    render_completion_context(data_map)
+    render_archive_restore_notice()
     render_workspace_search_results(data_map, fetch_report_files(),
                                     sessions=st.session_state.get('saved_sessions', []), on_restore=restore_session)
     if st.session_state.get('workspace_search_open') or st.session_state.get('workspace_search_query'):

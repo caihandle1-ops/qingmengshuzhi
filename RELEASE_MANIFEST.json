@@ -1,9 +1,16 @@
 {
-  "release": "QingmengData_V4 online trial 2026-10-07",
-  "base_commit": "63c8619c475b179d39618320423390d6ef8b4bd0",
+  "release": "QingmengData_V4 desktop research upgrade 4.20261008.1",
+  "base_commit": "2e62628bf77124cf7390e5e76d346a77f6dbfff6",
   "manifest_excludes_itself": true,
   "source_reference": "Original QingmengData_V4 project before the online trial upgrades",
+  "hash_policy": "sha256 of release files as stored in this Git commit; runtime cross-platform integrity uses RELEASE.json text-LF hashes",
   "files": [
+    {
+      "path": ".github/workflows/tests.yml",
+      "bytes": 1206,
+      "sha256": "fc91a6d5be60f7b9678ceab2049a5dd2c49fd300a535ee2f89f35badea4396dc",
+      "matches_source": false
+    },
     {
       "path": ".gitignore",
       "bytes": 841,
@@ -18,14 +25,20 @@
     },
     {
       "path": "README.md",
-      "bytes": 4580,
-      "sha256": "a7b0da956501bf77f54946b75db26b10d08edfa2412bb38bb7fe0dc97760995e",
+      "bytes": 8271,
+      "sha256": "f2303b00404f6662ffd7d5267d7b3e5ee8e928601ae30f5d203c219a31ecc1b3",
+      "matches_source": false
+    },
+    {
+      "path": "RELEASE.json",
+      "bytes": 15496,
+      "sha256": "9828bd4fb733a7e56dce0e0f5e9866a679c295b9b5843007b3f267e5b4324071",
       "matches_source": false
     },
     {
       "path": "VALIDATION_REPORT.json",
-      "bytes": 5659,
-      "sha256": "d8585c8b2b5367f1ad19405c96493c3c704149863102addd612dc284cdced58b",
+      "bytes": 6891,
+      "sha256": "46ca81dbb1593483febff337e5c4ebf476caed6bf691c80361c2f06432d70a4c",
       "matches_source": false
     },
     {
@@ -42,8 +55,8 @@
     },
     {
       "path": "app/answer_workbench.py",
-      "bytes": 16494,
-      "sha256": "4d7e045d924db5bbf36af171175aa36fa4206404f2e2d7d88518d5ce18199a57",
+      "bytes": 16734,
+      "sha256": "e75649d546de7853629bb5b09ef0afa1feadcc02d46daf651c3dc211baedeeff",
       "matches_source": false
     },
     {
@@ -161,6 +174,12 @@
       "matches_source": false
     },
     {
+      "path": "app/data_completion.py",
+      "bytes": 11118,
+      "sha256": "d8b8d2c7d85c84e42621e21c61601c94e6c8546467c2c11e19e7b63efd484bb2",
+      "matches_source": false
+    },
+    {
       "path": "app/data_identity.py",
       "bytes": 1422,
       "sha256": "dc6bff0df246539f80bc938badb0e72e2449d20d3cd741fdf4875559b373d3e1",
@@ -180,32 +199,32 @@
     },
     {
       "path": "app/director_frontend/director-model.js",
-      "bytes": 2944,
-      "sha256": "1e38ce1c38cb7348a476aaf7ce013c7ef11fab901c990b4362e73708f6e62e54",
+      "bytes": 3799,
+      "sha256": "396d8b14d091220be5b70ae9b0f95e5aa70d856b30fad310a2706ca1dcd2c9ba",
       "matches_source": false
     },
     {
       "path": "app/director_frontend/director.css",
-      "bytes": 14351,
-      "sha256": "293ab85215c23a5c5e082df28ed5778d8d02d23f54423bf6d82c7dfac2e09f22",
+      "bytes": 23712,
+      "sha256": "aafbfb293ffb6999d42c66baf46b15193042961b9f96257e7bb8233e8d0ef7bc",
       "matches_source": false
     },
     {
       "path": "app/director_frontend/director.js",
-      "bytes": 15052,
-      "sha256": "a1402ad0f2d24f508999a3b5d492b92b9b36b922a4025f9c881244dadf779530",
+      "bytes": 20256,
+      "sha256": "15711ac7bbe7d2a586994a0e858f1e142ec28fb7492aa692cae9db647d25e5d4",
       "matches_source": false
     },
     {
       "path": "app/director_frontend/index.html",
-      "bytes": 2766,
-      "sha256": "f0df62e8809e25a9cfb8486a64cef6a36a6f599ea3f6ebafd7196cde7ec913c2",
+      "bytes": 3789,
+      "sha256": "51ce798108a3608b913f31969c4567e29d734d6c0c203c278ad99dec636584a8",
       "matches_source": false
     },
     {
       "path": "app/director_mode.py",
-      "bytes": 10091,
-      "sha256": "be1d5edad5a5febb3b49fa357bd1aaa47f5be1c9af3cc5c7ac602d93069631c3",
+      "bytes": 10441,
+      "sha256": "69f69222e0706cf59698c77952cb216a457bda53e3ce1341b470c5903fe1798e",
       "matches_source": false
     },
     {
@@ -348,8 +367,8 @@
     },
     {
       "path": "app/main.py",
-      "bytes": 134836,
-      "sha256": "c3299fc20385161f369d4f57797c0ffd775e41e9e31a76bd1b3e27fc684775b3",
+      "bytes": 135719,
+      "sha256": "97b4dc3566fb17a85fdfa7c3d686060120ae65d851d32bf6e116bc232d760d85",
       "matches_source": false
     },
     {
@@ -425,6 +444,24 @@
       "matches_source": true
     },
     {
+      "path": "app/reading_position.js",
+      "bytes": 4826,
+      "sha256": "6da38d7748edf14afdb70d704f8006a545c632a575a809b48c27dbcb7bbd8684",
+      "matches_source": false
+    },
+    {
+      "path": "app/reading_position.py",
+      "bytes": 613,
+      "sha256": "05d92f5efb3789cf5e39fd432a76ebb38f134b94baa9d9c22c0f97516e2c335b",
+      "matches_source": false
+    },
+    {
+      "path": "app/release_health.py",
+      "bytes": 10901,
+      "sha256": "e4aea3d7c7b05e66d89872478f0f355711088323f0b50a9d9b795b9c1d2cc6cf",
+      "matches_source": false
+    },
+    {
       "path": "app/report_reader.css",
       "bytes": 9942,
       "sha256": "74604b67c1d8a7f31cf01a68ed83f4b3e30b7c38d20dd35cdad96545567883ea",
@@ -441,6 +478,12 @@
       "bytes": 13139,
       "sha256": "a6d49b19975ab475f16e4b631915b7569b7196056f473c629b9589b024a73917",
       "matches_source": true
+    },
+    {
+      "path": "app/research_archive.py",
+      "bytes": 6580,
+      "sha256": "1982f39371aae8e2de00fc8f10c1dd0ed7d8f7b4d271bbff49de66b6bdaaac9c",
+      "matches_source": false
     },
     {
       "path": "app/research_chart.py",
@@ -755,6 +798,12 @@
       "matches_source": false
     },
     {
+      "path": "core/research_archive.py",
+      "bytes": 44824,
+      "sha256": "7dc45df32f0b985eaf1416be0450108057ae20b940fcde93f955026ada099b3b",
+      "matches_source": false
+    },
+    {
       "path": "core/research_sources.py",
       "bytes": 8439,
       "sha256": "1960402611d10f313221b2ce72aaa4e7700f98072f4bb45180382ee760f3f6cb",
@@ -935,6 +984,12 @@
       "matches_source": false
     },
     {
+      "path": "tests/test_data_completion.py",
+      "bytes": 7459,
+      "sha256": "94b18e9574933612e527d23fd5ae12bd2a4936f4d55b55a31c79600179d1f5aa",
+      "matches_source": false
+    },
+    {
       "path": "tests/test_data_identity.py",
       "bytes": 10506,
       "sha256": "8c65696720e1b937fa4988f6e94db49869ab735e8448fb8ec33460b8dcad850f",
@@ -942,20 +997,20 @@
     },
     {
       "path": "tests/test_director_dom.cjs",
-      "bytes": 12974,
-      "sha256": "c5f1d9a96ce330932d09b6699ab17c0452441ce7d697087d61ffd56657055618",
+      "bytes": 16984,
+      "sha256": "53e8b87529c2b035bc1e157bb0e72fd8a54b72020163edbed4029f5379dfb676",
       "matches_source": false
     },
     {
       "path": "tests/test_director_mode.py",
-      "bytes": 5121,
-      "sha256": "966f5e4d532b0483c1b3ceb20fbd604c9d4e8e5bd32063a6113caaae9ba5fb71",
+      "bytes": 6836,
+      "sha256": "25ca30739034f938e2bd7673f807526bccc253fbe3e62c56b7925427df1c990e",
       "matches_source": false
     },
     {
       "path": "tests/test_director_model.cjs",
-      "bytes": 2166,
-      "sha256": "f2e3d513e989c3b6e7675c62dd321c8f58fcc19154691180f2a8bfe8766c2b24",
+      "bytes": 3198,
+      "sha256": "3cc25fd2ebd432d112c358521a2c111380ac555e9517aec4cc85a3566ca0d719",
       "matches_source": false
     },
     {
@@ -963,6 +1018,24 @@
       "bytes": 6294,
       "sha256": "72eac93b7af48f589f155b84ff2c19ba87bf2aee3b36420f75f5986d243e34a4",
       "matches_source": true
+    },
+    {
+      "path": "tests/test_reading_position.cjs",
+      "bytes": 3147,
+      "sha256": "158a98eabc55794d5a333f746b730039e88b84c862b6914ba805544012022514",
+      "matches_source": false
+    },
+    {
+      "path": "tests/test_release_health.py",
+      "bytes": 7962,
+      "sha256": "7d9e8805549c76f45e73a7a834eeafe8c31cf91572c748aa561e04cd5a0a71d5",
+      "matches_source": false
+    },
+    {
+      "path": "tests/test_research_archive.py",
+      "bytes": 17582,
+      "sha256": "de4a6ee9632cb2bdf504bce66132e9fd508ade0b54c4ca774173841411d6ecbb",
+      "matches_source": false
     },
     {
       "path": "tests/test_trial_upgrade.py",
@@ -987,6 +1060,12 @@
       "bytes": 6096,
       "sha256": "59422132709583676c1ce02aff32357821a171d1eee170d0a8743c6f4ff2e430",
       "matches_source": true
+    },
+    {
+      "path": "tools/check_release.py",
+      "bytes": 2413,
+      "sha256": "32b12f15ddc083064be12b5baf578efaa0091955582fd4b89b801eaf9b1aed3c",
+      "matches_source": false
     }
   ]
 }

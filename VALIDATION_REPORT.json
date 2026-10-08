@@ -1,138 +1,148 @@
 {
-  "release": "QingmengData_V4 online trial 2026-10-07",
-  "validated_at": "2026-10-07T20:41:05+08:00",
-  "base_commit": "63c8619c475b179d39618320423390d6ef8b4bd0",
+  "release": "QingmengData_V4 desktop research upgrade 4.20261008.1",
+  "validated_at": "2026-10-08T21:05:53+08:00",
+  "base_commit": "2e62628bf77124cf7390e5e76d346a77f6dbfff6",
   "changes": [
-    "Observed model connection status and explicit probe",
-    "Scoped data identity in company, metric, answer, TXT, PDF and frozen evidence",
-    "Session-bound fragments for source reading, report reading, charts and presentation; downloads do not rerun",
-    "Desktop presentation with chapter selection, ordering, keyboard navigation and cancellable motion"
+    "Early release integrity and loaded-module compatibility gate, public maintenance state and offline cold-start checker",
+    "Portable research archive with preview, explicit confirmation, isolated transactional restoration and original-file rebinding",
+    "Company/year/metric missing-data completion through the existing import workflow",
+    "Visitor-bound fragment updates, no-rerun downloads and cancellable reading-position continuity",
+    "Continuous director stage with shared actual-value focus and locally selectable metric/year"
   ],
-  "deployment": {
-    "main_file": "app/main.py",
+  "delivery": {
+    "target_branch": "upgrade/desktop-research-20261008",
+    "main_branch_unchanged": true,
+    "streamlit_actions": "none; no deploy, restart, settings change or merge",
+    "cloud_ui_verified": false,
     "python": "3.12",
     "streamlit": "1.64.0",
-    "default_mode": "public",
-    "url": "https://qingmeng-v4-trial.streamlit.app/",
-    "target_branch": "main",
-    "new_release_cloud_ui_verified": false,
-    "status_at_validation": "ready for GitHub push; cloud build and browser interaction not yet verified"
+    "main_file": "app/main.py"
   },
   "copy_integrity": {
-    "comparison_base_commit": "63c8619c475b179d39618320423390d6ef8b4bd0",
-    "brand_name_module_identical": true,
-    "logos_identical": true,
+    "protected_files_identical_to_base": {
+      ".streamlit/config.toml": true,
+      "app/assets/brand/qingmeng-shuzhi-logo-ui.png": true,
+      "app/assets/brand/qingmeng-shuzhi-logo.png": true,
+      "app/branding.py": true,
+      "requirements-dev.txt": true,
+      "requirements.txt": true
+    },
     "original_project_modified": false,
-    "note": "The release copy has the documented feature changes; it is no longer byte-identical to the original project."
+    "six_primary_functions_retained": true
   },
   "package_content": {
-    "private_runtime_data_included": false,
-    "private_absolute_paths_detected": false,
-    "allowed_data": [
+    "private_runtime_files": [],
+    "included_data": [
       "data/sample_*.csv",
       "data/evaluation/benchmark_v1.json",
-      "data/examples/翻转探针演示数据_模拟.csv"
-    ],
-    "required_public_fixture": "tests/fixtures/byd_2024_key_financials.pdf"
+      "data/examples/翻转探针演示数据_模拟.csv",
+      "tests/fixtures/byd_2024_key_financials.pdf"
+    ]
   },
   "python_syntax": {
-    "files": 86,
     "status": "passed",
-    "method": "ast.parse, no cache writes"
+    "files": 95,
+    "method": "ast.parse without cache writes"
   },
   "javascript_syntax": {
-    "files": 23,
     "status": "passed",
-    "method": "node --check, includes two CJS tests"
+    "files": 25,
+    "method": "node --check"
   },
-  "secret_scan": {
-    "status": "no findings",
-    "method": "Heuristic scan of publishable text files for provider/GitHub tokens, private key headers and private user paths. Credential values are never recorded."
+  "heuristic_scan": {
+    "finding_paths": [],
+    "scope": "Publishable runtime and documentation text; test credential fixtures excluded. Scans token-shaped values, private-key headers and private Windows user paths. This is not a guarantee that arbitrary sensitive prose is absent."
   },
-  "tests": {
-    "passed": 79,
-    "failed": 0,
+  "python_tests": {
+    "passed": 140,
+    "failures": 0,
     "errors": 0,
-    "duration_seconds": 126.526,
-    "files": [
-      "tests/test_connection_status.py",
-      "tests/test_data_identity.py",
-      "tests/test_director_mode.py",
-      "tests/test_public_session.py",
-      "tests/test_trial_upgrade.py",
-      "tests/test_unified_ui.py",
-      "tests/test_v1_regression.py"
-    ],
+    "skipped": 0,
+    "duration_seconds": 205.696,
+    "command": "python -m pytest tests -q -p no:cacheprovider --basetemp=<isolated-test-directory>",
     "isolated_data": true,
-    "cache_disabled": true,
-    "model_requests": "Mocked; no new real model calls or charges for validation.",
-    "fragment_harness": "Streamlit AppTest with fragment-specific rerun requests and complete widget states; checks real fragment execution, not CSS layout."
+    "model_requests": "Mocked; no paid model calls.",
+    "warning": "One expected zipfile warning from deliberately constructing duplicate research.json members in an invalid-archive test."
   },
-  "presentation_interaction": {
+  "javascript_tests": {
     "status": "passed",
     "scripts": [
       "tests/test_director_model.cjs",
-      "tests/test_director_dom.cjs"
+      "tests/test_director_dom.cjs",
+      "tests/test_reading_position.cjs"
     ],
     "coverage": [
-      "160 alternating navigation transitions",
-      "selection, reordering and active chapter preservation",
-      "all chapter types",
-      "keyboard controls and focus restoration",
-      "text escaping",
-      "single exit and unmount cleanup",
-      "reduced-motion and hidden-tab cancellation",
-      "fullscreen-exit/unmount race"
+      "Actual production director controller: chapter navigation, editor, keyboard, escaping, focus, exit and teardown",
+      "75 rapid transitions across scale/year/source with stable shared number node, exact selected metric/year/source and local controls",
+      "Reduced-motion, hidden state, interrupted animations and disposal",
+      "Reading position: native clamp, rerender, rapid superseding, wheel/touch/keyboard priority, scene change, expiry and teardown"
     ],
-    "method": "Actual production JavaScript executed with a small DOM/event/animation fixture; not a real browser or visual layout test."
+    "method": "Production code executed in Node with DOM/event/animation fixtures; not browser layout or visual acceptance."
   },
-  "pdf_render": {
+  "release_gate": {
+    "runtime_files": 154,
     "status": "passed",
-    "pages": 8,
-    "checked_pages": [
-      "cover",
-      "comparison sources",
-      "conclusion"
-    ],
-    "coverage": "Chinese text, separate main/comparison company data identities, source scopes and missing fields; no clipping or orphan conclusion heading in rendered sample."
+    "version": "4.20261008.1",
+    "cold_start": true,
+    "ordinary_rerun": true,
+    "method": "python tools/check_release.py --cold-start; fresh interpreter, real main.py AppTest, isolated public visitor, requests disabled",
+    "mixed_release_tests": "Missing/changed files and stale loaded modules refuse startup with a fixed safe message. No automatic module reload or server reboot."
   },
-  "streamlit_startup": {
-    "health_status": 200,
-    "health_body": "ok",
-    "root_status": 200,
-    "html_received": true,
-    "bind_address": "127.0.0.1",
-    "port": 8506,
-    "isolated_data": true,
-    "process_left_running_for_preview": true,
-    "note": "HTTP health and shell are server startup checks, not evidence of rendered UI or cloud deployment."
+  "research_restore_integration": {
+    "status": "passed",
+    "method": "Real CSV import, archive export, new public-session main.py AppTest, explicit core restoration followed by pending UI application and normal rerun",
+    "checked": [
+      "History/sidebar titles",
+      "Selected company/year, question draft and filters",
+      "Manual records and tuple signature",
+      "Original files rebound to receiving visitor; old visitor paths inaccessible",
+      "Existing blocked/conflict states preserved",
+      "Zero HTTP requests"
+    ],
+    "limitations": [
+      "File-uploader transport not exercised by AppTest",
+      "No real browser visual acceptance"
+    ]
+  },
+  "independent_review": {
+    "blocking_findings_remaining": 0,
+    "resolved": [
+      "Actual llm_key_* and embedded URL credential sanitization",
+      "Malformed history title/type validation",
+      "Review-note size validation before and after identifier rebinding with rollback",
+      "Legacy/unverified provenance semantics preserved",
+      "Completion years outside fixed list",
+      "New-session completion draft cleanup",
+      "Return preserves newly edited question and company",
+      "Keyboard focus takes priority over old reading anchor"
+    ]
+  },
+  "github_ci": {
+    "workflow": ".github/workflows/tests.yml",
+    "environment": "ubuntu-latest / Python 3.12 / Node 22",
+    "checks": [
+      "Offline cold startup",
+      "All Python tests",
+      "All tests/test_*.cjs"
+    ],
+    "deployment_steps": false,
+    "status_reference": "Check the workflow run for the pushed commit; this report records local pre-push validation."
   },
   "browser_validation": {
-    "new_release_local_visual_check": false,
-    "new_release_cloud_visual_check": false,
-    "blocker": "Official browser tools could not start because the Windows sandbox helper / trusted Node kernel exited unexpectedly.",
-    "external_web_open": "The online URL was not accessible through the web reader in this round."
+    "local_visual_check": false,
+    "cloud_visual_check": false,
+    "blocker": "Official browser and desktop tool initialization failed with Windows sandbox helper / trusted Node process errors. No alternative browser-control bypass was used."
   },
-  "review": {
-    "status": "passed",
-    "scope": [
-      "model state invalidation and global refresh after report enhancement",
-      "per-visitor fragment storage rebinding",
-      "source identity consistency in TXT, PDF and evidence ZIP",
-      "download rerun behavior"
-    ],
-    "blocking_findings": 0
-  },
-  "remaining_cloud_checks": [
-    "Confirm Streamlit has deployed the pushed commit",
-    "Real browser check of new presentation layout and motion",
-    "Real browser check of fragment collapse/expand position and global model badge",
-    "Live provider connectivity only with explicit visitor action"
+  "remaining_acceptance": [
+    "Real browser check of desktop director layouts and transition timing",
+    "Real browser check of scrolling and collapse while data changes",
+    "Research ZIP upload/download through the real browser controls",
+    "User-managed deployment and online checks after selecting the upgrade"
   ],
   "notes": [
-    "Company name, both Logo assets and all existing top-level functions are retained.",
-    "Mobile redesign, account persistence, feedback collection and workspace export are outside this four-part upgrade.",
-    "Private visitor data remains temporary and may not survive refresh, disconnect or instance restart.",
-    "Validation applies to the files in RELEASE_MANIFEST.json; pushing code is not browser acceptance."
+    "This branch includes the four earlier enhancements plus the new five-part work, with a release gate in front of their business imports.",
+    "The previous cloud ImportError was reproduced with a stale core.llm module; the exact cause on the cloud instance was not confirmed.",
+    "Research archives are explicit portable backups, not account-based automatic persistence. Original uploaded files are included only when selected and are preserved as-is.",
+    "No Streamlit service was changed during this work."
   ]
 }

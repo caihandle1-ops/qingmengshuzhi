@@ -93,3 +93,35 @@ def test_origin_identity_is_scoped_to_the_actual_metric():
     assert metrics[0]['source']['identity'] == '用户导入'
     assert metrics[1]['source']['identity'] == '内置样本'
     assert metrics[2]['source']['identity'] == '来源待核验'
+
+
+def test_shared_focus_preserves_exact_year_metric_value_and_source_without_filling_gaps():
+    earlier, later = row(2022, 0), row(2024, 72.12345, imported=True)
+    payload = director_payload('测试公司', [later, earlier])
+    focus = payload['focus']
+    assert focus['initial'] == {'metric': 'revenue', 'year': 2024}
+    assert [year['year'] for year in focus['rows']] == [2022, 2024]
+    assert focus['rows'][0]['metrics'][0]['value'] == 0
+    assert focus['rows'][1]['metrics'][0]['value'] == 72.12345
+    assert focus['rows'][1]['metrics'][2]['value'] is None
+    for year in focus['rows']:
+        for metric in year['metrics']:
+            matches = [source for source in by_id(payload, 'sources')['sources']
+                       if source['year'] == year['year'] and source['metric'] == metric['id']]
+            if metric['value'] is None:
+                assert not matches
+            else:
+                assert len(matches) == 1
+                assert matches[0]['value'] == metric['value']
+                assert matches[0]['unit'] == metric['unit']
+                assert matches[0]['file'] == metric['source']['file']
+                assert matches[0]['location'] == metric['source']['location']
+
+
+def test_shared_focus_keeps_ambiguous_and_empty_rows_unavailable():
+    payload = director_payload('测试公司', [row(2024, 50), row(2024, 500)])
+    assert payload['focus']['rows'][0]['ambiguous'] is True
+    assert all(metric['value'] is None for metric in payload['focus']['rows'][0]['metrics'])
+    assert by_id(payload, 'sources')['sources'] == []
+    empty = director_payload('空数据公司', [])
+    assert empty['focus']['rows'] == [] and empty['focus']['initial']['year'] is None

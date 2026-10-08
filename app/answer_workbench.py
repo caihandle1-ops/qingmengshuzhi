@@ -17,6 +17,7 @@ from app.source_viewer import render_source, citation_location
 from app.research_chart import render_research_chart
 from app.data_identity import render_data_identity
 from core.data_identity import summarize_data_identity
+from app.data_completion import render_gap_actions
 from app.messages import public_message
 
 
@@ -82,6 +83,8 @@ def _render_summary(snapshot, key, result=None):
         st.html(answer_canvas_header(snapshot, key))
         render_data_identity(snapshot.get('records') or [], metrics=[metric],
                              years=[year, snapshot.get('base_year')], title='本次回答与同比来源')
+        render_gap_actions(snapshot['company'], snapshot.get('records') or [],
+                           metrics=[metric], years=[year, snapshot.get('base_year')], key=f'answer_{key}')
         with st.container(key=f'answer_canvas_top_{key}'):
             kpi, yoy = st.columns([1.8, 1], gap='small')
             with kpi.container(key=f'answer_canvas_lead_{key}'):
