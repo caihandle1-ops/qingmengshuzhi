@@ -126,7 +126,8 @@
       "All tests/test_*.cjs"
     ],
     "deployment_steps": false,
-    "status_reference": "Check the workflow run for the pushed commit; this report records local pre-push validation."
+    "status_reference": "Check the workflow run for the pushed commit; this report records local pre-push validation.",
+    "workflow_validation_correction": "The first push could not create a job: runner.temp was referenced in job-level env. The path is now initialized inside a runner step via RUNNER_TEMP and GITHUB_ENV; duplicate branch/PR runs share a concurrency group. Runtime application files are unchanged."
   },
   "browser_validation": {
     "local_visual_check": false,
