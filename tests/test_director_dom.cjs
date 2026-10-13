@@ -61,7 +61,7 @@ function environment({reducedMotion=false, fullscreen=true}={}) {
   vm.createContext(context);for(const file of ['director-model.js','director.js'])vm.runInContext(fs.readFileSync(path.join(frontend,file),'utf8'),context,{filename:file});
   const get=id=>document.getElementById(id);
   return {context,document,allNodes,animations,observers,messages,media,get,
-    render:payload=>context.emit('message',{source:context.parent,data:{type:'streamlit:render',args:{payload}}}),
+    render:(payload,mode='presentation')=>context.emit('message',{source:context.parent,data:{type:'streamlit:render',args:{payload,motion:{version:1,mode}}}}),
     key:(key,code=key,target=document.root)=>document.emit('keydown',{key,code,target}),
     values:()=>messages.filter(message=>message.type==='streamlit:setComponentValue')};
 }
@@ -122,6 +122,9 @@ const payload={version:1,revision:'first',brand:'擎梦数智',company:'超长�
   assert.equal(env.context.listenerCount()+env.document.listenerCount()+env.media.listenerCount(),0);
   assert.equal(env.allNodes.reduce((sum,node)=>sum+node.listenerCount(),0),0,'dispose removes retained node listeners');
   const count=env.messages.length;await env.get('next').click();await env.render({...payload,revision:'late'});assert.equal(env.messages.length,count);
+  const research=environment();await research.render(payload,'research');await research.get('next').click();assert.equal(research.get('director').dataset.motion,'light');
+  const researchCount=research.animations.length;await research.render(payload,'research');assert.equal(research.animations.length,researchCount);
+  research.context.__qmDirector.dispose();
   const reduced=environment({reducedMotion:true});await reduced.render(payload);await reduced.get('next').click();assert.equal(reduced.animations.length,0);
   const navButton=reduced.get('chapters').querySelectorAll('button')[3];navButton.focus();await navButton.click();
   assert.equal(reduced.document.activeElement.dataset.chapterId,'answer','chapter navigation retains keyboard focus');
@@ -158,11 +161,18 @@ const payload={version:1,revision:'first',brand:'擎梦数智',company:'超长�
   assert.equal(continuity.get('stage').querySelector('.source-locator').textContent,'独立定位待补充','missing values cannot promote stale metadata into a valid citation');
   await continuity.get('metric-choices').querySelectorAll('button').find(button=>button.dataset.focusMetric==='revenue').click();assert.equal(focusNode.textContent,'0.00');
   continuity.get('focus-year').value='2024';await continuity.get('focus-year').emit('change');assert.equal(focusNode.textContent,'123.45');
-  await continuity.get('motion-mode').click();assert.equal(continuity.get('director').dataset.motion,'light');
+  await continuity.get('motion-mode').click();assert.equal(continuity.values().length,1);
+  const request=continuity.values()[0].value;assert.equal(request.event,'request_motion_mode');assert.equal(request.mode,'research');
+  assert.equal(continuity.get('director').dataset.motion,'enhanced','iframe waits for global authority before changing its mode');
+  await continuity.get('motion-mode').click();assert.equal(continuity.values().length,1,'pending mode request cannot be emitted twice');
+  const chapterBefore=continuity.context.__qmDirector.deck.snapshot().active,animationsBefore=continuity.animations.length;
+  await continuity.render(current,'research');assert.equal(continuity.get('director').dataset.motion,'light');
+  assert.equal(continuity.context.__qmDirector.deck.snapshot().active,chapterBefore);assert.equal(continuity.get('focus-value'),focusNode);
+  assert.equal(continuity.animations.length,animationsBefore,'preference change never replays current scene');
   const afterLight=continuity.animations.length;await go('annual');assert.equal(continuity.animations.length-afterLight,1,'light mode only animates the scene');
   continuity.media.matches=true;await continuity.media.emit('change');assert.equal(continuity.get('motion-mode').disabled,true);
   const afterReduced=continuity.animations.length;await go('sources');assert.equal(continuity.animations.length,afterReduced);
-  assert.equal(continuity.values().length,0,'fact, year and motion choices do not rerun Streamlit');
+  assert.equal(continuity.values().filter(message=>message.value.event!=='request_motion_mode').length,0,'facts and year stay local; only global preference is reported');
   continuity.context.__qmDirector.dispose();assert.ok(continuity.animations.every(animation=>animation.cancelled));
   assert.equal(continuity.allNodes.reduce((sum,node)=>sum+node.listenerCount(),0),0);
   reduced.context.__qmDirector.dispose();hidden.context.__qmDirector.dispose();

@@ -2,7 +2,10 @@
 from __future__ import annotations
 
 from html import escape
+from hashlib import sha256
+import json
 from math import isfinite
+from pathlib import Path, PureWindowsPath
 
 import streamlit as st
 
@@ -107,59 +110,185 @@ def attribution_markup(attribution: dict) -> str:
     )
 
 
+def _has_document_records(citations):
+    return any(isinstance(item, dict) and any(item.get(field) not in (None, '')
+               for field in ('file_path', 'file_name', 'snippet', 'report_year', 'page', 'location'))
+               for item in citations)
+
+
+def evidence_layout(quantitative_sources, citations):
+    """Layout reflects saved records, never upgrades an evidence verdict."""
+    quantities, documents = bool(quantitative_sources), _has_document_records(citations)
+    if quantities and documents:
+        return 'paired', [1, 1]
+    if quantities:
+        return 'quantitative', [3, 1]
+    if documents:
+        return 'documents', [1, 3]
+    return 'empty', [1, 1]
+
+
+def _source_groups(records, *, documents=False):
+    """Group only exact file paths AND recorded import versions; retain rows.
+
+    Missing identity is deliberately not inferred from a basename, report year,
+    or adjacent rows. Optional file hashes further separate conflicting copies.
+    Original indexes remain attached to every row for native viewer identities.
+    """
+    groups, indexed = [], {}
+    for index, record in enumerate(records):
+        source = record if documents else record.get('metric_source') if isinstance(record, dict) else None
+        path = source.get('file_path') if isinstance(source, dict) else None
+        version = source.get('import_id') if isinstance(source, dict) else None
+        version_known = isinstance(version, (str, int)) and not isinstance(version, bool) and bool(str(version).strip())
+        if isinstance(path, str) and path.strip() and version_known:
+            identity = json.dumps([path, version, {field: source.get(field) for field in
+                                  ('file_name', 'file_hash', 'file_sha256', 'sha256', 'content_hash', 'company_id')}],
+                                  ensure_ascii=False, sort_keys=True, default=str)
+        else:
+            identity = f'unresolved-record-{index}'
+        if identity not in indexed:
+            group = {'token': sha256(identity.encode()).hexdigest()[:16], 'source': source, 'rows': []}
+            indexed[identity] = group
+            groups.append(group)
+        year = record.get('report_year' if documents else 'year') if isinstance(record, dict) else None
+        indexed[identity]['rows'].append({'index': index, 'year': year, 'record': record, 'source': source})
+
+    def order(row):
+        try:
+            value = float(row['year'])
+            if not isinstance(row['year'], bool) and isfinite(value) and value.is_integer():
+                return (0, int(value), row['index'])
+        except (ValueError, TypeError, OverflowError):
+            pass
+        return (1, 0, row['index'])
+    for group in groups:
+        group['rows'].sort(key=order)
+    return groups
+
+
+def _source_group_heading(group, *, documents=False):
+    source = group['source']
+    if not isinstance(source, dict):
+        return
+    name = PureWindowsPath(str(source.get('file_name') or source.get('file_path') or
+                              ('报告原文' if documents else '指标来源'))).name
+    # Use native text for the file/version. Full path is only an internal key.
+    st.text(name)
+    version = public_message(source.get('import_id'), fallback='未记录')
+    st.caption(f'导入版本：{version} · {len(group["rows"])} 条来源记录')
+
+
+def _source_row_heading(year, details):
+    label = str(year) if year is not None else '—'
+    return ('<div class="at-source-year"><b>' + _text(label) + '<small> 年</small></b><p>'
+            + ' · '.join(_text(detail) for detail in details if detail) + '</p></div>')
+
+
+def _empty_evidence_html(kind):
+    title, copy = (
+        ('量化出处待补充', '本节点未保存独立的量化出处。报告解释不能替代原始指标。') if kind == 'quantitative' else
+        ('同年报告待补充', '本节点尚无充分报告依据，量化变化不代表原因已被证实。'))
+    return ('<aside class="at-evidence-empty" aria-label="' + title + '"><span>待补充依据</span>'
+            '<h5>' + title + '</h5><p>' + copy + '</p></aside>')
+
+
+def _render_quantitative_sources(quantitative_sources, key):
+    st.caption('01 / 量化数据出处')
+    if not quantitative_sources:
+        st.html(_empty_evidence_html('quantitative'))
+        return
+    with st.container(key=f'attribution_source_ledger_quantitative_{key}'):
+        for group in _source_groups(quantitative_sources):
+            with st.container(key=f'attribution_source_group_quantitative_{key}_{group["token"]}'):
+                _source_group_heading(group)
+                for row in group['rows']:
+                    index, source, year = row['index'], row['source'], row['year']
+                    if not isinstance(source, dict):
+                        st.caption(f'{year if year is not None else "—"} 年：历史行级记录，未核验该指标独立出处。')
+                        continue
+                    try:
+                        page = int(source.get('page') or 0)
+                    except (TypeError, ValueError):
+                        page = 0
+                    details = ['原始单位：' + str(source.get('raw_unit') or '未记录')]
+                    if source.get('cell'):
+                        details.append('对应单元格：' + str(source['cell']))
+                    if page > 0:
+                        details.append(f'PDF 第 {page} 页')
+                    if source.get('location') and source.get('location') != source.get('cell'):
+                        details.append('保存定位：' + str(source['location']))
+                    with st.container(key=f'attribution_source_record_quantitative_{key}_{index}'):
+                        st.html(_source_row_heading(year, details))
+                        is_pdf = str(source.get('file_path') or source.get('file_name') or '').lower().endswith('.pdf')
+                        if source.get('file_path') and (not is_pdf or page > 0):
+                            render_source(source, f'{key}_number_{index}', default_page=page if page > 0 else 1)
+                        elif is_pdf:
+                            st.caption('未记录该指标在 PDF 中的页码，暂不提供定位入口。')
+
+
+def _render_document_sources(citations, key):
+    st.caption('02 / 同年报告解释')
+    if not _has_document_records(citations):
+        st.html(_empty_evidence_html('documents'))
+        return
+    with st.container(key=f'attribution_source_ledger_documents_{key}'):
+        for group in _source_groups(citations, documents=True):
+            if not isinstance(group['source'], dict):
+                continue
+            with st.container(key=f'attribution_source_group_documents_{key}_{group["token"]}'):
+                _source_group_heading(group, documents=True)
+                for row in group['rows']:
+                    index, citation = row['index'], row['source']
+                    try:
+                        page = int(citation.get('page'))
+                    except (TypeError, ValueError):
+                        page = 0
+                    details = [f'PDF 第 {page} 页' if page > 0 else '未提供可定位页码']
+                    if citation.get('cell'):
+                        details.append('对应单元格：' + str(citation['cell']))
+                    if citation.get('location'):
+                        details.append('保存定位：' + str(citation['location']))
+                    with st.container(key=f'attribution_source_record_documents_{key}_{index}'):
+                        st.html(_source_row_heading(row['year'], details))
+                        # Uploaded snippets remain native text, not markup.
+                        st.text(citation.get('snippet') or '未提供原文片段。')
+                        if page > 0:
+                            render_source(citation, f'{key}_{index}', default_page=page)
+
+
+def evidence_bridge_html(node):
+    return ('<header class="at-evidence-bridge"><span>SELECTED NODE / EVIDENCE</span>'
+            '<h4>' + _text(node.get('label') or '财务指标') + ' <i aria-hidden="true">↘</i></h4>'
+            '<p>关系图中的当前节点，连接到它自己的数据出处与报告解释。</p>'
+            '<b>' + EVIDENCE_LABELS.get(node.get('evidence_status'), EVIDENCE_LABELS['insufficient']) + '</b></header>')
+
+
 def _render_evidence(node: dict, *, key: str, selected=False, explorer_key=None):
     citations = node.get('evidence') or []
     quantitative_sources = node.get('quantitative_sources') or []
     if not citations and not quantitative_sources:
         return
-    panel = (st.container(border=True, key=f'attribution_selected_evidence_{key}') if selected else
+    panel = (st.container(key=f'attribution_selected_evidence_{key}') if selected else
              st.expander(f'查看数据与报告依据 · {node.get("label") or "财务指标"}', expanded=False))
     with panel:
         if selected:
-            st.text(f'当前节点依据 · {node.get("label") or "财务指标"}')
+            st.html(evidence_bridge_html(node))
             st.button('收起当前依据', key=f'attribution_close_evidence_{key}',
                       on_click=close_attribution_source, args=(explorer_key,),
                       icon=':material/close_fullscreen:')
-        if quantitative_sources:
-            st.caption('量化数据来源')
-        for index, entry in enumerate(quantitative_sources):
-            source = entry.get('metric_source') if isinstance(entry, dict) else None
-            if not isinstance(source, dict):
-                year = entry.get('year', '—') if isinstance(entry, dict) else '—'
-                st.caption(f'{year} 年：历史行级记录，未核验该指标独立出处。')
-                continue
-            st.text(f'{entry.get("year", "—")} 年 · {source.get("file_name") or "指标来源"}'
-                    f' · 原始单位：{source.get("raw_unit") or "未记录"}'
-                    f' · 导入版本：{source.get("import_id") or "未记录"}')
-            try:
-                page = int(source.get('page') or 0)
-            except (TypeError, ValueError):
-                page = 0
-            if source.get('cell'):
-                st.text(f'对应单元格：{source["cell"]}')
-            if page > 0:
-                st.text(f'PDF 第 {page} 页')
-            is_pdf = str(source.get('file_path') or source.get('file_name') or '').lower().endswith('.pdf')
-            if source.get('file_path') and (not is_pdf or page > 0):
-                render_source(source, f'{key}_number_{index}', default_page=page if page > 0 else 1)
-            elif is_pdf:
-                st.caption('未记录该指标在 PDF 中的页码，暂不提供定位入口。')
-        if citations:
-            st.caption('报告解释证据')
-        for index, citation in enumerate(citations):
-            if not isinstance(citation, dict):
-                continue
-            try:
-                page = int(citation.get('page'))
-            except (TypeError, ValueError):
-                page = 0
-            location = f'PDF 第 {page} 页' if page > 0 else '未提供可定位页码'
-            # These fields originate in uploaded documents; native text output
-            # avoids treating file names and snippets as Markdown or HTML.
-            st.text(f'{citation.get("file_name") or "报告原文"} · {citation.get("report_year") or "—"} 年 · {location}')
-            st.text(citation.get('snippet') or '未提供原文片段。')
-            if page > 0:
-                render_source(citation, f'{key}_{index}', default_page=page)
+            layout, widths = evidence_layout(quantitative_sources, citations)
+            with st.container(key=f'attribution_evidence_layout_{layout}_{key}'):
+                numbers, documents = st.columns(widths, gap='large', vertical_alignment='top')
+                with numbers:
+                    _render_quantitative_sources(quantitative_sources, key)
+                with documents:
+                    _render_document_sources(citations, key)
+        else:
+            if quantitative_sources:
+                _render_quantitative_sources(quantitative_sources, key)
+            if citations:
+                _render_document_sources(citations, key)
 
 
 def _render_checks(attribution: dict):
@@ -197,6 +326,7 @@ def render_attribution(attribution: dict | None, key: str) -> None:
     if not isinstance(attribution, dict):
         return
     with st.expander('数因融合财务归因', expanded=True):
+        st.html('<style>' + Path(__file__).with_suffix('.css').read_text(encoding='utf-8') + '</style>')
         if attribution.get('scope_note'):
             st.caption(public_message(attribution['scope_note']))
         if attribution.get('status') != 'success' or not attribution.get('root'):
@@ -205,12 +335,20 @@ def render_attribution(attribution: dict | None, key: str) -> None:
             st.caption(DISCLAIMER)
             return
         focused_node = render_attribution_explorer(attribution, key)
+        # The exact validated node is surfaced first. Stable source keys keep
+        # cached previews, locator state and the existing native close action.
+        node_records = list(attribution_nodes(attribution))
+        for index, (node_id, node) in enumerate(node_records):
+            if node_id == focused_node:
+                _render_evidence(node, key=f'{key}_{index}', selected=True, explorer_key=key)
         with st.expander('全部节点数据 · 文字视图', expanded=False):
             st.markdown(attribution_markup(attribution), unsafe_allow_html=True)
         nodes = [attribution['root']] + list(attribution.get('drivers') or [])
         if not any(node.get('evidence') for node in nodes if isinstance(node, dict)):
             st.caption(NO_EVIDENCE)
-        for index, (node_id, node) in enumerate(attribution_nodes(attribution)):
-            _render_evidence(node, key=f'{key}_{index}', selected=node_id == focused_node, explorer_key=key)
+        with st.expander('浏览其他节点依据', expanded=False):
+            for index, (node_id, node) in enumerate(node_records):
+                if node_id != focused_node:
+                    _render_evidence(node, key=f'{key}_{index}', explorer_key=key)
         _render_checks(attribution)
         st.caption(DISCLAIMER)

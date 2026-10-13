@@ -1,0 +1,15 @@
+/* Only the selected attribution evidence, never arbitrary source drawers. */
+[class*="st-key-attribution_selected_evidence_"]{border-top:5px solid #2b5dff;border-bottom:1px solid #b4c3da;padding:24px 28px;background:#eef2fa;margin:0 0 24px!important}
+.at-evidence-bridge{position:relative;color:#1b3156;padding:0 0 18px;border-bottom:1px solid #bac9e2;margin-bottom:12px}.at-evidence-bridge>span{font:10px/1.5 Consolas,monospace;letter-spacing:.16em;color:#4a6cad}.at-evidence-bridge h4{font-size:29px!important;line-height:1.35!important;color:#172d50!important;padding:0!important;margin:9px 0!important;letter-spacing:-.04em;overflow-wrap:anywhere}.at-evidence-bridge i{font-style:normal;font-size:35px;color:#2b5dff;margin-left:15px}.at-evidence-bridge p{font-size:12px;color:#6c7c97;margin:0 0 13px!important}.at-evidence-bridge>b{font-size:11px;color:#335785}
+[class*="st-key-attribution_source_ledger_"]{min-width:0;background:#fbfcf8;border-top:2px solid #7898d1;padding:18px 22px!important}
+[class*="st-key-attribution_source_group_"]{padding:0 0 8px!important;border-bottom:1px solid #cbd5e5;gap:7px!important}
+[class*="st-key-attribution_source_group_"]+[class*="st-key-attribution_source_group_"]{margin-top:16px}
+[class*="st-key-attribution_source_group_"] [data-testid="stCaptionContainer"]{font-size:13px;color:#62748c;line-height:1.6}
+[class*="st-key-attribution_source_record_"]{gap:7px!important;padding-top:10px!important;min-width:0}
+.at-source-year{display:grid;grid-template-columns:minmax(64px,auto) minmax(0,1fr);align-items:baseline;gap:16px;border-top:1px solid #dce3ee;padding:12px 0 6px;color:#233d65}
+.at-source-year>b{font:600 24px/1.25 Georgia,"Microsoft YaHei",serif;white-space:nowrap;font-variant-numeric:tabular-nums}.at-source-year small{font:13px/1.4 "Microsoft YaHei",sans-serif;color:#697c98}.at-source-year p{margin:0!important;color:#5b6e89;font-size:14px;line-height:1.8;overflow-wrap:anywhere}
+.at-evidence-empty{background:#192b49;border-top:3px solid #8faefc;padding:21px 19px;color:#d6e0f3;min-width:0;align-self:start}.at-evidence-empty>span{display:block;font-size:12px;color:#a1b7df;letter-spacing:.1em}.at-evidence-empty h5{font-size:19px!important;color:#f5f7ff!important;line-height:1.45!important;margin:12px 0!important;padding:0!important;overflow-wrap:anywhere}.at-evidence-empty p{font-size:14px;line-height:1.9;color:#bccce5;margin:0!important}
+[class*="st-key-attribution_source_record_"] [class*="st-key-source_document_toolbar_"]{border-top:0!important;margin-top:0!important;padding-block:4px!important}
+[class*="st-key-attribution_close_evidence_"] button{border-radius:0!important;border:1px solid #9db1d3!important;background:transparent!important;color:#2b4d82!important;min-height:36px!important;font-size:12px!important}
+@media(max-width:680px){[class*="st-key-attribution_selected_evidence_"]{padding:20px 16px}.at-evidence-bridge h4{font-size:24px!important}}
+@media(max-width:900px){[class*="st-key-attribution_source_ledger_"]{padding:15px!important}.at-source-year{grid-template-columns:1fr;gap:3px}.at-evidence-empty{padding:18px 15px}.at-evidence-empty h5{font-size:17px!important}}

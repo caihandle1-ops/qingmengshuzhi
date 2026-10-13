@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from copy import deepcopy
 from hashlib import sha256
 from html import escape
 import json
@@ -60,12 +61,14 @@ def _styles(path, modified):
 
 def _load_styles():
     path = Path(__file__).with_suffix('.css')
-    st.html(f'<style>{_styles(str(path), path.stat().st_mtime_ns)}</style>')
+    desk = path.with_name('verification_desks.css')
+    st.html('<style>' + _styles(str(path), path.stat().st_mtime_ns)
+            + _styles(str(desk), desk.stat().st_mtime_ns) + '</style>')
 
 
 def _scene(name, identifier, content):
     return (f'<section class="tool-result tr-{name}" data-result-scene="{name}" '
-            f'data-result-id="{_e(identifier)}">{content}</section>')
+            f'data-result-id="{_e(identifier)}" data-desk-scene="{name}" data-desk-id="{_e(identifier)}">{content}</section>')
 
 
 def scope_matrix_html(report, selected=None):
@@ -106,27 +109,43 @@ def render_scope_matrix(report):
         st.session_state.scope_matrix_focus = None
     selected = st.session_state.get('scope_matrix_focus')
     with st.container(key='scope_matrix'):
-        st.html(scope_matrix_html(report, selected))
         dimensions = report.get('dimensions') or []
+        fingerprints = report.get('fingerprints') or []
+        headings = ''.join(f'<span><b>{_e(item.get("company"))}</b><small>{_e(item.get("year"))} 年</small></span>'
+                           for item in fingerprints)
+        st.html(f'<header class="vd-heading vd-heading-scope" data-desk-scene="scope" data-desk-id="{identity}"><div><span>COMPARABILITY / 口径对照</span>'
+                f'<h3>{_e(report.get("label"), "六维口径")}</h3></div>'
+                '<p>点击维度，就地展开判定依据。</p><i data-vd-accent aria-hidden="true"></i></header>'
+                f'<div class="vd-scope-columns"><span>核验维度 / 判定状态</span><div>{headings or "尚无完整来源记录"}</div></div>')
         if not dimensions:
+            st.info('尚无完整的维度记录。')
             return
-        st.caption('选择一个维度查看判定依据；再次点击收起。')
-        with st.container(key='scope_matrix_picker'):
-            columns = st.columns(3)
-            for index, dimension in enumerate(dimensions):
-                key = dimension.get('key')
-                columns[index % 3].button(dimension.get('label') or key, key=f'scope_matrix_pick_{key}',
-                    type='primary' if selected == key else 'secondary', width='stretch',
-                    on_click=_toggle_focus, args=(key,))
-        if selected:
-            dimension = next((item for item in dimensions if item.get('key') == selected), None)
-            if dimension:
-                with st.container(key='scope_matrix_evidence'):
-                    st.markdown(f'**{dimension.get("label")} · {STATUS.get(dimension.get("status"), "待复核")}**')
-                    st.write(dimension.get('reason') or '尚无完整判定依据。')
-                    if dimension.get('missing'):
-                        st.caption('缺少口径记录：' + '、'.join(map(str, dimension['missing'])))
-                    st.caption('可继续通过“查看来源依据”核对原值与原件；人工补充不能覆盖已有冲突。')
+        for index, dimension in enumerate(dimensions):
+            key = dimension.get('key')
+            with st.container(key=f'scope_matrix_row_{key}'):
+                pick, values = st.columns([.72, 2], gap='small', vertical_alignment='center')
+                pick.button(f'**{index + 1:02}  {dimension.get("label") or key}**\n\n'
+                            f'{STATUS.get(dimension.get("status"), "待复核")} · {"收起依据" if selected == key else "查看依据"}',
+                            key=f'scope_matrix_pick_{key}', type='primary' if selected == key else 'secondary',
+                            width='stretch', on_click=_toggle_focus, args=(key,))
+                records = []
+                for fingerprint in fingerprints:
+                    value = (fingerprint.get('dimensions') or {}).get(key)
+                    label = VALUE_LABELS.get(value, value) if isinstance(value, str) else value
+                    if key == 'definition':
+                        from core.analysis import METRIC_LABELS
+                        label = METRIC_LABELS.get(value, label)
+                    records.append(f'<span>{_e(label, "未确认")}</span>')
+                values.html(f'<div class="vd-scope-values vd-state-{_tone(dimension.get("status"))}" '
+                            f'data-vd-selected="{str(selected == key).lower()}">'
+                            + (''.join(records) or '<span>没有完整指标记录</span>') + '</div>')
+                if selected == key:
+                    with st.container(key='scope_matrix_evidence'):
+                        st.markdown(f'**{dimension.get("label")} · 判定依据**')
+                        st.write(dimension.get('reason') or '尚无完整判定依据。')
+                        if dimension.get('missing'):
+                            st.caption('缺少口径记录：' + '、'.join(map(str, dimension['missing'])))
+                        st.caption('人工补充不会覆盖已有冲突。再次点击同一维度可收起。')
 
 
 def counter_comparison_html(result):
@@ -201,7 +220,14 @@ def replay_archive_html(item, key, selected=None):
 def render_replay_archive(item, key, selected=None):
     _load_styles()
     with st.container(key='replay_archive'):
-        st.html(replay_archive_html(item, key, selected))
+        result = item.get('result') or {}
+        delivery = result.get('delivery_state') or {}
+        content = ('<div class="vd-record-cover"><span>RESEARCH ARCHIVE / 研究档案</span>'
+                   f'<h3>{_e(item.get("question"), "已保存问数记录")}</h3>'
+                   f'<p>{_e(delivery.get("label"), "交付状态待复核")}</p>'
+                   f'<small>{_e(delivery.get("reason"), "读取回答时保存的内容与来源。")}</small>'
+                   '<i data-vd-accent aria-hidden="true"></i></div>')
+        st.html(_scene('replay', result_id({'record': key, 'result': result}), content))
 
 
 def replay_comparison_html(review):
@@ -255,4 +281,43 @@ def replay_comparison_html(review):
 def render_replay_comparison(review):
     _load_styles()
     with st.container(key='replay_comparison'):
-        st.html(replay_comparison_html(review))
+        field = 'differences' if review.get('action') == '版本比对' else 'formulas'
+        rows = (review.get('result') or {}).get(field) or []
+        view = review
+        if len(rows) > 6:
+            groups = replay_groups(review)
+            options = list(groups) + ['全部企业']
+            identity = result_id(review)[:16]
+            with st.container(key='replay_difference_filters'):
+                company_column, ordering_column = st.columns([1.4, 1])
+                company = company_column.selectbox('核验企业', options, key=f'replay_group_{identity}',
+                    format_func=lambda name: f'{name} · {len(rows) if name == "全部企业" else len(groups[name])} 项')
+                attention_first = ordering_column.checkbox('待核对项优先', value=True, key=f'replay_attention_{identity}')
+            view = replay_group_review(review, company, attention_first=attention_first)
+            shown = len(view['result'].get(field) or [])
+            st.caption(f'当前显示 {shown} / {len(rows)} 项数值对照；可切换企业或选择“全部企业”。')
+        st.html(replay_comparison_html(view))
+
+
+def replay_groups(review):
+    """Group frozen rows without recomputation or elevating a stored status."""
+    field = 'differences' if review.get('action') == '版本比对' else 'formulas'
+    groups = {}
+    for row in (review.get('result') or {}).get(field) or []:
+        company = str(row.get('company') or '未注明企业')
+        groups.setdefault(company, []).append(row)
+    return dict(sorted(groups.items(), key=lambda item: all(row.get('status') in {'passed', 'verified', 'replayed'}
+                                                           for row in item[1])))
+
+
+def replay_group_review(review, company, *, attention_first=True):
+    """A reading projection; original result, timestamps and checks stay intact."""
+    view = deepcopy(review)
+    field = 'differences' if review.get('action') == '版本比对' else 'formulas'
+    rows = list((view.get('result') or {}).get(field) or [])
+    if company != '全部企业':
+        rows = [row for row in rows if str(row.get('company') or '未注明企业') == company]
+    if attention_first:
+        rows.sort(key=lambda row: row.get('status') in {'passed', 'verified', 'replayed'})
+    view.setdefault('result', {})[field] = rows
+    return view

@@ -14,9 +14,21 @@ def is_research_task(question):
             and any(w in question for w in ['现金流','利润']))
 
 
-def run_research_task(question, data_map, *, reports=None, index_root=None, progress=None):
+def run_research_task(question, data_map, *, reports=None, index_root=None, progress=None,
+                      checkpoint=None, save_checkpoint=None, check_interrupt=None):
     """Screen revenue up and cash flow/profit down; attach scoped report evidence."""
     started=perf_counter()
+    checkpoint = checkpoint if checkpoint is not None else {}
+    completed = checkpoint.setdefault('completed', {})
+    def interrupt(stage):
+        # Unlike optional progress notifications, cancellation/budget exceptions
+        # must escape to the durable job runner.
+        if check_interrupt is not None:
+            check_interrupt(stage)
+    def persist():
+        if save_checkpoint is not None:
+            save_checkpoint(checkpoint)
+    interrupt('研究任务条件识别')
     def notify(stage, status, detail):
         if progress is not None:
             try:
@@ -48,6 +60,7 @@ def run_research_task(question, data_map, *, reports=None, index_root=None, prog
     trace=[{'step':1,'name':'任务拆解','status':'completed','detail':f'{previous}至{current}年；先复核数据，再计算与筛选，最后检索解释'}]
     qualifying=[]; excluded=[]; snapshots={}; calculations=[]
     for company,frame in data_map.items():
+        interrupt('企业年度筛选')
         if frame.empty or 'year' not in frame:
             excluded.append({'company':company,'reason':'没有年度指标'}); continue
         selected=frame[frame['year'].astype(int).isin([previous,current])]
@@ -78,14 +91,27 @@ def run_research_task(question, data_map, *, reports=None, index_root=None, prog
            '变化复算与条件筛选已执行。' if calculations else '没有完整可计算范围，未执行变化复算。')
     wants_evidence=any(w in question for w in ['原因','解释','年报','研报','为什么'])
     citations=[]
+    checkpoint['total'] = len(qualifying) if wants_evidence else 0
+    checkpoint['screened'] = len(snapshots)
+    persist()
     if wants_evidence and qualifying:
         notify('retrieve','running','正在按符合条件的企业检索报告解释依据。')
     for row in qualifying:
         if not wants_evidence:
             row['explanation']='未请求报告解释'; continue
-        result=retrieve_documents(f'{row["company"]}{current}年'+('现金流' if target=='operating_cashflow' else '净利润')+'下降的原因是什么？',
-            {'companies':[row['company']],'years':[current],'metrics':[target],'period':'annual'},
-            reports=reports,index_root=index_root)
+        company = row['company']
+        if company in completed:
+            result = completed[company]
+        else:
+            interrupt('企业报告检索：' + company)
+            result=retrieve_documents(f'{company}{current}年'+('现金流' if target=='operating_cashflow' else '净利润')+'下降的原因是什么？',
+                {'companies':[company],'years':[current],'metrics':[target],'period':'annual'},
+                reports=reports,index_root=index_root)
+            completed[company] = result
+            # Commit the actual retrieval result before a budget/cancellation
+            # check: an interrupted next step must not repeat this company.
+            persist()
+            interrupt('企业检索检查点已保存：' + company)
         row['explanation']=result.get('answer','未获得解释依据')
         row['evidence_status']=result.get('status','no_evidence')
         citations.extend(result.get('citations') or [])

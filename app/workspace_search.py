@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from html import escape
 import re
 
 import pandas as pd
@@ -9,6 +10,7 @@ import streamlit as st
 
 from app.navigation import navigate, open_workspace_route, preserve_inputs, recent_workspace_pages, route_label
 from app.ui_state import history_caption, on_company_change, restore_session
+from app.interface_states import render_empty_state
 from core.analysis import METRIC_LABELS, safe_num
 
 
@@ -38,6 +40,9 @@ _WORKSPACE_PAGES = (
     ('import', '数据接入', 'upload_file', '选择本地文件或公开披露接入。', {'page': '数据资产', 'asset_subview': '数据接入', 'data_center_view': None}, ('接入', '导入', '上传', '公开披露')),
     ('evaluation', '评测中心', 'checklist', '进入实际测试题与评测记录。', {'page': '数据资产', 'asset_subview': '评测中心'}, ('评测', '测试题')),
     ('review', '待复核记录', 'assignment', '查看本地已提交的复核请求。', {'page': '数据资产', 'asset_subview': '待复核记录'}, ('复核记录', '待复核')),
+    ('annual_originals', '年度报告', 'description', '查阅企业已接入的年报原件与披露来源。', {'page':'数据资产','asset_subview':'年度报告'}, ('年报','年度报告','年报原件')),
+    ('system', '系统说明', 'schema', '实际系统架构、数据库表与字段关系。', {'page':'数据资产','asset_subview':'系统说明'}, ('架构','Schema','数据库','表结构')),
+    ('agents', '多智能体协作', 'account_tree', '独立角色对已保存答案进行复核。', {'page':'数据资产','asset_subview':'多智能体协作'}, ('多智能体','协作','协同','模型复核')),
 )
 
 
@@ -150,12 +155,32 @@ def search_workspace_resources(query, data_map, reports, sessions=None, pages=No
 def open_workspace_search(query=''):
     preserve_inputs()
     st.session_state.workspace_search_query = _text(query)
+    st.session_state.workspace_palette_query = _text(query)
     st.session_state.workspace_search_open = True
 
 
 def close_workspace_search():
     st.session_state.workspace_search_query = ''
+    st.session_state.workspace_palette_query = ''
     st.session_state.workspace_search_open = False
+
+
+def clear_workspace_query():
+    """Return to recent resources without changing the research draft."""
+    st.session_state.workspace_search_query = ''
+    st.session_state.workspace_palette_query = ''
+    st.session_state.header_search = ''
+    st.session_state.mobile_header_search = ''
+    st.session_state.workspace_search_open = True
+
+
+def submit_palette_query():
+    """Native Enter/blur updates only search; it never submits a QA task."""
+    # Esc/close can unmount a dirty input before its delayed native blur arrives.
+    # That stale search edit must not reopen the workspace after a close/route.
+    if not st.session_state.get('workspace_search_open'):
+        return
+    st.session_state.workspace_search_query = _text(st.session_state.get('workspace_palette_query'))
 
 
 def _select_company(company):
@@ -224,12 +249,15 @@ def _render_search_items(matches, kind, icon, data_map, on_restore, prefix='work
             known_years = tuple(int(safe_num(value)) for value in frame['year'] if safe_num(value) is not None) if (
                 isinstance(frame, pd.DataFrame) and 'year' in frame) else ()
             callback, args = _prefill_metric, (item, known_years)
-        st.button(_button_label(item['label']), icon=f':material/{item.get("icon", icon)}:',
-                  key=f'{prefix}_{kind}_{index}', on_click=callback, args=args, width='stretch')
-        if kind == 'report':
-            st.caption(' · '.join(str(item[key]) for key in ('company', 'year') if item.get(key) is not None))
-        elif item.get('detail'):
-            st.caption(item['detail'])
+        with st.container(key=f'workspace_search_item_{prefix}_{kind}_{index}'):
+            category, title, context = st.columns([.65, 4.2, 2], gap='small', vertical_alignment='center')
+            category.caption({'page': '功能', 'session': '会话', 'company': '企业',
+                              'report': '资料', 'metric': '指标'}[kind])
+            title.button(_button_label(item['label']), icon=f':material/{item.get("icon", icon)}:',
+                         key=f'{prefix}_{kind}_{index}', on_click=callback, args=args, width='stretch')
+            detail = item.get('detail') or ' · '.join(str(item[key]) for key in ('company', 'year') if item.get(key) is not None)
+            if detail:
+                context.caption(detail)
     if not matches:
         st.caption('暂无匹配')
     elif len(matches) > 5:
@@ -244,11 +272,21 @@ def render_workspace_search_results(data_map, reports, sessions=None, on_restore
     data_map = data_map if isinstance(data_map, Mapping) else {}
     sessions = st.session_state.get('saved_sessions', []) if sessions is None else sessions
     with st.container(key='workspace_search_results'):
+        st.html('<div class="qm-command-head" data-qm-command-query="' + escape(query, quote=True) + '">'
+                '<span>WORKSPACE / 工作区导航</span><kbd>Ctrl / ⌘ K</kbd>'
+                '<i class="qm-command-rule" aria-hidden="true"></i></div>')
         title, close = st.columns([4, 1], vertical_alignment='center')
         title.markdown('### 搜索工作区')
         close.button('关闭搜索', icon=':material/close:', key='workspace_search_close',
                      on_click=close_workspace_search, width='stretch')
-        st.caption('查找页面、企业、指标、资料或历史会话。选择入口后继续当前任务。')
+        # This is a real Streamlit input and callback. The keyboard controller
+        # only focuses/clicks mounted native controls; no duplicate client index.
+        if st.session_state.get('workspace_palette_query') != query:
+            st.session_state.workspace_palette_query = query
+        st.text_input('搜索工作区资源', key='workspace_palette_query',
+                      placeholder='页面、企业、指标、资料或历史会话', max_chars=500,
+                      on_change=submit_palette_query, label_visibility='collapsed')
+        st.caption('输入关键词后回车 · ↑ ↓ 选择 · Enter 打开 · Esc 返回研究')
         if not query:
             recent, pages = st.tabs(['最近访问', '功能入口'])
             with recent:
@@ -257,7 +295,7 @@ def render_workspace_search_results(data_map, reports, sessions=None, on_restore
                 if visited:
                     _render_search_items(visited, 'page', 'history', data_map, on_restore, prefix='workspace_recent')
                 else:
-                    st.info('还没有页面访问记录。可在“功能入口”选择页面，或在顶部输入关键词。')
+                    render_empty_state('从一项研究开始', '还没有页面访问记录。可在“功能入口”选择页面，或在顶部输入关键词。', kind='recent-empty')
             with pages:
                 _render_search_items(workspace_page_resources(), 'page', 'apps', data_map, on_restore,
                                      prefix='workspace_entry')
@@ -269,13 +307,16 @@ def render_workspace_search_results(data_map, reports, sessions=None, on_restore
                   ('session', '历史会话', 'forum')]
         # Put the first matching category first; inactive tabs keep the surface compact.
         groups.sort(key=lambda group: not any(item['kind'] == group[0] for item in results))
-        tabs = st.tabs([f'{heading} · {sum(item["kind"] == kind for item in results)}'
-                        for kind, heading, _icon in groups])
-        for tab, (kind, _heading, icon) in zip(tabs, groups):
-            with tab:
-                _render_search_items([item for item in results if item['kind'] == kind], kind, icon,
-                                     data_map, on_restore)
-        if not results:
-            st.info('当前工作区没有匹配结果。可换一个关键词。')
+        if results:
+            tabs = st.tabs([f'{heading} · {sum(item["kind"] == kind for item in results)}'
+                            for kind, heading, _icon in groups])
+            for tab, (kind, _heading, icon) in zip(tabs, groups):
+                with tab:
+                    _render_search_items([item for item in results if item['kind'] == kind], kind, icon,
+                                         data_map, on_restore)
+        else:
+            render_empty_state('当前工作区没有匹配结果', '可换一个关键词，或将这段文字作为问题继续分析。', kind='search-empty')
+            st.button('清除关键词', icon=':material/backspace:', key='workspace_search_clear',
+                      on_click=clear_workspace_query)
         st.button('作为问题开始分析', icon=':material/chat:', key='workspace_search_as_question',
                   on_click=_analyze_search_question, help='明确提交这段文字后，才会生成问答记录')

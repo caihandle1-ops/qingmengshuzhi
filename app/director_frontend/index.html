@@ -24,7 +24,7 @@
       <div class="focus-light" aria-hidden="true"></div>
       <section id="focusbar" class="focusbar" aria-label="贯穿汇报的当前指标" hidden>
         <div class="focus-settings"><div id="metric-choices" class="metric-choices" role="group" aria-label="选择贯穿汇报的指标"></div><div class="focus-year-line"><label for="focus-year">观察年度</label><select id="focus-year" aria-label="观察年度"></select><span id="focus-origin"></span></div></div>
-        <div class="focus-fact" id="focus-fact"><span id="focus-label"></span><div><strong id="focus-value"></strong><span id="focus-unit"></span></div></div>
+        <div id="focus-home" class="focus-home"><div class="focus-fact" id="focus-fact"><span id="focus-label"></span><div><strong id="focus-value"></strong><span id="focus-unit"></span></div></div></div>
         <div id="focus-journey" class="focus-journey" aria-label="当前指标的叙事进度"><span data-focus-chapter="metrics">量级</span><i></i><span data-focus-chapter="annual">年度</span><i></i><span data-focus-chapter="sources">出处</span></div>
       </section>
       <div id="stage" class="stage"></div>
@@ -36,10 +36,19 @@
       </aside>
     </section>
   </div>
+  <section id="cinema-controls" class="cinema-controls" aria-label="本章镜头控制" hidden>
+    <div class="cinema-toolbar"><span class="cinema-caption">镜头时间轴 <small id="cinema-state" role="status">静态阅读</small></span><div class="cinema-buttons"><button id="cinema-play" type="button" aria-pressed="false">播放</button><button id="cinema-reverse" type="button">倒放</button><button id="cinema-replay" type="button">重播</button></div></div>
+    <div class="cinema-scrubber"><div id="cinema-track" class="cinema-track" aria-hidden="true"><div id="cinema-progress" class="cinema-progress"></div><span id="cinema-playhead" class="cinema-playhead"></span></div><input id="cinema-seek" type="range" min="0" max="1000" step="1" value="1000" aria-label="本章镜头进度"><output id="cinema-time" for="cinema-seek">6.4 / 6.4 秒</output></div>
+    <div class="cinema-phases" role="group" aria-label="跳转到镜头阶段"><button type="button" data-cinema-phase="establish">01 建立全景</button><button type="button" data-cinema-phase="inspect">02 聚焦线索</button><button type="button" data-cinema-phase="trace">03 展开依据</button></div>
+  </section>
   <footer class="controlbar"><div class="chapter-progress"><b id="position">01</b><span id="total">/ 01</span><span id="identity" class="identity"></span></div><p id="status" aria-live="polite">正在载入已有记录</p><div class="page-actions"><button id="previous" type="button" aria-label="上一章">←</button><button id="next" type="button" aria-label="下一章">→</button></div></footer>
   <p id="announcement" class="sr-only" role="status" aria-live="polite"></p>
 </main>
 <script src="director-model.js"></script>
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/Draggable.min.js"></script>
+<script src="vendor/Flip.min.js"></script>
+<script src="director-cinema.js"></script>
 <script src="director.js"></script>
 </body>
 </html>

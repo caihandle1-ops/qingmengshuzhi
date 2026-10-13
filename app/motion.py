@@ -3,6 +3,7 @@ from inspect import signature
 from pathlib import Path
 
 import streamlit as st
+from app.static_assets import read_asset_text
 
 MOTION_VERSION = '2026-10-05.5'
 MOTION_SCRIPT = Path(__file__).with_suffix('.js')
@@ -13,7 +14,7 @@ def render_motion() -> bool:
     if 'unsafe_allow_javascript' not in signature(st.html).parameters:
         return False
     try:
-        javascript = MOTION_SCRIPT.read_text(encoding='utf-8')
+        javascript = read_asset_text(MOTION_SCRIPT)
     except OSError:
         return False
     # Only this repository-owned script is executed in the main document.

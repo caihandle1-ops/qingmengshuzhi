@@ -1,0 +1,27 @@
+/* Business reading rhythm, scoped away from the animated scenes and header. */
+[data-testid="stMain"] [class*="st-key-feedback_surface_"] {
+  --feedback-ink:#31546b; --feedback-rule:#8da6b4;
+  padding:16px 20px;margin:10px 0;border:1px solid #c9d3d6;
+  border-left:3px solid var(--feedback-rule);border-radius:3px;background:#f7f8f5;
+}
+[data-testid="stMain"] [class*="st-key-feedback_surface_"]:has([data-feedback-tone="error"]) {--feedback-ink:#893d43;--feedback-rule:#ad6169;background:#fbf5f3}
+[data-testid="stMain"] [class*="st-key-feedback_surface_"]:has([data-feedback-tone="warning"]) {--feedback-ink:#70511c;--feedback-rule:#a58a4c;background:#faf8ef}
+[data-testid="stMain"] [class*="st-key-feedback_surface_"]:has([data-feedback-tone="success"]) {--feedback-ink:#315f48;--feedback-rule:#698e79;background:#f2f7f2}
+.feedback-heading {display:flex;align-items:center;gap:11px;font-size:14px;line-height:1.65;color:var(--feedback-ink);position:relative}
+.feedback-rule {display:block;width:22px;height:2px;background:currentColor;transform-origin:left;flex:0 0 22px}
+[data-testid="stMain"] [class*="st-key-feedback_surface_"] [data-testid="stAlert"] {padding:0;border:0;background:transparent;border-radius:0;color:#233c49}
+[data-testid="stMain"] [class*="st-key-feedback_surface_"] [data-testid="stAlert"] p {font-size:14px;line-height:1.8;color:inherit;overflow-wrap:anywhere}
+.feedback-next {font-size:13px;line-height:1.8;color:#4e626e;margin:0;max-width:90ch}
+.feedback-next>span {font-size:12px;font-weight:650;color:var(--feedback-ink);margin-right:12px}
+[data-testid="stMain"] :is([class*="st-key-answer_workbench_"],.st-key-guided_content_data_center_view,.st-key-enterprise_metric_spread) [data-testid="stCaptionContainer"] p {font-size:13px;line-height:1.8;color:#526773}
+[data-testid="stMain"] :is([class*="st-key-answer_workbench_"],.st-key-guided_content_data_center_view) [data-testid="stWidgetLabel"] p {font-size:14px;line-height:1.6}
+[data-testid="stMain"] [class*="st-key-answer_workbench_"] [data-testid="stMarkdownContainer"]>p {font-size:15px;line-height:1.85}
+[data-testid="stMain"] :is([class*="st-key-financial_table_"],.st-key-local_import_review) [data-testid="stDataFrame"] {border:1px solid #c3cfd4;border-radius:3px;overflow:hidden}
+@media(min-width:1600px) {
+ [data-testid="stMain"] [class*="st-key-answer_workbench_"] {padding-inline:clamp(0px,1vw,20px)}
+ [data-testid="stMain"] [class*="st-key-answer_workbench_"] [data-testid="stMarkdownContainer"]>p {max-width:86ch}
+}
+@media(min-width:1100px) and (max-width:1450px) {
+ [data-testid="stMain"] .st-key-app_header .st-key-header_bar>[data-testid="stLayoutWrapper"]>[data-testid="stHorizontalBlock"] {gap:14px!important}
+ [data-testid="stMain"] [class*="st-key-feedback_surface_"] {padding:14px 16px}
+}

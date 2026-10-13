@@ -111,9 +111,9 @@ def _close_panel(state_key):
     st.session_state[state_key] = False
 
 
-def _render_sources(result, key):
+def _render_sources(result, key, *, inline=False):
     entries = collect_answer_sources(result)
-    with st.container(key=f'answer_sources_panel_{key}'):
+    with st.container(key=f'answer_sources_{"inline" if inline else "panel"}_{key}'):
         st.markdown('<span class="evidence-drawer-marker" aria-hidden="true"></span>', unsafe_allow_html=True)
         title, close = st.columns([4, 1])
         title.markdown('**本次回答的来源**')
@@ -124,7 +124,17 @@ def _render_sources(result, key):
             st.warning('本次回答没有保存真实来源记录。资料目录不能替代引用，仍需补充原文核验。')
             return
         from app.source_reading import render_linked_reading
+        from app.dual_evidence import render_dual_evidence
+        if not inline:
+            render_dual_evidence(result, entries, f'answer_direct_{key}')
         render_linked_reading(result, entries, key, answer_verification(result), render_source)
+
+
+def render_answer_comparison(result, key):
+    """Keep the adjustable two-original spread below the compact evidence rail."""
+    if st.session_state.get(f'answer_sources_open_{key}'):
+        from app.dual_evidence import render_dual_evidence
+        render_dual_evidence(result, collect_answer_sources(result), f'answer_direct_{key}')
 
 
 def _render_checks(result, key):
@@ -165,28 +175,42 @@ def _render_checks(result, key):
                         st.caption(dimension.get('reason') or dimension.get('message'))
 
 
-def render_answer_actions(result, key):
-    """Two visible actions; one explicitly opened panel, no automatic exports."""
+def render_answer_actions(result, key, *, compact=False):
+    """A compact evidence toolbar; one explicitly opened panel, no exports."""
     sources_open, check_open = f'answer_sources_open_{key}', f'answer_check_open_{key}'
     sources = collect_answer_sources(result)
     names = list(dict.fromkeys(_source_name(entry['source']) for entry in sources
                                if entry['source'].get('file_name')))
-    source_label = f'查看来源 · {len(names)}份文件' if names else '查看来源'
+    # Different originals can share a basename. Count the frozen citation
+    # records here rather than presenting distinct names as a file count.
+    source_label = f'查看来源 · {len(sources)} 条引用' if sources else '查看来源'
     source_help = '来源文件：' + '；'.join(names) if names else '查看本次回答保存的来源与原文位置。'
     verdict = answer_verification(result)
     with st.container(key=f'answer_actions_{key}'):
-        source_col, check_col = st.columns(2)
+        if compact:
+            context_col, source_col, check_col = st.container(), st.container(), st.container()
+        else:
+            context_col, source_col, check_col = st.columns([2.8, 1.55, 1.8], gap='small')
+        context_col.html('<div class="answer-action-context"><span>本次回答</span>'
+                         f'<strong>{len(sources)} 条保存引用</strong>'
+                         '<small>依据与核验记录</small></div>')
         source_col.button('收起来源' if st.session_state.get(sources_open) else source_label,
                           icon=':material/description:', key=f'answer_sources_toggle_{key}',
                           on_click=_toggle_panel, args=(sources_open, check_open), width='stretch',
+                          type='primary' if st.session_state.get(sources_open) else 'secondary',
                           help=source_help)
         tone = 'verified' if verdict['deliverable'] else 'conflict' if verdict['status'] in {'blocked', 'conflict', 'failed', 'error'} else 'pending'
         with check_col:
             with st.container(key=f'answer_verdict_{tone}_{key}'):
                 st.button('收起核验' if st.session_state.get(check_open) else f'核验 · {verdict["label"]}',
                           icon=':material/fact_check:', key=f'answer_check_toggle_{key}',
-                          on_click=_toggle_panel, args=(check_open, sources_open), width='stretch')
+                          on_click=_toggle_panel, args=(check_open, sources_open), width='stretch',
+                          type='primary' if st.session_state.get(check_open) else 'secondary',
+                          help=verdict['reason'])
     if st.session_state.get(sources_open):
-        _render_sources(result, key)
+        _render_sources(result, key, inline=compact)
     elif st.session_state.get(check_open):
         _render_checks(result, key)
+    elif compact:
+        from app.answer_desk import evidence_rest_html
+        st.html(evidence_rest_html(sources, key))

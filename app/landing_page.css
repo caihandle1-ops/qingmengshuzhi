@@ -1,0 +1,13 @@
+/* The brand page owns the viewport, not a card inside Streamlit's workspace. */
+body:has(.st-key-brand_landing){background:#080f20!important;overflow:hidden}
+body:has(.st-key-brand_landing) :is([data-testid="stHeader"],[data-testid="stSidebar"],[data-testid="stToolbar"],footer){display:none!important}
+body:has(.st-key-brand_landing) [data-testid="stMainBlockContainer"]{padding:0!important;max-width:none!important}
+.st-key-brand_landing{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;background:#080f20;z-index:99990;overflow:hidden}
+.st-key-brand_landing iframe{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;border:0!important;max-width:none!important;display:block}
+.st-key-brand_landing [data-testid="stElementContainer"]:has(iframe){margin:0!important;padding:0!important}
+.st-key-landing_enter_workspace{position:fixed!important;top:26px;right:36px;width:auto!important;z-index:99999}
+.st-key-landing_enter_workspace button{min-height:40px!important;color:#f1f5ff!important;background:transparent!important;border:0!important;border-bottom:1px solid #ffffff66!important;border-radius:0!important;padding:0 2px!important;box-shadow:none!important;transform:none!important}
+.st-key-landing_enter_workspace button p{font-size:13px!important;letter-spacing:.06em}
+.st-key-landing_enter_workspace button:hover{color:#dcf98a!important;border-bottom-color:#dcf98a!important}
+.st-key-landing_enter_workspace button:focus-visible{outline:2px solid #dcf98a!important;outline-offset:5px}
+@media(max-width:700px){.st-key-landing_enter_workspace{top:20px;right:20px}}

@@ -1,0 +1,22 @@
+/* Compact, native research filters. Labels and field geometry stay still. */
+.st-key-asset_gallery_facets{background:#f1f3e8!important;border:1px solid #cad5c2!important;border-top:3px solid #244f40!important;border-radius:0!important;padding:15px 18px 11px!important;margin-bottom:0!important}
+.st-key-asset_gallery_facets .asset-index-label{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;color:#254e3f;margin-bottom:0!important}
+.st-key-asset_gallery_facets .asset-index-label>span{font:9px/1.4 Consolas,monospace;letter-spacing:.13em;color:#6c7d68}
+.st-key-asset_gallery_facets .asset-index-label>strong{font-size:18px;line-height:1.4;letter-spacing:-.04em}
+.st-key-asset_gallery_facets .asset-index-label>small{margin-left:auto;font-size:11px;color:#697960}
+.st-key-asset_gallery_facets [data-testid="stVerticalBlock"]{gap:9px!important}
+.st-key-asset_gallery_facets [data-testid="stHorizontalBlock"]{gap:12px!important;align-items:flex-end;flex-wrap:nowrap!important}
+.st-key-asset_gallery_facets [data-testid="stColumn"]{min-width:0!important}
+.st-key-asset_gallery_facets [data-testid="stWidgetLabel"] p{font-size:11px!important;line-height:1.5!important;color:#62735c!important;font-weight:500!important}
+.st-key-asset_gallery_facets [data-baseweb="select"]>div,.st-key-asset_gallery_facets [data-baseweb="input"]{min-height:40px!important;border:1px solid #c7d3c0!important;background:#fcfdf6!important;border-radius:2px!important;box-shadow:none!important}
+.st-key-asset_gallery_facets :is(input,[data-baseweb="select"]){font-size:12px!important;color:#274e3e!important}
+.st-key-asset_gallery_facets [data-baseweb="select"]>div{padding-top:0!important;padding-bottom:0!important}
+.st-key-asset_gallery_facets .asset-year-index{display:flex;gap:0!important;align-items:center;flex-wrap:wrap;border-top:1px solid #ccd6c2;margin-top:0;padding-top:7px}
+.st-key-asset_gallery_facets .asset-year-token{display:flex;align-items:baseline;gap:6px;padding:0 15px!important;border-right:1px solid #c9d4be;font-size:11px;color:#748169}
+.st-key-asset_gallery_facets .asset-year-token:first-child{padding-left:0!important}
+.st-key-asset_gallery_facets .asset-year-token:last-child{border-right:0}
+.st-key-asset_gallery_facets .asset-year-token b{font:600 12px/1.6 Arial,sans-serif}
+.st-key-asset_gallery_facets .asset-year-token small{font-size:9px}
+.st-key-asset_gallery_facets .asset-year-token.is-active b{box-shadow:0 2px #889b3d;color:#254c3b}
+@media(max-width:1050px){.st-key-asset_gallery_facets [data-testid="stHorizontalBlock"]{flex-wrap:wrap!important}.st-key-asset_gallery_facets [data-testid="stColumn"]{flex:1 1 145px!important}}
+@media(forced-colors:active){.st-key-asset_gallery_facets,.st-key-asset_gallery_facets [data-baseweb="select"]>div,.st-key-asset_gallery_facets [data-baseweb="input"]{background:Canvas!important;color:CanvasText!important;border-color:CanvasText!important}}

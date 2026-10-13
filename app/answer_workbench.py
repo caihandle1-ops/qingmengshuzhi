@@ -69,6 +69,11 @@ def answer_canvas_header(snapshot, key):
             f'<span class="answer-canvas-period">{escape(str(snapshot["year"]))} 年度</span></div>')
 
 
+def _toggle_research(key):
+    state_key=f'answer_research_expanded_{key}'
+    st.session_state[state_key]=not st.session_state.get(state_key,False)
+
+
 def _render_summary(snapshot, key, result=None):
     metric, year = snapshot['metric'], snapshot['year']
     label, unit = METRIC_LABELS.get(metric, metric), METRIC_UNITS.get(metric, '')
@@ -76,6 +81,7 @@ def _render_summary(snapshot, key, result=None):
     source = (current.get('metric_provenance') or {}).get(metric) or {}
     name = str(source.get('file_name') or current.get('raw_source') or '来源未标注').replace('\\', '/').rsplit('/', 1)[-1]
     location = source.get('cell') or (citation_location(source) if source.get('page') is not None or source.get('location') else '')
+    expanded=bool(st.session_state.get(f'answer_research_expanded_{key}',False))
     # The CSS is local, dependency-free, and has no entry/height animation.
     # studio_motion owns the once-per-answer decorative choreography.
     st.html(f'<style>{Path(__file__).with_name("answer_canvas.css").read_text(encoding="utf-8")}</style>')
@@ -94,6 +100,8 @@ def _render_summary(snapshot, key, result=None):
                 st.caption('数据身份：' + summarize_data_identity([current], metrics=[metric], years=[year])['label'])
                 if value is None:
                     st.caption('暂无已冻结数值，缺失数据保持空缺。')
+                st.button('收起指标研究 ↙' if expanded else '展开指标研究 ↗',
+                          key=f'answer_research_toggle_{key}',on_click=_toggle_research,args=(key,))
             with yoy.container(key=f'answer_canvas_compare_{key}'):
                 st.caption('年度对照')
                 st.metric('同比变化', f'{growth:+.2f}%' if growth is not None else '无可比数据')
@@ -124,6 +132,11 @@ def _render_summary(snapshot, key, result=None):
                 st.markdown(f'**{label}**')
                 st.write(explain_metric(metric))
                 st.caption('数值与定位来自本次回答记录；核验结论见下方核验入口。')
+                if expanded and source.get('file_path'):
+                    render_source(source,f'answer_research_original_{key}',preview_on_open=True,focus_location=True)
+        st.html(f'<span hidden data-result-continuity="{answer_canvas_id(snapshot,key)}" '
+                f'data-result-native-key="{escape(str(key),quote=True)}" '
+                f'data-result-expanded="{str(expanded).lower()}"></span>')
 
 
 def _render_snapshot_data(snapshot):
@@ -188,6 +201,8 @@ def render_simple_answer(result, key, *, show_details=True, view=None):
         _render_snapshot_data(snapshot)
         return
     if view == 'source':
+        from app.dual_evidence import render_dual_evidence, entries_from_result
+        render_dual_evidence(result, entries_from_result(result), f'answer_detail_{key}')
         _render_snapshot_source(snapshot, key)
         return
     if view == 'explanation':

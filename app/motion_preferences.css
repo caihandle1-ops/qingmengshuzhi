@@ -1,0 +1,35 @@
+/* Research mode keeps composition but removes decorative travel and loops. */
+html:is([data-qm-motion-level="light"],[data-qm-motion-level="reduced"]) :is(
+  .studio-financial-device,.studio-financial-device *,[data-feature-scene],
+  [data-feature-scene] *,[data-result-scene] *,[data-enterprise-story] *,
+  .qm-probe-visual *,.studio-nav-indicator,.asset-gallery *,
+  .qm-route-stage,.qm-route-stage *,.qm-evidence-shade,.qm-evidence-shade *,
+  .studio-path-step,.execution-stage-index,[data-baseweb="popover"],.report-reader,.report-reader *) {
+  animation: none !important;
+  transition-duration: 0s !important;
+}
+html:is([data-qm-motion-level="light"],[data-qm-motion-level="reduced"]) [data-feature-scene] {
+  --scene-tilt-x: 0deg !important; --scene-tilt-y: 0deg !important;
+  --scene-drift-x: 0px !important; --scene-drift-y: 0px !important;
+}
+html:is([data-qm-motion-level="light"],[data-qm-motion-level="reduced"]) [data-enterprise-story] {
+  --es-camera-x: 0px !important; --es-camera-y: 0px !important;
+  --es-camera-turn: 0deg !important; --es-camera-scale: 1 !important;
+}
+html[data-qm-motion-level="enhanced"] .qm-route-stage {
+  perspective: 1200px; transform-style: preserve-3d;
+  box-shadow: 0 40px 100px #142c5940;
+}
+html[data-qm-motion-level="enhanced"] .qm-route-stage-copy {
+  text-shadow: 0 14px 40px #10203530;
+}
+.st-key-qm_motion_preferences [data-testid="stRadio"] label { cursor: pointer; }
+.st-key-qm_motion_preferences [data-testid="stCaptionContainer"] { font-size: .73rem; }
+@media (prefers-reduced-motion: reduce) {
+  .qm-route-stage,.qm-evidence-shade { display: none !important; }
+}
+
+html:is([data-qm-motion-level="light"],[data-qm-motion-level="reduced"]) .report-reader,html:is([data-qm-motion-level="light"],[data-qm-motion-level="reduced"]) .report-reader * {
+  --rr-cover-x: 0px !important; --rr-cover-y: 0px !important;
+  --rr-paper-x: 0px !important; --rr-paper-y: 0px !important; --rr-paper-turn: 0deg !important;
+}

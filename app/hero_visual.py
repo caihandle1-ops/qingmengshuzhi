@@ -1,8 +1,11 @@
-"""A local, input-independent illustration of the financial research workflow."""
+"""Isolated spatial navigation; the parent owns actual routes and operations."""
 from pathlib import Path
+import re
+from uuid import uuid4
 
 import streamlit as st
 import streamlit.components.v1 as components
+from app.motion_preferences import motion_preferences
 
 
 _FRONTEND = Path(__file__).with_name('hero_frontend')
@@ -67,13 +70,53 @@ _DEVICE_HTML = '''
 '''
 
 
-def render_hero_visual():
-    """Render an isolated local sculpture, never send research data to the iframe."""
-    stylesheet = Path(__file__).with_suffix('.css').read_text(encoding='utf-8')
-    st.html(f'<style>{stylesheet}</style>')
-    if all((_FRONTEND / name).is_file() for name in ('index.html', 'hero.css', 'hero.js', 'hero-runtime.js')):
-        # Local phase/pointer controls deliberately never set a component value.
-        # A stable slot survives unrelated Streamlit reruns without replaying entry.
-        _hero(height=580, key='qm_immersive_hero_20261005_3', default=None)
+_ACTIONS = {'annual_reports', 'annual_data', 'answer_evidence'}
+
+
+def _navigation_context(context=None):
+    """Only bounded display labels and an opaque parent-owned context token cross the iframe."""
+    context = context if isinstance(context, dict) else {}
+    token = context.get('token')
+    token = token if isinstance(token, str) and re.fullmatch(r'[A-Za-z0-9_.:-]{1,96}', token) else ''
+    company = context.get('company')
+    company = company.strip()[:100] if isinstance(company, str) else ''
+    year = context.get('year')
+    year = str(year).strip()[:24] if isinstance(year, (str, int)) and not isinstance(year, bool) else ''
+    return {'token': token, 'company': company, 'year': year,
+            **{name: context.get(name) is True for name in ('has_reports', 'has_data', 'has_answer')}}
+
+
+def _navigation_event(value, context, *, landing=False):
+    if not isinstance(value, dict) or not context['token']:
+        return None
+    action, nonce = value.get('action'), value.get('nonce')
+    actions = _ACTIONS | ({'enter_workspace'} if landing else set())
+    if (not isinstance(action, str) or action not in actions or not isinstance(nonce, str)
+            or not re.fullmatch(r'[A-Za-z0-9_-]{1,64}', nonce)
+            or value.get('context_token') != context['token']):
+        return None
+    return {'action': action, 'nonce': nonce, 'context_token': context['token']}
+
+
+def render_hero_visual(context=None, *, landing=False):
+    """Return a validated user intent; the caller validates freshness and deduplicates it."""
+    context = _navigation_context(context)
+    if not landing:
+        stylesheet = Path(__file__).with_suffix('.css').read_text(encoding='utf-8')
+        st.html(f'<style>{stylesheet}</style>')
+    if all((_FRONTEND / name).is_file() for name in ('index.html', 'hero.css', 'hero.js', 'hero-runtime.js', 'hero-quality.js', 'hero-paper.js', 'hero-navigation.js')):
+        # The slot stays stable as the bounded context changes. No business call
+        # occurs here; even a valid component value is only a navigation intent.
+        from app.branding import BRAND_NAME, logo_data_uri
+        event = _hero(height=900 if landing else 580, motion=motion_preferences(), context=context,
+                      landing=landing, brand={'mark':logo_data_uri(variant='light'), 'name':BRAND_NAME} if landing else {},
+                      key='qm_brand_landing_v24' if landing else 'qm_immersive_hero_20261009_4', default=None)
+        return _navigation_event(event, context, landing=landing)
     else:
         st.html(_DEVICE_HTML.replace('studio-financial-device', 'studio-financial-device is-paused', 1))
+        if context['token']:
+            for action, label in [('annual_reports', '查阅年度报告'), ('annual_data', '查看年度数据'),
+                                  ('answer_evidence', '打开答案与依据')]:
+                if st.button(label, key=f'hero_fallback_{action}', type='tertiary'):
+                    return {'action': action, 'nonce': uuid4().hex, 'context_token': context['token']}
+    return None

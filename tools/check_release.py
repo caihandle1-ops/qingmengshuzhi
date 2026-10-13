@@ -32,6 +32,14 @@ with TemporaryDirectory(prefix='qingmeng-release-check-') as directory:
         app = AppTest.from_file(root / 'app/main.py', default_timeout=60).run()
         if not app.exception:
             app.run()  # A normal rerun must also accept the already loaded modules.
+        # The public first visit is the brand page; native entry must work even
+        # though AppTest does not execute the isolated graphics frontend.
+        entry = next((button for button in app.button if button.key == 'landing_enter_workspace'), None)
+        if app.exception or entry is None or app.radio:
+            raise SystemExit(1)
+        entry.click().run()
+        if not app.exception:
+            app.run()
     title = ' '.join(item.value for item in app.title)
     if app.exception or '系统维护' in title or not app.radio:
         raise SystemExit(1)

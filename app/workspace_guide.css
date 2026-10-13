@@ -1,0 +1,44 @@
+/* Only this guide owns the drawer surface. Other popovers keep native layout. */
+[data-testid="stPopoverBody"]:has(.st-key-workspace_guide_panel) {
+  width:min(530px,calc(100vw - 40px))!important;
+  max-width:min(530px,calc(100vw - 40px))!important;
+  max-height:calc(100dvh - 140px);overflow-y:auto;overscroll-behavior:contain;
+  background:#f7f8f4;border:1px solid #bac4ce;border-top:4px solid #2855ed;
+  border-radius:3px 3px 18px 3px;box-shadow:0 20px 65px #101d3a30;padding:24px!important;
+  scrollbar-width:thin;scrollbar-color:#aeb8c6 transparent;
+}
+[data-baseweb="popover"]:has(.st-key-workspace_guide_panel){animation:none!important;translate:none!important}
+.st-key-workspace_guide_panel{color:#11213b}
+.st-key-workspace_guide_panel > [data-testid="stVerticalBlock"]{gap:14px}
+.qm-workspace-guide-head{padding:0 0 6px}
+.qm-workspace-guide-head>span{font:600 10px/1.5 sans-serif;letter-spacing:.17em;color:#2855bd}
+.qm-workspace-guide-head h2{font-size:26px!important;line-height:1.35!important;letter-spacing:-.04em;padding:8px 0!important;margin:0!important;color:#11213b}
+.qm-workspace-guide-head p{font-size:13px;line-height:1.75;color:#657386;margin:0}
+.qm-guide-context{border-left:3px solid #2954e8;background:#e8edfd;padding:15px 17px;display:flex;flex-direction:column;gap:4px}
+.qm-guide-context>span{font-size:11px;color:#47659e;letter-spacing:.07em}
+.qm-guide-context strong{font-size:17px;line-height:1.5;color:#163878;overflow-wrap:anywhere}
+.qm-guide-context p{font-size:13px;margin:0;color:#314d7e}
+.qm-guide-context small{font-size:12px;line-height:1.65;color:#556a8d}
+.qm-guide-context em{font-style:normal;font-size:11px;border-top:1px solid #c7d4f6;margin-top:6px;padding-top:7px;color:#355693}
+.qm-guide-current{padding:10px 0 14px;border-bottom:1px solid #c5ccd4}
+.qm-guide-current>span{font-size:11px;color:#677487}
+.qm-guide-current h3{font-size:19px!important;padding:6px 0!important;line-height:1.45!important;margin:0!important;color:#11213b}
+.qm-guide-current p{font-size:13px;line-height:1.85;color:#526176;margin:0}
+.qm-guide-section-label{font-size:14px;font-weight:700;color:#182b48;margin:3px 0}
+.qm-guide-section-label span{display:block;font-size:11px;font-weight:400;color:#6a7688;margin-top:4px}
+.st-key-workspace_guide_panel [data-testid="stExpander"]{background:transparent!important;border:0!important;border-top:1px solid #cbd2dd!important;border-radius:0!important;box-shadow:none!important}
+.st-key-workspace_guide_panel [data-testid="stExpander"] summary{padding:12px 0!important;min-height:48px;color:#183467;background:transparent!important;transition:none!important}
+.st-key-workspace_guide_panel [data-testid="stExpander"] summary p{font-size:14px!important;font-weight:650!important}
+.st-key-workspace_guide_panel [data-testid="stExpanderDetails"]{padding:1px 0 16px!important}
+.st-key-workspace_guide_panel [data-testid="stMarkdownContainer"] p{font-size:13px;line-height:1.85;color:#3f4f66}
+.st-key-workspace_guide_panel [data-testid="stCaptionContainer"] p{font-size:11px!important;line-height:1.8!important;color:#6b788c!important}
+.st-key-workspace_guide_panel [data-testid="stButton"] button{border-radius:2px!important;min-height:40px!important;padding:9px 13px!important;background:#fff!important;color:#244ba8!important;border:1px solid #beccec!important;box-shadow:none!important;transform:none!important;transition:background .16s ease,border-color .16s ease!important}
+.st-key-workspace_guide_panel [data-testid="stButton"] button p{font-size:13px!important;color:inherit!important;line-height:1.45!important}
+.st-key-workspace_guide_panel [data-testid="stButton"] button[kind="primary"]{background:#244cce!important;border-color:#244cce!important;color:#fff!important}
+.st-key-workspace_guide_panel [data-testid="stButton"] button:hover:not(:disabled){background:#edf1ff!important;color:#183d9f!important;border-color:#2855ed!important}
+.st-key-workspace_guide_panel [data-testid="stButton"] button:focus-visible{outline:3px solid #7899f7!important;outline-offset:3px!important}
+.st-key-workspace_guide_panel [data-testid="stButton"] button:disabled{opacity:.5!important;cursor:not-allowed}
+.st-key-workspace_guide_panel .st-key-workspace_guide_close button{min-height:28px!important;padding:3px 0!important;border:0!important;background:transparent!important;color:#62718a!important;justify-content:flex-end!important}
+.st-key-workspace_guide_panel [data-testid="stCode"]{border-radius:0;font-size:12px;border-left:2px solid #bad06c}
+.st-key-qm_guide_focus_bootstrap{display:none!important}
+@media(prefers-reduced-motion:reduce){.st-key-workspace_guide_panel *{transition:none!important;animation:none!important}}

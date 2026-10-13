@@ -3,7 +3,7 @@
   const $ = id => document.getElementById(id), shell = $('director');
   const abort = new AbortController(), reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let navAbort = new AbortController(), editorAbort = new AbortController(), focusAbort = new AbortController(), stageAbort = new AbortController();
-  let disposed = false, onscreen = true, animations = [], editing = false, lastHeight = 0, exiting = false, enhanced = true;
+  let disposed = false, onscreen = true, animations = [], editing = false, lastHeight = 0, exiting = false, enhanced = false, requestedMode = null, modeNonce = 0;
   const listen = (node, type, fn, signal = abort.signal) => node.addEventListener(type, fn, {signal});
   const send = (type, values = {}) => parent.postMessage({isStreamlitMessage:true, type, ...values}, '*');
   const node = (tag, className, text) => {
@@ -11,6 +11,9 @@
     if (text !== undefined && text !== null) result.textContent = String(text); return result;
   };
   const button = (label, className, action, signal = abort.signal) => {const result = node('button', className, label); result.type='button'; listen(result, 'click', action, signal); return result;};
+  const cinema = window.QMDirectorCinema?.create({document, shell, quiet: () => reduced.matches || !enhanced,
+    visible: () => !document.hidden && onscreen && !editing && !exiting});
+  const factSlot = kind => {const slot = node('div', 'fact-slot fact-slot-' + kind);slot.dataset.factSlot = kind;return slot;};
   const amount = value => typeof value === 'number' && Number.isFinite(value)
     ? value.toLocaleString('zh-CN', {minimumFractionDigits:2, maximumFractionDigits:2}) : '暂无数据';
   function height() {if(disposed || document.fullscreenElement) return; const value=Math.ceil(shell.getBoundingClientRect().height)+4;
@@ -22,7 +25,7 @@
     // Each navigation cancels old work before starting. No spring, stale timer,
     // numeric tween or completion callback can put an earlier page back.
     animations.push(slide.animate([
-      {opacity:enhanced?.12:.6, transform:enhanced?`translateX(${sign*72}px) translateZ(-150px) rotateY(${sign*-11}deg)`:`translateX(${sign*14}px)`},
+      {opacity:enhanced?.12:.6, transform:enhanced?`translateX(${sign*108}px) translateZ(-230px) rotateY(${sign*-15}deg)`:`translateX(${sign*14}px)`},
       {opacity:1, transform:'translateX(0px) translateZ(0px) rotateY(0deg)'}
     ], {duration:enhanced?690:240,easing:'cubic-bezier(.16,.72,.18,1)',fill:'none'}));
     if(!enhanced)return;
@@ -62,7 +65,8 @@
       const ordered=[...shown].sort((a,b)=>Number(b.id===state.focus.metric)-Number(a.id===state.focus.metric));
       heading(slide,chapter,label);const grid=node('div','metric-stage');
       ordered.forEach(metric=>{const card=node('section','metric-sheet plane-item'+(metric.id===state.focus.metric?' is-focused':''));card.dataset.metric=metric.id;card.tabIndex=0;card.setAttribute('aria-label',metric.label+'与来源，内容较长时可滚动');card.append(node('span','metric-identity',metric.source.identity),node('span','metric-name',metric.label));
-        const value=node('div','metric-value',amount(metric.value));if(metric.value!==null)value.append(node('span','metric-unit',metric.unit));card.append(value);addSource(card,metric.source);grid.append(card);});
+        if(cinema&&state.fact&&metric.id===state.focus.metric)card.append(factSlot('metrics'));
+        else {const value=node('div','metric-value',amount(metric.value));if(metric.value!==null)value.append(node('span','metric-unit',metric.unit));card.append(value);}addSource(card,metric.source);grid.append(card);});
       slide.append(grid,node('p','footnote',(row?.ambiguous??chapter.ambiguous)?'同年度存在多条记录，本页不从中任取一条作为企业结论。':'同一个观察指标，将贯穿年度记录与来源定位。数值始终保留接入值。'));
     }else if(chapter.kind==='annual'){
       const fact=state.fact,metricAt=row=>row.metrics.find(metric=>metric.id===state.focus.metric)||row.metrics[0];
@@ -71,10 +75,11 @@
       chapter.rows.forEach(row=>{const metric=metricAt(row),value=metric.value,line=button('','annual-row plane-item'+(state.focus.year===row.year?' is-focused':''),()=>deck.setFocus(state.focus.metric,row.year),stageAbort.signal), track=node('div','annual-bar-track'), bar=node('div','annual-bar'+(value<0?' is-negative':''));
         line.dataset.year=String(row.year);line.setAttribute('aria-label',`${row.year} 年 ${metric.label} ${amount(value)} ${value===null?'':metric.unit}`);line.setAttribute('aria-pressed',String(state.focus.year===row.year));
         bar.style.width=typeof value==='number'?Math.abs(value)/max*100+'%':'0%';track.setAttribute('aria-hidden','true');track.append(bar);
-        const number=node('div','annual-amount',amount(value));number.append(node('small','',row.ambiguous?'同年度记录待核对':metric.source.identity));line.append(node('span','annual-year',row.year),track,number);list.append(line);});slide.append(list,node('p','footnote','条形长度按绝对量缩放；负值保留负号，缺失年份不补齐。'));
+        const number=cinema&&state.fact&&state.focus.year===row.year?factSlot('annual'):node('div','annual-amount',amount(value));number.append(node('small','',row.ambiguous?'同年度记录待核对':metric.source.identity));line.append(node('span','annual-year',row.year),track,number);list.append(line);});slide.append(list,node('p','footnote','条形长度按绝对量缩放；负值保留负号，缺失年份不补齐。'));
     }else if(chapter.kind==='sources'){
       heading(slide,chapter,label);const reading=node('div','reading');reading.tabIndex=0;reading.setAttribute('aria-label','来源索引，可滚动');
       if(state.fact){const fact=state.fact,spotlight=node('section','source-spotlight plane-item');spotlight.dataset.metric=fact.id;spotlight.dataset.year=String(fact.year);
+        if(cinema)spotlight.append(factSlot('sources'));
         spotlight.append(node('span','source-spotlight-label',`${fact.year} 年 · ${fact.label} · ${fact.source.identity}`),node('h3','',fact.value===null?'该年度暂无可定位的有效数值':fact.source.file),node('strong','source-locator',fact.value===null?'独立定位待补充':fact.source.location),
           node('p','',fact.ambiguous?'同年度多条记录待核对。未选择其中任何一条作为该年结论。':fact.value===null?'该年度没有这一指标的有效数值；不使用相邻年度或其它指标的出处替代。':fact.source.recorded?'这是选中数值保存的文件与定位记录。完整原件请回到工作台核对。':'该数值尚无完整独立定位，请回到工作台补充核验。'));
         reading.append(spotlight);const related=chapter.sources.filter(source=>source.metric===fact.id&&source.year!==fact.year);
@@ -88,7 +93,7 @@
       heading(slide,chapter,label);const reading=node('div','reading');reading.tabIndex=0;
       chapter.alerts.forEach((alert,index)=>{const item=node('section','signal plane-item'),body=node('div');body.append(node('h3','',alert.title||'已记录信号'),node('p','',alert.message||'未记录额外说明'),node('small','',`依据：${alert.basis || '未记录'}\n规则：${alert.rule || '未记录'}`));item.append(node('span','',String(index+1).padStart(2,'0')),body);reading.append(item);});slide.append(reading);
     }else{heading(slide,chapter,label);slide.append(node('div','empty-mark','—'),node('p','slide-subtitle',chapter.body));}
-    return slide;
+    if(cinema){const marker=node('span','cinema-marker'),lens=node('div','cinema-lens');marker.setAttribute('aria-hidden','true');lens.setAttribute('aria-hidden','true');slide.append(marker,lens);}return slide;
   }
   function renderEditor(state) {
     const previous=document.activeElement?.dataset?.focusKey;editorAbort.abort();editorAbort=new AbortController();const list=$('editor-list');list.replaceChildren();
@@ -113,10 +118,11 @@
     $('focus-origin').textContent=fact.ambiguous?'同年度记录待核对':fact.source.identity;$('focus-fact').setAttribute('aria-label',`${fact.year} 年 ${fact.label} ${value} ${fact.value===null?'':fact.unit}，${fact.source.identity}`);
     $('focus-journey').dataset.chapter=chapter.kind;
   }
-  function syncMotion(){cancelMotion();shell.dataset.motion=reduced.matches?'reduced':enhanced?'enhanced':'light';$('motion-mode').disabled=reduced.matches;
-    $('motion-mode').textContent=reduced.matches?'减少动态效果':enhanced?'增强动效':'轻量动效';$('motion-mode').setAttribute('aria-pressed',String(!reduced.matches&&enhanced));}
+  function syncMotion(){cancelMotion();shell.dataset.motion=reduced.matches?'reduced':enhanced?'enhanced':'light';$('motion-mode').disabled=reduced.matches || requestedMode!==null;
+    $('motion-mode').textContent=reduced.matches?'系统已减少动态效果':enhanced?'演示模式 · 全站':'研究模式 · 全站';$('motion-mode').setAttribute('aria-pressed',String(!reduced.matches&&enhanced));cinema?.sync();}
   function paint(state) {
     if(!state.payload||disposed)return;const chapter=state.payload.chapters.find(item=>item.id===state.active);
+    const replaceSlide=state.changed||!$('stage').firstElementChild;if(replaceSlide)cinema?.prepare(state);
     shell.dataset.chapter=chapter.kind;paintFocus(state,chapter);
     const nav=$('chapters'),restoreNavFocus=Boolean(document.activeElement?.dataset?.chapterId);navAbort.abort();navAbort=new AbortController();nav.replaceChildren();state.visible.forEach((id,index)=>{const item=state.payload.chapters.find(c=>c.id===id),control=button('','chapter-button',()=>deck.go(id),navAbort.signal);
       control.dataset.chapterId=id;control.append(node('span','',String(index+1).padStart(2,'0')),node('b','',item.title));if(id===state.active)control.setAttribute('aria-current','step');nav.append(control);});
@@ -124,20 +130,20 @@
     $('chapter-count').textContent=String(state.visible.length).padStart(2,'0');$('position').textContent=String(state.index+1).padStart(2,'0');$('total').textContent='/ '+String(state.visible.length).padStart(2,'0');
     $('identity').textContent=!$('focusbar').hidden?state.fact.source.identity:chapter.identity?.label||'来源待核验';$('status').textContent=chapter.status||'现有研究记录';$('previous').disabled=state.index===0;$('next').disabled=state.index===state.visible.length-1;
     $('announcement').textContent=`第 ${state.index+1} 章，共 ${state.visible.length} 章。${chapter.title}。${chapter.status || ''}`;
-    if(state.changed||!$('stage').firstElementChild){cancelMotion();stageAbort.abort();stageAbort=new AbortController();const slide=content(chapter,state);$('stage').replaceChildren(slide);motion(slide,state.direction);}
+    if(replaceSlide){cancelMotion();stageAbort.abort();stageAbort=new AbortController();const slide=content(chapter,state);$('stage').replaceChildren(slide);if(cinema)cinema.mount(slide,state,chapter,state.direction);else motion(slide,state.direction);}
     else if(chapter.kind!=='overview')$('stage').querySelector('.slide-label').textContent=chapterLabel(chapter,state);
     if(editing)renderEditor(state);height();
   }
   const deck=window.QMDirector.createDeck(paint);
-  function editor(value){editing=value;$('editor').hidden=!value;$('configure').setAttribute('aria-expanded',String(value));if(value){cancelMotion();renderEditor(deck.snapshot());$('close-editor').focus({preventScroll:true});}else $('configure').focus({preventScroll:true});}
-  async function exit(){if(exiting||disposed||!deck.snapshot().payload)return;const revision=deck.snapshot().payload.revision;exiting=true;cancelMotion();
+  function editor(value){editing=value;$('editor').hidden=!value;$('configure').setAttribute('aria-expanded',String(value));cinema?.suspend(value);if(value){cancelMotion();renderEditor(deck.snapshot());$('close-editor').focus({preventScroll:true});}else $('configure').focus({preventScroll:true});}
+  async function exit(){if(exiting||disposed||!deck.snapshot().payload)return;const revision=deck.snapshot().payload.revision;exiting=true;cancelMotion();cinema?.pause();
     if(document.fullscreenElement){try{await document.exitFullscreen();}catch(_){/* Exit still works if fullscreen permission changes. */}}
     if(disposed)return;
     send('streamlit:setComponentValue',{value:{event:'exit',revision,nonce:String(Date.now())},dataType:'json'});
   }
   listen($('configure'),'click',()=>editor(!editing));listen($('close-editor'),'click',()=>editor(false));listen($('reset-order'),'click',()=>deck.reset());
   listen($('focus-year'),'change',()=>deck.setFocus(deck.snapshot().focus.metric,Number($('focus-year').value)));
-  listen($('motion-mode'),'click',()=>{enhanced=!enhanced;syncMotion();});syncMotion();
+  listen($('motion-mode'),'click',()=>{const state=deck.snapshot();if(reduced.matches||requestedMode||!state.payload||disposed)return;requestedMode=enhanced?'research':'presentation';syncMotion();send('streamlit:setComponentValue',{value:{event:'request_motion_mode',mode:requestedMode,revision:state.payload.revision,nonce:Date.now()+'-'+(++modeNonce)},dataType:'json'});});syncMotion();
   listen($('previous'),'click',()=>deck.step(-1));listen($('next'),'click',()=>deck.step(1));listen($('exit'),'click',exit);
   $('fullscreen').disabled=!document.fullscreenEnabled;
   if(!document.fullscreenEnabled)$('fullscreen').title='当前浏览器未允许嵌入画布全屏，可使用浏览器全屏功能。';
@@ -151,12 +157,15 @@
   });
   listen(window,'message',event=>{if(event.source!==parent||event.data?.type!=='streamlit:render')return;const data=event.data.args?.payload;
     if(!data||data.version!==1||typeof data.revision!=='string')return;
+    const preference=event.data.args?.motion,next=preference?.version===1&&preference.mode==='presentation';
+    const acknowledged=requestedMode===(next?'presentation':'research');if(acknowledged)requestedMode=null;
+    if(next!==enhanced){enhanced=next;syncMotion();}else if(acknowledged)syncMotion();
     if(deck.setPayload(data)){$('brand-name').textContent=data.brand||'擎梦数智';if(typeof data.logo==='string'&&/^data:image\/(png|webp);base64,/.test(data.logo)){$('brand-logo').src=data.logo;$('brand-logo').hidden=false;}else{$('brand-logo').hidden=true;}}
   });
-  function syncVisibility(){shell.dataset.paused=String(document.hidden||!onscreen);if(document.hidden||!onscreen)cancelMotion();}
+  function syncVisibility(){shell.dataset.paused=String(document.hidden||!onscreen);if(document.hidden||!onscreen)cancelMotion();cinema?.sync();}
   listen(document,'visibilitychange',syncVisibility);listen(reduced,'change',syncMotion);
   const observer=new IntersectionObserver(entries=>{onscreen=entries.some(entry=>entry.isIntersecting);syncVisibility();},{threshold:.01});observer.observe(shell);
   const resize=new ResizeObserver(height);resize.observe(shell);
-  function dispose(){if(disposed)return;disposed=true;cancelMotion();deck.dispose();observer.disconnect();resize.disconnect();navAbort.abort();editorAbort.abort();focusAbort.abort();stageAbort.abort();abort.abort();}
-  listen(window,'pagehide',dispose);window.__qmDirector={deck,dispose};send('streamlit:componentReady',{apiVersion:1});height();
+  function dispose(){if(disposed)return;disposed=true;cancelMotion();cinema?.dispose();deck.dispose();observer.disconnect();resize.disconnect();navAbort.abort();editorAbort.abort();focusAbort.abort();stageAbort.abort();abort.abort();}
+  listen(window,'pagehide',dispose);window.__qmDirector={deck,dispose,cinema};send('streamlit:componentReady',{apiVersion:1});height();
 })();

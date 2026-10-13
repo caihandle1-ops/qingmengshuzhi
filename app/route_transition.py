@@ -2,6 +2,7 @@
 from inspect import signature
 from pathlib import Path
 import streamlit as st
+from app.static_assets import read_asset_text
 
 
 _ROOT = Path(__file__).parent
@@ -13,8 +14,8 @@ def render_route_transition():
     if 'unsafe_allow_javascript' not in signature(st.html).parameters:
         return False
     try:
-        css = STYLES.read_text(encoding='utf-8')
-        script = SCRIPT.read_text(encoding='utf-8').replace('</script', '<\\/script')
+        css = read_asset_text(STYLES)
+        script = read_asset_text(SCRIPT).replace('</script', '<\\/script')
     except OSError:
         return False
     with st.container(key='route_transition_bootstrap'):

@@ -1,0 +1,22 @@
+/* Research begins here. The cinematic brand scene lives on its own page. */
+.st-key-workspace_hero{background:#f7f8f4!important;border:0!important;border-top:4px solid #2454ff!important;padding:clamp(26px,3.5vw,56px)!important;box-shadow:none!important;color:#142239!important}
+.st-key-workspace_hero .studio-hero-title{font-size:clamp(30px,3.25vw,56px)!important;line-height:1.2!important;color:#142239!important;letter-spacing:-.045em!important;margin:14px 0!important}
+.st-key-workspace_hero .studio-hero-accent{color:#2454ff!important}
+.st-key-workspace_hero :is(.studio-hero-copy,.studio-control-label,.studio-field-heading,.studio-field-heading strong){color:#314863!important}
+.st-key-workspace_hero :is(.studio-data-coverage,.studio-hero-eyebrow){color:#657589!important}
+.st-key-workspace_hero :is([data-baseweb="select"]>div,textarea){background:#fff!important;color:#142239!important;border:1px solid #cdd7df!important;border-radius:3px!important}
+.st-key-workspace_hero [data-baseweb="select"] span{color:#142239!important}
+.st-key-workspace_hero .studio-step-label{color:#2454ff!important}
+.st-key-workspace_question_card{border-top:1px solid #cdd7df!important;margin-top:12px!important;padding-top:24px!important}
+.st-key-workspace_resource_links{border-top:1px solid #cdd7df;padding-top:18px;margin-top:12px}
+.st-key-workspace_resource_links button{border:0!important;border-radius:0!important;background:transparent!important;color:#2454ff!important;box-shadow:none!important;justify-content:space-between!important;min-height:44px!important;text-align:left!important}
+.st-key-workspace_resource_links button:hover{background:#e9eeff!important}
+.st-key-sidebar_brand_entry button{border:0!important;background:transparent!important;box-shadow:none!important;min-height:30px!important;font-size:11px!important;color:#64718a!important;padding:0!important}
+.st-key-sidebar_brand_entry button p{font-size:11px!important}
+.st-key-workspace_workflow [data-testid="stCaptionContainer"] p{color:#607388!important}
+.st-key-workspace_hero .studio-field-heading{display:flex;align-items:center;gap:12px}
+.st-key-workspace_hero .st-key-studio_company_controls [role="group"]{background:#fff!important;color:#142239!important;border:1px solid #cdd7df!important;border-radius:3px!important}
+.st-key-workspace_hero .st-key-studio_company_controls :is(input,svg){color:#142239!important;fill:currentColor}
+.st-key-workspace_hero .st-key-workspace_submit button{background:#2454ff!important;color:#fff!important;border:1px solid #2454ff!important;border-radius:3px!important;min-height:48px!important}
+.st-key-workspace_hero .st-key-workspace_submit button p{color:#fff!important}
+.st-key-workspace_hero .st-key-workspace_submit button:hover{background:#163ad5!important}

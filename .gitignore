@@ -31,6 +31,8 @@ work/
 !/data/examples/翻转探针演示数据_模拟.csv
 **/workspaces/
 **/sessions/
+**/research_jobs/
+**/_research_recovery/
 *.db
 *.db-*
 *.sqlite

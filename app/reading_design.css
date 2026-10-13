@@ -1,0 +1,43 @@
+/* .21 reading scale: target prose/chrome, never SVG plots or animated figures. */
+[data-testid="stMain"] {--qm-reading-ink:#263e49;--qm-reading-muted:#52656c}
+[data-testid="stMain"] [data-testid="stWidgetLabel"] p {font-size:14px!important;line-height:1.6!important}
+[data-testid="stMain"] [data-testid="stCaptionContainer"] p {font-size:14px!important;line-height:1.75!important}
+[data-testid="stMain"] [data-testid="stText"] {font-size:16px;line-height:1.8}
+[data-testid="stMain"] [class*="st-key-guided_picker_"] button p {font-size:15px!important}
+[data-testid="stMain"] summary[data-qm-ui-disclosure] p {font-size:16px!important}
+.qm-ledger-heading span {font-size:14px!important;color:#50636d!important}
+.guided-hint,.source-reading-context p,.source-reading-context small {font-size:14px!important;line-height:1.75!important;color:#4d6570!important}
+[data-testid="stMain"] .source-dock-heading>small {font-size:14px;color:#bdcbd5}
+[data-testid="stMain"] .source-dock-heading>span {font-size:13px;color:#d9ed83}
+.source-reading-values small {color:#bdcbd5!important}
+[data-testid="stMain"] [class*="st-key-source_dock_panel_"] [data-testid="stCaptionContainer"] p {color:#4b6171!important}
+[data-testid="stMain"] .es-chapter>p {font-size:17px!important;line-height:1.85!important;color:#4c5c6a!important}
+[data-testid="stMain"] .es-chapter-detail p {font-size:15px!important;line-height:1.8!important;color:#566574!important}
+[data-testid="stMain"] .es-chapter-nav a {font-size:14px!important}
+[data-testid="stMain"] .es-stage-topline,[data-testid="stMain"] .es-stage-bottomline {font-size:13px!important}
+[data-testid="stMain"] .es-pane-kicker,[data-testid="stMain"] .es-pane-note,
+[data-testid="stMain"] .es-metric-line>small {font-size:14px!important;line-height:1.75!important}
+[data-testid="stMain"] .es-metric-line>span {font-size:16px!important}
+[data-testid="stMain"] .es-year-row,[data-testid="stMain"] .es-year-row>b {font-size:14px!important}
+[data-testid="stMain"] .es-risk-score>span,[data-testid="stMain"] .es-risk-signal>b {font-size:16px!important}
+[data-testid="stMain"] .es-risk-signal>p,[data-testid="stMain"] .es-risk-coverage,
+[data-testid="stMain"] .es-report-record>span,[data-testid="stMain"] .es-report-record>p,
+[data-testid="stMain"] .es-report-record>div {font-size:14px!important;line-height:1.75!important;color:#475f7c!important}
+[data-testid="stMain"] .es-report-edition [data-es-pane]:not([data-es-pane="0"]) .es-pane-kicker,
+[data-testid="stMain"] .es-report-edition [data-es-pane]:not([data-es-pane="0"]) .es-pane-note {color:#506984!important}
+[data-testid="stMain"] .es-report-edition .es-pane-note {color:#dae4ff}
+[data-testid="stMain"] .es-report-edition .es-stage-panels,[data-testid="stMain"] .es-report-edition .es-stage-pane {min-height:490px}
+[data-testid="stMain"] .es-report-edition .es-year-ledger {max-height:138px}
+[data-testid="stMain"] .es-report-edition .es-risk-coverage {max-height:95px}
+[data-testid="stMain"] .rr-prose {font-size:17px;line-height:1.95}
+[data-testid="stMain"] .rr-cover-footer,[data-testid="stMain"] .rr-chapter-foot,
+[data-testid="stMain"] .rr-source-note p,[data-testid="stMain"] .rr-toc a {font-size:14px!important;line-height:1.7}
+/* Annual action occupies the frame's edge, behind the stable figures. */
+.qm-annual-turn {position:absolute;inset:52px 0 42px;overflow:hidden;pointer-events:none;z-index:1}
+.qm-annual-turn i {position:absolute;display:block;width:110%;height:5px;left:-5%;top:0;background:#def576;opacity:0;transform-origin:left center}
+.qm-annual-turn i:nth-child(2){top:-20%;background:#173778;height:140%;width:42%}
+.qm-annual-turn i:nth-child(3){top:auto;bottom:0;background:#def576;height:4px}
+.qm-feature-action-anchor {scroll-margin-top:112px;height:0;outline:none}
+@media(min-width:1600px){[data-testid="stMain"] .es-chapter>p{font-size:18px!important}.rr-prose{font-size:18px}}
+@media(prefers-reduced-motion:reduce){.qm-annual-turn{display:none}}
+@media(forced-colors:active){.qm-annual-turn{display:none}[data-testid="stMain"] .guided-hint{color:CanvasText!important}}

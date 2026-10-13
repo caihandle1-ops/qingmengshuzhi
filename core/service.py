@@ -230,7 +230,7 @@ def _verify_committed_import(result: dict, targets: list[tuple], *, document_onl
 
 
 def commit_import(batch: dict, confirmed: bool = False, overwrite_existing: bool = False,
-                  *, document_only: bool = False) -> dict:
+                  *, document_only: bool = False, expected_current_signature: str | None = None) -> dict:
     """Commit companies, annual facts, sources and reports as one atomic unit.
 
     ok is true only for verified structured imports. An explicit document-only
@@ -279,6 +279,12 @@ def commit_import(batch: dict, confirmed: bool = False, overwrite_existing: bool
                 result['status'] = 'unchanged'
                 result['warnings'].append('本次预览对应的文件已经提交，未重复写入。')
                 return result
+            if expected_current_signature is not None:
+                from core.import_changes import current_import_signature
+                current_signature = current_import_signature(batch, overwrite_existing=overwrite_existing)
+                if current_signature != expected_current_signature:
+                    result['status'] = 'preview_stale'
+                    return reject(['当前资料已在预览后改变，本次未写入。请重新核对变化预览并确认。'])
             companies = list(conn.execute('SELECT id,name,stock_code FROM companies'))
             company_ids = {}
             planned = []

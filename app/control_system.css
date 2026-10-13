@@ -1,0 +1,46 @@
+/* .20 business controls. Native disclosure height and hit areas have one owner. */
+[data-testid="stMain"] [data-testid="stExpander"]:has(> details > summary[data-qm-ui-disclosure]) {
+  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+}
+[data-testid="stMain"] [data-testid="stExpander"] > details:has(> summary[data-qm-ui-disclosure]) {
+  border:0!important;border-block:1px solid #bac7ca!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+}
+[data-testid="stMain"] summary[data-qm-ui-disclosure] {
+  min-height:60px;padding:17px 17px 17px 4px!important;background:transparent!important;
+  border:0!important;border-radius:0!important;color:#233d49!important;position:relative;
+}
+[data-testid="stMain"] summary[data-qm-ui-disclosure] p {font-size:15px!important;font-weight:600!important;letter-spacing:.01em;color:inherit!important}
+[data-testid="stMain"] summary[data-qm-ui-disclosure]::after {
+  content:"";position:absolute;left:0;right:0;bottom:0;height:2px;pointer-events:none;
+  background:var(--ui-accent,#3151da);transform:scaleX(var(--qm-ui-open,0));transform-origin:left;
+}
+[data-testid="stMain"] details[open] > summary[data-qm-ui-disclosure] {color:var(--ui-accent,#3151da)!important;background:#e8edf080!important}
+[data-testid="stMain"] summary[data-qm-ui-disclosure]:hover {background:#e7eceb!important}
+[data-testid="stMain"] summary[data-qm-ui-disclosure] .qm-ui-expander-mark {background:#1b3442;color:#eef4e6;border-radius:0;width:27px;height:27px;flex:0 0 27px}
+[data-testid="stMain"] summary[data-qm-ui-disclosure] :is(.qm-ui-expander-minus,.qm-ui-expander-plus) {left:6px;top:13px;width:15px}
+[data-testid="stMain"] [data-testid="stExpander"]:has(> details > summary[data-qm-ui-disclosure]) [data-testid="stExpanderDetails"] {padding:20px 14px 22px!important;background:transparent!important;border:0!important}
+/* A compact section rail has a clear active section, not several competing cards. */
+[data-testid="stMain"] [class*="st-key-guided_picker_"] {border:0;background:#e5eae8;padding:6px!important}
+[data-testid="stMain"] [class*="st-key-guided_picker_"] > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] {gap:6px!important}
+[data-testid="stMain"] [class*="st-key-guided_picker_"] [class*="st-key-guided_card_"] button {
+  min-height:52px!important;padding:13px 18px!important;border:0!important;border-radius:2px!important;
+  background:transparent!important;color:#41575f!important;box-shadow:none!important;transform:none!important;
+}
+[data-testid="stMain"] [class*="st-key-guided_picker_"] [class*="st-key-guided_card_"] button p {font-size:14px!important;line-height:1.6!important}
+[data-testid="stMain"] [class*="st-key-guided_picker_"] [class*="st-key-guided_card_"] button:hover:not(:disabled) {background:#d6dfdb!important;color:#162f3c!important}
+[data-testid="stMain"] [class*="st-key-guided_picker_"] [class*="st-key-guided_card_"] button:is([kind="primary"],[data-testid="stBaseButton-primary"]) {background:#182f3e!important;color:#f0f5dd!important}
+[data-testid="stMain"] [class*="st-key-guided_picker_"] .qm-ui-active-line {background:var(--ui-accent,#3151da);height:3px;bottom:0}
+/* Native financial grids keep sort / copy / export and all supplied columns. */
+.qm-ledger-heading {display:flex;align-items:baseline;justify-content:space-between;gap:24px;padding:17px 0 13px;border-top:3px solid #233d49;color:#203745}
+.qm-ledger-heading h4 {margin:0!important;padding:0!important;font-size:18px!important;font-weight:600!important;line-height:1.6!important}
+.qm-ledger-heading span {font:500 11px/1.6 Consolas,"Microsoft YaHei",monospace;color:#526772;white-space:nowrap}
+[data-testid="stMain"] [class*="st-key-financial_table_"] [data-testid="stDataFrame"] {border:1px solid #bcc9ce!important;border-radius:0!important}
+/* Secondary utility actions form a quiet toolbar with a visible label. */
+[data-testid="stMain"] :is([class*="st-key-qa_quick_table_toggle_"],.st-key-qa_more_examples,.st-key-qa_extra_examples) button {
+  min-height:44px!important;padding:10px 15px!important;background:#e8ede9!important;border:1px solid #bccbc2!important;
+  border-radius:2px!important;box-shadow:none!important;transform:none!important;color:#264538!important;
+}
+[data-testid="stMain"] :is([class*="st-key-qa_quick_table_toggle_"],.st-key-qa_more_examples,.st-key-qa_extra_examples) button:hover:not(:disabled) {background:#d8e5d5!important;border-color:#75916d!important}
+[data-testid="stMain"] :is(.st-key-qa_quick_toolbar,.st-key-library_filter_strip) [data-testid="stWidgetLabel"] p {color:#425c68!important}
+[data-testid="stMain"] :is(.st-key-qa_quick_toolbar,.st-key-library_filter_strip) :is([data-baseweb="select"] > div,[data-testid="stSelectbox"] [role="group"]) {border:0!important;border-bottom:2px solid #8c9eaa!important;background:#edf0ef!important;border-radius:0!important}
+@media(forced-colors:active){[data-testid="stMain"] summary[data-qm-ui-disclosure],[data-testid="stMain"] [class*="st-key-guided_picker_"] button{background:Canvas!important;color:CanvasText!important;border:1px solid CanvasText!important}.qm-ledger-heading{color:CanvasText;border-color:CanvasText}}

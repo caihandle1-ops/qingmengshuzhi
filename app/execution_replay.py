@@ -6,6 +6,7 @@ from pathlib import Path
 
 import streamlit as st
 import streamlit.components.v1 as components
+from app.motion_preferences import motion_preferences
 
 from app.execution_progress import STAGES, STAGE_STATES
 from app.messages import public_message
@@ -68,7 +69,7 @@ def render_execution_replay(snapshot):
         return False
     if all((FRONTEND / name).is_file() for name in ['index.html', 'replay.css', 'replay.js', 'replay-model.js']):
         identity = sha256(payload['run_id'].encode()).hexdigest()[:20]
-        _replay(payload=payload, key=f'execution_replay_{identity}_1', height=480, default=None)
+        _replay(payload=payload, motion=motion_preferences(), key=f'execution_replay_{identity}_1', height=480, default=None)
     else:
         st.dataframe([{'环节': dict(STAGES)[e['stage']], '状态': STAGE_STATES[e['status']],
                        '记录耗时 ms': e['elapsed_ms'], '说明': e['detail']} for e in payload['events']],

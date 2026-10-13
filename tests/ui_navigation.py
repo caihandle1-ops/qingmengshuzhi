@@ -2,7 +2,19 @@
 PAGES = ['研究工作台', '财报问数', '口径核验', '反证核验', '证据复演', '数据资产']
 
 
+def ensure_workspace(app):
+    """Enter the actual workspace through the visible first-visit fallback."""
+    if _has_button(app, 'landing_enter_workspace'):
+        _click(app, 'landing_enter_workspace')
+    assert any(widget.key == 'navigation' for widget in app.radio), (
+        'Expected workspace navigation; visible notices: '
+        + ' | '.join(item.value for kind in ('info', 'warning', 'error', 'caption') for item in app.get(kind))
+    )
+    return app
+
+
 def open_page(app, page):
+    ensure_workspace(app)
     if page == '企业分析':
         app.radio(key='navigation').set_value('研究工作台').run()
         if not _has_button(app, 'enterprise_back_home'):

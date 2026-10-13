@@ -1,15 +1,16 @@
 /* Pure geometry around native viewers. No file handles, widget state or React moves. */
 (() => {
   'use strict';
-  const VERSION = 'source-dock-20261005-2';
+  const VERSION = 'source-dock-20261011-22-ink';
   if (window.__qmSourceDock?.version === VERSION) { window.__qmSourceDock.refresh(); return; }
   window.__qmSourceDock?.dispose();
   const abort = new AbortController(), desktop = matchMedia('(min-width:1001px)'), reduced = matchMedia('(prefers-reduced-motion:reduce)');
+  const quiet = () => reduced.matches || document.documentElement.dataset.qmMotionMode === 'research';
   const mounted = new Map(), departing = new Map(), prepared = new Map(), riskOrigins = new Map(), effects = new Set(), papers = new Set();
   const html = document.documentElement;
   let frame = 0, restoreFrame = 0, restoreSettle = 0, disposed = false;
   html.dataset.qmSourceDock = VERSION;
-  const active = () => !disposed && !document.hidden && !reduced.matches && desktop.matches;
+  const active = () => !disposed && !document.hidden && !quiet() && desktop.matches;
   const box = node => {
     if (!node?.isConnected) return null;
     const rect = node.getBoundingClientRect();
@@ -92,8 +93,15 @@
     if (!active() || !inView(from) || !inView(to)) return;
     const paper = document.createElement('div');paper.className='qm-source-paper';paper.inert=true;paper.setAttribute('aria-hidden','true');
     const line=document.createElement('i');paper.appendChild(line);
+    const tab=document.createElement('span');tab.className='qm-source-paper-tag';tab.textContent='来源';paper.appendChild(tab);
     Object.assign(paper.style,{left:to.left+'px',top:to.top+'px',width:to.width+'px',height:to.height+'px'});
     document.body.appendChild(paper);papers.add(paper);state.flight=paper;
+    let motion;
+    const settled=()=>{effects.delete(motion);papers.delete(paper);paper.remove();
+      if(state.flight===paper)state.flight=null;if(state.animation===motion)state.animation=null;
+      if(departing.get(state.key)===state)departing.delete(state.key);};
+    motion=window.QMCommittedMotion?.source(paper,from,to,closing,settled);
+    if(motion){effects.add(motion);state.animation=motion;return;}
     if (!paper.animate) { paper.remove();papers.delete(paper);state.flight=null;return; }
     const animation=paper.animate([
       {transform:'translate('+(from.left-to.left)+'px,'+(from.top-to.top)+'px) scale('+(from.width/to.width)+','+(from.height/to.height)+')',opacity:.88},
@@ -153,7 +161,7 @@
       mounted.set(key,state);reserve(state,true);
       state.box=box(panel);
       if(desktop.matches){restoreReading(origin.reading);flight(state,origin.box,state.box);}
-      else panel.scrollIntoView({behavior:reduced.matches?'auto':'smooth',block:'start'});
+      else panel.scrollIntoView({behavior:quiet()?'auto':'smooth',block:'start'});
     }
   }
   function refresh(){if(!frame&&!disposed&&!document.hidden)frame=requestAnimationFrame(scan);}
@@ -180,12 +188,13 @@
     if(riskOrigins.size > 12)riskOrigins.delete(riskOrigins.keys().next().value);
     for(const state of mounted.values())if(state.kind==='risk'&&riskKey(markerRisk(state.marker))===key)state.originBox=record.box;
   },{signal:abort.signal});
-  const mutation=new MutationObserver(refresh);mutation.observe(document.body,{childList:true,subtree:true});
+  const mutation=new MutationObserver(refresh);mutation.observe(document,{childList:true,subtree:true});
   const resize=new ResizeObserver(refresh);
   document.querySelectorAll('[data-testid="stMain"]').forEach(node=>resize.observe(node));
   function layoutChanged(){cancelVisuals();cancelRestore();for(const state of mounted.values())reserve(state,true);refresh();}
   desktop.addEventListener('change',layoutChanged,{signal:abort.signal});
   reduced.addEventListener('change',()=>{cancelVisuals();refresh();},{signal:abort.signal});
+  window.addEventListener('qm-motion-preference-change',()=>{cancelVisuals();refresh();},{signal:abort.signal});
   window.addEventListener('resize',layoutChanged,{passive:true,signal:abort.signal});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelVisuals();cancelRestore();if(frame)cancelAnimationFrame(frame);frame=0;}else refresh();},{signal:abort.signal});
   const api={version:VERSION,prepare,refresh,dispose(){

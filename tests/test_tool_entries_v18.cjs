@@ -1,0 +1,42 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const {JSDOM}=require('jsdom');
+const dom=new JSDOM('<!doctype html><html><body></body></html>',{runScripts:'outside-only',pretendToBeVisual:true});
+const win=dom.window,doc=win.document,mediaListeners=new Set(),observers=[];
+const media={matches:false,addEventListener:(_name,fn)=>mediaListeners.add(fn),removeEventListener:(_name,fn)=>mediaListeners.delete(fn)};
+win.matchMedia=()=>media;
+win.IntersectionObserver=class {constructor(callback){this.callback=callback;this.nodes=new Set();observers.push(this);}observe(node){this.nodes.add(node);}unobserve(node){this.nodes.delete(node);}disconnect(){this.nodes.clear();}};
+const read=name=>fs.readFileSync(path.join(__dirname,'../app',name),'utf8');
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+function fixture(key='scope_enter_six'){
+  const host=doc.createElement('div');host.className='st-key-tool_entry_'+key;
+  host.innerHTML=`<div class="tool-entry-art" data-tool-entry="${key}" data-tool-kind="align" aria-hidden="true"><div class="tool-entry-object"><i class="tool-entry-plane"></i></div></div><div class="st-key-${key}"><button type="button" kind="primary">六维口径检查</button></div><input value="未提交的口径备注">`;
+  host.getBoundingClientRect=()=>({x:0,y:30,top:30,bottom:224,left:0,right:430,width:430,height:194});doc.body.append(host);return host;
+}
+(async()=>{
+  const host=fixture(),button=host.querySelector('button'),input=host.querySelector('input'),art=host.querySelector('[data-tool-entry]');
+  let clicks=0;button.addEventListener('click',()=>clicks++);input.focus();
+  win.eval(read('vendor/gsap/gsap.min.js'));win.eval(read('tool_entries.js'));
+  await wait(70);assert.equal(win.QMToolEntries.getState().entries,1);assert.equal(button.dataset.qmUiButton,'true');
+  assert.ok(+art.style.getPropertyValue('--tool-enter')<1,'Only the decorative object receives its first entrance.');
+  assert.equal(button.style.transform,'');assert.equal(host.style.transform,'');assert.equal(button.style.opacity,'');
+  button.dispatchEvent(new win.MouseEvent('pointerover',{bubbles:true}));await wait(140);
+  assert.ok(+art.style.getPropertyValue('--tool-hover')>0,'Hover opens the six planes.');
+  const amount=+art.style.getPropertyValue('--tool-hover');button.dispatchEvent(new win.MouseEvent('pointerout',{bubbles:true}));await wait(110);
+  assert.ok(+art.style.getPropertyValue('--tool-hover')<amount,'Fast reversal continues from current pose.');
+  assert.equal(input.value,'未提交的口径备注');assert.equal(doc.activeElement,input);assert.equal(clicks,0);
+  button.click();assert.equal(clicks,1,'The original native click remains the only action.');
+  button.focus();await wait(70);assert.ok(+art.style.getPropertyValue('--tool-hover')>0,'Keyboard focus shares decorative response.');
+  doc.documentElement.dataset.qmMotionMode='research';win.dispatchEvent(new win.Event('qm-motion-preference-change'));
+  assert.equal(+art.style.getPropertyValue('--tool-enter'),1);assert.equal(+art.style.getPropertyValue('--tool-hover'),0);assert.equal(win.QMToolEntries.getState().running,0);
+  delete doc.documentElement.dataset.qmMotionMode;win.dispatchEvent(new win.Event('qm-motion-preference-change'));
+  media.matches=true;for(const fn of mediaListeners)fn();assert.equal(+art.style.getPropertyValue('--tool-hover'),0);
+  media.matches=false;for(const fn of mediaListeners)fn();
+  observers[0].callback([{target:host,isIntersecting:false}]);assert.equal(win.QMToolEntries.getState().running,0,'Offscreen artwork immediately settles.');
+  const singleton=win.QMToolEntries;win.eval(read('tool_entries.js'));assert.equal(win.QMToolEntries,singleton);
+  host.remove();await wait(80);assert.equal(singleton.getState().entries,0);assert.equal(button.hasAttribute('data-qm-ui-button'),false,'Ownership is released on removal.');
+  const replacement=fixture();await wait(80);const replacementArt=replacement.querySelector('[data-tool-entry]');
+  assert.equal(+replacementArt.style.getPropertyValue('--tool-enter'),1,'A Streamlit rerun must not replay the entrance.');
+  singleton.dispose();assert.equal(singleton.getState().entries,0);assert.equal(replacementArt.style.getPropertyValue('--tool-enter'),'');assert.equal(mediaListeners.size,0);assert.equal(observers[0].nodes.size,0);
+  win.gsap.ticker.sleep();dom.window.close();console.log('tool entries: native action/focus/draft, decoration-only GSAP, reverse, quiet/offscreen, rerun and cleanup passed');
+})().catch(error=>{win.gsap?.ticker.sleep();dom.window.close();console.error(error);process.exitCode=1;});

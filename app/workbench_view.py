@@ -7,10 +7,11 @@ import streamlit as st
 
 from app.ui_state import on_company_change
 from app.navigation import navigate, preserve_inputs
-from app.guided_ui import page_intro, guide_hint, action_card
+from app.guided_ui import page_intro, guide_hint
 from core.db import fetch_report_files
 from app.answer_actions import collect_answer_sources
 from app.hero_visual import render_hero_visual
+from app.verification_hub import hub_action
 
 
 def show_workbench_layer(layer):
@@ -106,7 +107,9 @@ def resume_latest_answer(analysis_names=(), data_map=None, open_source=False):
         st.session_state[f'answer_sources_pick_{key}'] = 0
 
 
-def render_workbench(analysis_names, companies, data_map, selected_main, selected_cmp):
+def render_workbench(analysis_names, companies, data_map, selected_main, selected_cmp, reports=None):
+    from pathlib import Path
+    st.html('<style>' + Path(__file__).with_name('workspace_entry.css').read_text(encoding='utf-8') + '</style>')
     layer = st.session_state.get('workbench_layer', 'home')
     if layer == 'verification':
         _render_verification_layer(analysis_names, data_map)
@@ -129,45 +132,46 @@ def render_workbench(analysis_names, companies, data_map, selected_main, selecte
     st.session_state.workspace_year = chosen_year
     coverage = f'{min(years)}—{max(years)}年' if len(years) > 1 else f'{years[0]}年' if years else '暂无年度指标'
     with st.container(key='workspace_hero'):
-        with st.container(key='studio_hero_grid'):
-            question_panel, path_panel = st.columns([.95, 1.15], gap='large')
-            with question_panel:
-                with st.container(key='workspace_workflow'):
-                    _render_studio_heading()
-                    if st.session_state.get('workspace_more_company') != selected_main:
-                        st.session_state.workspace_more_company = selected_main
-                    with st.container(key='studio_company_controls'):
-                        st.markdown('<div class="studio-field-heading"><span class="studio-step-label">01</span>'
-                                    '<strong>当前研究条件</strong></div>', unsafe_allow_html=True)
-                        company_control, period_control = st.columns([2.1, 1], gap='small')
-                        company_control.markdown('<div class="studio-control-label">研究企业</div>',
-                                                 unsafe_allow_html=True)
-                        company_control.selectbox('研究企业', analysis_names, key='workspace_more_company',
-                                                  on_change=_select_more_company,
-                                                  format_func=lambda name: option_labels.get(name, short_name(name)),
-                                                  label_visibility='collapsed',
-                                                  help='搜索已接入的企业；切换后会同步研究条件并保留问题草稿。')
-                        period_control.markdown('<div class="studio-control-label">研究年度</div>',
-                                                unsafe_allow_html=True)
-                        year = period_control.selectbox('研究年度', years or [None], key='workspace_year',
-                                                        label_visibility='collapsed',
-                                                        format_func=lambda value: f'{value}年度' if value else '无年度数据')
-                        st.markdown(f'<p class="studio-data-coverage">已接入年度指标 · {escape(coverage)}</p>',
-                                    unsafe_allow_html=True)
-                    with st.container(key='workspace_question_card'):
-                        st.markdown('<div class="studio-field-heading studio-composer-label">'
-                                    '<span class="studio-step-label">02</span><strong>财报问数</strong></div>',
-                                    unsafe_allow_html=True)
-                        st.text_area('工作台财务问题', key='workspace_question', height=90,
-                                     placeholder=f'{short_name(selected_main)}{year or ""}年营业收入是多少？',
-                                     label_visibility='collapsed')
-                        hint, submit = st.columns([1.55, 1], gap='small')
-                        hint.caption('也可直接在问题中指定企业与年度。')
-                        submit.button('开始分析 →', key='workspace_submit', type='primary',
-                                      width='stretch', on_click=_submit_workspace)
-            with path_panel:
-                with st.container(key='studio_hero_visual'):
-                    render_hero_visual()
+        with st.container(key='workspace_workflow'):
+            _render_studio_heading()
+            if st.session_state.get('workspace_more_company') != selected_main:
+                st.session_state.workspace_more_company = selected_main
+            with st.container(key='studio_company_controls'):
+                st.markdown('<div class="studio-field-heading"><span class="studio-step-label">01</span>'
+                            '<strong>当前研究条件</strong></div>', unsafe_allow_html=True)
+                company_control, period_control = st.columns([2.1, 1], gap='small')
+                company_control.markdown('<div class="studio-control-label">研究企业</div>',
+                                         unsafe_allow_html=True)
+                company_control.selectbox('研究企业', analysis_names, key='workspace_more_company',
+                                          on_change=_select_more_company,
+                                          format_func=lambda name: option_labels.get(name, short_name(name)),
+                                          label_visibility='collapsed',
+                                          help='搜索已接入的企业；切换后会同步研究条件并保留问题草稿。')
+                period_control.markdown('<div class="studio-control-label">研究年度</div>',
+                                        unsafe_allow_html=True)
+                year = period_control.selectbox('研究年度', years or [None], key='workspace_year',
+                                                label_visibility='collapsed',
+                                                format_func=lambda value: f'{value}年度' if value else '无年度数据')
+                st.markdown(f'<p class="studio-data-coverage">已接入年度指标 · {escape(coverage)}</p>',
+                            unsafe_allow_html=True)
+            with st.container(key='workspace_question_card'):
+                st.markdown('<div class="studio-field-heading studio-composer-label">'
+                            '<span class="studio-step-label">02</span><strong>财报问数</strong></div>',
+                            unsafe_allow_html=True)
+                st.text_area('工作台财务问题', key='workspace_question', height=90,
+                             placeholder=f'{short_name(selected_main)}{year or ""}年营业收入是多少？',
+                             label_visibility='collapsed')
+                hint, submit = st.columns([1.55, 1], gap='small')
+                hint.caption('也可直接在问题中指定企业与年度。')
+                submit.button('开始分析 →', key='workspace_submit', type='primary',
+                              width='stretch', on_click=_submit_workspace)
+        from app.workspace_portal import handle_workspace_action
+        with st.container(key='workspace_resource_links'):
+            for col, (action, label) in zip(st.columns(3), [
+                ('annual_reports', '年度报告 ↗'), ('annual_data', '年度数据 ↗'),
+                ('answer_evidence', '答案与依据 ↗')]):
+                col.button(label, key='workspace_resource_' + action, width='stretch',
+                           on_click=handle_workspace_action, args=(action, analysis_names, data_map, reports))
     with st.container(key='studio_home_lower'):
         with st.container(key='workspace_main_grid'):
             if _latest_answer_question():
@@ -180,11 +184,21 @@ def render_workbench(analysis_names, companies, data_map, selected_main, selecte
                 _render_studio_tools()
 
 
+def _render_spatial_portal(data_map, reports):
+    from app.workspace_portal import portal_context, queue_portal_event
+    from app.portal_motion import render_portal_context
+    context = portal_context(data_map, reports or [])
+    render_portal_context(context['token'])
+    event = render_hero_visual(context)
+    if queue_portal_event(event, context):
+        st.rerun()
+
+
 def _render_studio_heading():
     with st.container(key='studio_hero_heading'):
-        st.markdown('<div class="studio-hero-eyebrow">FINANCIAL RESEARCH STUDIO / 财报研究</div>'
-                    '<h1 class="studio-hero-title">从问题，<br>走到<span class="studio-hero-accent">有据的答案。</span></h1>'
-                    '<p class="studio-hero-copy">查财报，理解变化，让每个答案都有来源。</p>', unsafe_allow_html=True)
+        st.markdown('<div class="studio-hero-eyebrow">YOUR RESEARCH / 研究工作区</div>'
+                    '<h1 class="studio-hero-title">开始你的<span class="studio-hero-accent">下一次研究。</span></h1>'
+                    '<p class="studio-hero-copy">确认企业与期间，提出问题，沿着来源继续研究。</p>', unsafe_allow_html=True)
 
 
 def _render_studio_tools():
@@ -238,14 +252,14 @@ def _latest_answer_question():
 def _render_verification_layer(analysis_names=(), data_map=None):
     with st.container(key='workspace_verification_hub'):
         page_intro('核验工具', '从当前问题出发，选择一种核验方式。', icon='fact_check')
-        choices, context = st.columns([1.25, 1], gap='large')
+        choices, context = st.columns([1.8, 1], gap='large')
         features = [('口径可比性核验', '统一指标、年度与报表范围', '口径核验', 'tune'),
                     ('反证式财务核验', '核对候选答案的原文与计算', '反证核验', 'shield'),
                     ('可复演证据包', '复算历史回答的冻结证据', '证据复演', 'history')]
         with choices:
             with st.container(key='workspace_verification_choices'):
                 for number, (label, detail, page, icon) in enumerate(features):
-                    action_card(label, detail, f'workspace_feature_{number}', icon, navigate, (page,))
+                    hub_action(label, detail, f'workspace_feature_{number}', icon, navigate, (page,))
         with context:
             with st.container(key='workspace_verification_context'):
                 st.markdown('<div class="verification-context-heading"><span>核验路径</span>'
@@ -280,14 +294,21 @@ def _render_research_layer(analysis_names, data_map, selected_main):
     with st.container(key='workspace_research_tools'):
         analysis, library, evaluation = st.columns(3)
         with analysis:
-            action_card('企业分析', '查看趋势、企业对比、风险及报告', 'workspace_enterprise',
+            hub_action('企业分析', '查看趋势、企业对比、风险及报告', 'workspace_enterprise',
                         'analytics', navigate, ('研究工作台', '企业分析'))
         with library:
-            action_card('研究资料库', '查阅已接入文档和外部资料入口', 'workspace_library',
+            hub_action('研究资料库', '查阅已接入文档和外部资料入口', 'workspace_library',
                         'menu_book', navigate, ('数据资产', '研究资料库'))
         with evaluation:
-            action_card('评测中心', '运行固定题集，查看实际评测结果', 'workspace_evaluation',
+            hub_action('评测中心', '运行固定题集，查看实际评测结果', 'workspace_evaluation',
                         'fact_check', navigate, ('数据资产', '评测中心'))
+        system, collaboration = st.columns(2)
+        with system:
+            hub_action('系统说明', '查看实际系统架构与数据库表结构', 'workspace_system',
+                       'schema', navigate, ('数据资产', '系统说明'))
+        with collaboration:
+            hub_action('多智能体协作', '让独立模型角色复核已保存答案', 'workspace_agents',
+                       'account_tree', navigate, ('数据资产', '多智能体协作'))
     if not analysis_names or selected_main not in data_map:
         guide_hint('当前尚无可分析的年度指标，可先到数据资产接入文件。')
         return

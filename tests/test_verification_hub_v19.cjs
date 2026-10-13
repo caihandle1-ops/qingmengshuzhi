@@ -1,0 +1,44 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const {JSDOM}=require('jsdom');
+const dom=new JSDOM('<!doctype html><html><body></body></html>',{runScripts:'outside-only',pretendToBeVisual:true});
+const win=dom.window,doc=win.document,mediaListeners=new Set(),observers=[];
+const media={matches:false,addEventListener:(_name,fn)=>mediaListeners.add(fn),removeEventListener:(_name,fn)=>mediaListeners.delete(fn)};
+win.matchMedia=()=>media;
+win.IntersectionObserver=class {constructor(callback){this.callback=callback;this.nodes=new Set();observers.push(this);}observe(node){this.nodes.add(node);}unobserve(node){this.nodes.delete(node);}disconnect(){this.nodes.clear();}};
+const read=name=>fs.readFileSync(path.join(__dirname,'../app',name),'utf8');
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+function fixture(key='workspace_feature_0'){
+  const host=doc.createElement('div');host.className='st-key-hub_entry_'+key;
+  host.innerHTML=`<div class="hub-entry-art" data-hub-entry="${key}" data-hub-kind="align" aria-hidden="true"><div class="hub-entry-object"><i class="hub-entry-plane"></i></div></div><div class="st-key-${key}"><button type="button">口径可比性核验</button></div>`;
+  host.getBoundingClientRect=()=>({x:0,y:30,top:30,bottom:187,left:0,right:650,width:650,height:157});doc.body.append(host);return host;
+}
+(async()=>{
+  const draft=doc.createElement('input');draft.value='不应被导航动效改变的草稿';doc.body.append(draft);draft.focus();
+  const host=fixture(),button=host.querySelector('button'),art=host.querySelector('[data-hub-entry]');
+  let clicks=0;button.addEventListener('click',()=>clicks++);
+  win.eval(read('vendor/gsap/gsap.min.js'));win.eval(read('verification_hub.js'));
+  await wait(70);assert.equal(win.QMVerificationHub.getState().entries,1);assert.equal(button.dataset.qmUiButton,'true');
+  assert.ok(+art.style.getPropertyValue('--hub-enter')<1,'Only decorative artwork enters.');
+  assert.equal(button.style.transform,'');assert.equal(host.style.transform,'');assert.equal(button.style.opacity,'');
+  button.dispatchEvent(new win.MouseEvent('pointerover',{bubbles:true}));await wait(120);
+  assert.ok(+art.style.getPropertyValue('--hub-hover')>0,'Pointer opens geometry.');
+  const amount=+art.style.getPropertyValue('--hub-hover');button.dispatchEvent(new win.MouseEvent('pointerout',{bubbles:true}));await wait(100);
+  assert.ok(+art.style.getPropertyValue('--hub-hover')<amount,'Interrupted response reverses from its current pose.');
+  assert.equal(draft.value,'不应被导航动效改变的草稿');assert.equal(doc.activeElement,draft);assert.equal(clicks,0);
+  button.click();assert.equal(clicks,1,'One native click causes exactly one existing callback.');
+  button.focus();await wait(70);assert.ok(+art.style.getPropertyValue('--hub-hover')>0,'Keyboard focus shares the response.');
+  doc.documentElement.dataset.qmMotionMode='research';win.dispatchEvent(new win.Event('qm-motion-preference-change'));
+  assert.equal(+art.style.getPropertyValue('--hub-enter'),1);assert.equal(+art.style.getPropertyValue('--hub-hover'),0);assert.equal(win.QMVerificationHub.getState().running,0);
+  delete doc.documentElement.dataset.qmMotionMode;win.dispatchEvent(new win.Event('qm-motion-preference-change'));
+  media.matches=true;for(const fn of mediaListeners)fn();assert.equal(win.QMVerificationHub.getState().running,0);
+  media.matches=false;for(const fn of mediaListeners)fn();
+  observers[0].callback([{target:host,isIntersecting:false}]);assert.equal(win.QMVerificationHub.getState().running,0,'Offscreen art settles without running work.');
+  const singleton=win.QMVerificationHub;win.eval(read('verification_hub.js'));assert.equal(win.QMVerificationHub,singleton);
+  host.remove();await wait(65);assert.equal(singleton.getState().entries,0);assert.equal(button.hasAttribute('data-qm-ui-button'),false);
+  const replacement=fixture();await wait(65);const replacementArt=replacement.querySelector('[data-hub-entry]');
+  assert.equal(+replacementArt.style.getPropertyValue('--hub-enter'),1,'Native rerun does not replay art entrance.');
+  const ignored=fixture('unknown_key');await wait(40);assert.equal(singleton.getState().entries,1,'Controller accepts only its six explicit entries.');ignored.remove();
+  singleton.dispose();assert.equal(singleton.getState().entries,0);assert.equal(replacementArt.style.getPropertyValue('--hub-enter'),'');assert.equal(mediaListeners.size,0);assert.equal(observers[0].nodes.size,0);
+  win.gsap.ticker.sleep();dom.window.close();console.log('verification hub: native action/focus/draft, GSAP response/reverse, quiet/offscreen, rerun, scope and cleanup passed');
+})().catch(error=>{win.gsap?.ticker.sleep();dom.window.close();console.error(error);process.exitCode=1;});

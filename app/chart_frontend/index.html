@@ -1,6 +1,7 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="chart.css?v=20261005.2"></head>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="chart.css?v=20261011.22"></head>
 <body><main id="chart-shell"><header><div><span class="eyebrow" id="chart-mode">年度指标</span><h3 id="chart-title">指标变化</h3></div><div id="metric-tabs" role="group" aria-label="切换指标"></div></header>
 <div id="series-legend" role="list" aria-label="企业折线图例" hidden></div>
-<div id="chart-viewport"><svg id="chart" viewBox="0 0 800 280" role="group" aria-label="年度指标图表" aria-describedby="chart-hint"><g id="grid"></g><line id="selection-line" x1="0" x2="0" y1="25" y2="225"></line><path id="line" fill="none"></path><g id="marks"></g></svg></div>
+<div id="chart-turn" aria-hidden="true" inert><i id="chart-turn-band"></i><i id="chart-turn-trace"></i></div>
+<div id="chart-viewport"><svg id="chart" viewBox="0 0 800 280" role="group" aria-label="年度指标图表" aria-describedby="chart-hint"><rect id="selection-band" y="24" height="224" pointer-events="none"></rect><g id="grid"></g><line id="selection-line" x1="0" x2="0" y1="25" y2="225"></line><path id="line" fill="none"></path><g id="marks"></g></svg></div>
 <section id="readout" aria-live="polite" aria-atomic="true"><div class="readout-summary"><span id="readout-year"></span><strong id="readout-value"></strong></div><p id="readout-source"></p><p id="readout-status"></p><button id="source-button" aria-describedby="readout-year readout-source" hidden><span>查看该来源</span><span aria-hidden="true">↗</span></button></section>
-<p class="hint" id="chart-hint">悬停、点击或用 Tab 选择数据点；左右方向键切换年份，数值与来源同步显示。窄屏可横向查看图表。</p></main><script src="chart.js?v=20261005.3"></script></body></html>
+<p class="hint" id="chart-hint">悬停、点击或用 Tab 选择数据点；左右方向键切换年份，数值与来源同步显示。查看来源会定位保存的引用页；唯一匹配的摘录显示高亮，仍需核验。</p></main><script src="gsap.min.js"></script><script src="chart.js?v=20261011.22"></script></body></html>

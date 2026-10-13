@@ -1,6 +1,8 @@
 /* Every amount remains a supplied text value. The camera changes only geometry. */
 (() => {
   'use strict';
+  let presentation = false;
+  const quiet = () => !presentation || reduced.matches || !window.requestAnimationFrame;
   const shell = document.getElementById('atlas'), stage = document.getElementById('map-stage');
   const scene = document.getElementById('map-scene'), zones = document.getElementById('risk-zones');
   const detail = document.getElementById('risk-detail'), resetButton = document.getElementById('reset-camera');
@@ -62,8 +64,8 @@
     for (const [position, button] of buttons.entries()) {
       button.classList.toggle('is-selected', position === index); button.setAttribute('aria-pressed', String(position === index));
     }
-    if (index === null) { delete detail.dataset.state; height(); return; }
-    const rule = payload.rules[index]; detail.dataset.state = rule.status;
+    if (index === null) { delete detail.dataset.state; delete detail.dataset.rule; height(); return; }
+    const rule = payload.rules[index]; detail.dataset.state = rule.status; detail.dataset.rule = rule.id;
     text('rule-domain', `${rule.id} / ${rule.domain}`); text('rule-title', rule.label); text('rule-status', rule.status_label);
     text('rule-reason', rule.reason); text('rule-definition', rule.rule); text('rule-basis', rule.basis);
     const facts = document.getElementById('rule-facts'); facts.replaceChildren();
@@ -135,7 +137,7 @@
       button.addEventListener('keydown', event => keys(event,index)); buttons.push(button); zones.appendChild(button);
     });
     showDetail(null);
-    camera = window.QMRiskCamera.createCamera({reduced: reduced.matches || !window.requestAnimationFrame,
+    camera = window.QMRiskCamera.createCamera({reduced: quiet(),
       now: () => performance.now(), hidden: () => document.hidden,
       raf: callback => window.requestAnimationFrame ? requestAnimationFrame(callback) : setTimeout(() => callback(performance.now()), 0),
       cancel: id => window.cancelAnimationFrame ? cancelAnimationFrame(id) : clearTimeout(id)}, paint, buttons.length);
@@ -153,6 +155,8 @@
   function onRender(event) {
     if (disposed || event.source !== window.parent || event.data?.type !== 'streamlit:render') return;
     const args = event.data.args || {}, next = args.payload;
+    const enabled = args.motion?.version === 1 && args.motion.mode === 'presentation';
+    if (presentation !== enabled) { presentation = enabled; camera?.setReduced(quiet()); }
     if (!next || typeof next.revision !== 'string' || !Array.isArray(next.rules) || next.rules.length !== 6) return;
     const prior = sourceSelection, candidate = args.source_selection;
     sourceSelection = candidate && candidate.revision === next.revision && next.rules.some(rule => rule.id === candidate.rule_id &&
@@ -167,7 +171,7 @@
     currentSourceAnchor(); height();
   }
   const visibility = () => camera?.syncVisibility();
-  const reduce = () => camera?.setReduced(reduced.matches || !window.requestAnimationFrame);
+  const reduce = () => camera?.setReduced(quiet());
   function dispose() {
     if (disposed) return; disposed = true; camera?.dispose(); resize?.disconnect(); intersection?.disconnect();
     window.removeEventListener('message', onRender); document.removeEventListener('visibilitychange', visibility);

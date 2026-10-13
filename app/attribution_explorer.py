@@ -9,6 +9,7 @@ import re
 
 import streamlit as st
 import streamlit.components.v1 as components
+from app.motion_preferences import motion_preferences
 
 from app.messages import public_message
 
@@ -147,7 +148,7 @@ def render_attribution_explorer(attribution, key):
         st.session_state[focus_key] = None
         selected = None
     if payload['nodes'] and all((_FRONTEND / filename).is_file() for filename in ('index.html', 'explorer.js', 'explorer.css', 'motion.js')):
-        event = _explorer(payload=payload, evidence_node=selected[1] if selected else None,
+        event = _explorer(payload=payload, motion=motion_preferences(), evidence_node=selected[1] if selected else None,
                           key=f'qm_attribution_20261005_1_{key}', default=None)
         if consume_attribution_event(event, payload, key, st.session_state):
             # Push the authoritative evidence selection back to the persistent

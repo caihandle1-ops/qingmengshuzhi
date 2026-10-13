@@ -1,0 +1,26 @@
+{
+  "package": "gsap",
+  "version": "3.15.0",
+  "source": "https://registry.npmjs.org/gsap/-/gsap-3.15.0.tgz",
+  "npm_integrity": "sha512-dMW4CWBTUK1AEEDeZc1g4xpPGIrSf9fJF960qbTZmN/QwZIWY5wgliS6JWl9/25fpTGJrMRtSjGtOmPnfjZB+A==",
+  "files_sha256": {
+    "gsap.min.js": "92bb9a96476f983d212a2bc4f54c889039c1696dd4461d40a736860938570fbb",
+    "package.json": "85cc13e31f7a3cd124b587a40f545f265f47d0dfb9a556bb122d70fc0fca3459",
+    "LICENSE-NOTICE.txt": "61c8c2879d5be55d39de5bf08df1849d092c0e2bcaa42c4d0a79189ea5d89731",
+    "MorphSVGPlugin.min.js": "19c891a412240d8521b13330813d9b551ea5b0f707907c365ffecaf1dfa0f5cf",
+    "MotionPathPlugin.min.js": "ace44a07c6c179f5347d9b46a152d468e4c9f272ee0d68bf0354e00d60000693",
+    "Draggable.min.js": "eb28ff7ac2d320ba24a5c065563fcd8f61f2df9d7574b175b9b30942e5867e8c",
+    "Flip.min.js": "cbe3ca726350f8d230da38a14ce2384e7772e05a45cee6144dd7fe6dde868c2f",
+    "ScrollTrigger.min.js": "b0b14d67b55b0c43c756ac0b106cfcb09d0879945f6ead64451065b0672916a2"
+  },
+  "usage": "Pinned local core/CSSPlugin plus MorphSVG, MotionPath, ScrollTrigger, Draggable and Flip. Original upstream bytes and notices; no runtime CDN.",
+  "component_copies": {
+    "app/chart_frontend/gsap.min.js": "92bb9a96476f983d212a2bc4f54c889039c1696dd4461d40a736860938570fbb",
+    "app/director_frontend/vendor/gsap.min.js": "92bb9a96476f983d212a2bc4f54c889039c1696dd4461d40a736860938570fbb",
+    "app/director_frontend/vendor/Draggable.min.js": "eb28ff7ac2d320ba24a5c065563fcd8f61f2df9d7574b175b9b30942e5867e8c",
+    "app/director_frontend/vendor/Flip.min.js": "cbe3ca726350f8d230da38a14ce2384e7772e05a45cee6144dd7fe6dde868c2f",
+    "app/director_frontend/vendor/LICENSE-NOTICE.txt": "61c8c2879d5be55d39de5bf08df1849d092c0e2bcaa42c4d0a79189ea5d89731",
+    "app/hero_frontend/gsap.min.js": "92bb9a96476f983d212a2bc4f54c889039c1696dd4461d40a736860938570fbb",
+    "app/hero_frontend/LICENSE-NOTICE.txt": "61c8c2879d5be55d39de5bf08df1849d092c0e2bcaa42c4d0a79189ea5d89731"
+  }
+}

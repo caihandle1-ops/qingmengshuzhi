@@ -1,14 +1,15 @@
 /* Local document geometry only. Native widgets remain the sole action path. */
 (() => {
+  const quiet = () => reduced.matches || document.documentElement.dataset.qmMotionMode === 'research';
   'use strict';
-  const VERSION = '2026-10-05.1';
+  const VERSION = '2026-10-05.1-global-2-body-ready20';
   if (window.__qmAssetGallery?.version === VERSION) { window.__qmAssetGallery.refresh(); return; }
   window.__qmAssetGallery?.dispose();
   const abort = new AbortController(), reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const effects = new Set(), decorations = new Set(), root = document.documentElement;
   let records = new Map(), pending = null, committed = '', model = { selected: '', open: '' };
   let frame = 0, disposed = false, inView = true, observed = null, journey = null, route = null;
-  const enabled = () => !disposed && !reduced.matches && !document.hidden && inView;
+  const enabled = () => !disposed && !quiet() && !document.hidden && inView;
   const keyOf = node => node?.getAttribute('data-asset-record-id');
   const rect = node => {
     if (!node?.isConnected) return null;
@@ -144,14 +145,15 @@
     if (changes.some(change => change.type === 'attributes' || Array.from(change.addedNodes || []).concat(Array.from(change.removedNodes || []))
       .some(node => node.nodeType === 1 && !node.matches?.('.qm-asset-flight,.qm-asset-flight *')))) refresh();
   });
-  mutation.observe(document.body, { subtree: true, childList: true, attributes: true,
+  mutation.observe(document, { subtree: true, childList: true, attributes: true,
     attributeFilter: ['data-asset-gallery-commit', 'data-studio-scene'] });
   const stationary = () => { cancelEffects(); pending = null; records = collect(); refresh(); };
-  const visibility = () => { if (document.hidden || reduced.matches) stationary(); else refresh(); };
+  const visibility = () => { if (document.hidden || quiet()) stationary(); else refresh(); };
   reduced.addEventListener('change', visibility);
   document.addEventListener('visibilitychange', visibility, { signal: abort.signal });
   window.addEventListener('resize', stationary, { passive: true, signal: abort.signal });
   window.addEventListener('scroll', () => { if (effects.size && !visible(rect(gallery()))) stationary(); }, { passive: true, capture: true, signal: abort.signal });
+  window.addEventListener('qm-motion-preference-change', stationary, {signal: abort.signal});
   window.__qmAssetGallery = { version: VERSION, refresh, dispose() {
     disposed = true; if (frame) cancelAnimationFrame(frame); frame = 0;
     reset(); intersection?.disconnect(); mutation.disconnect(); abort.abort(); reduced.removeEventListener('change', visibility);

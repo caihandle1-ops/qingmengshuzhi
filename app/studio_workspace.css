@@ -3,7 +3,7 @@
 [data-testid="stAppViewContainer"] {background:linear-gradient(115deg,#f4f4f0 0%,#f0f3f3 65%,#f3f2f1 100%)}
 [data-testid="stMain"] {background:transparent}
 .st-key-app_header {background:transparent}
-.st-key-workspace_hero {padding:36px;border-radius:12px;background:radial-gradient(ellipse at 95% 25%,#294854 0,transparent 58%),#152435;border-top:3px solid #df7343}
+.st-key-workspace_hero {padding:36px;border-radius:3px;background:radial-gradient(ellipse at 88% 28%,#2454ff17 0,transparent 56%),#101a2e;border:1px solid #2e3b54;border-top:1px solid #617391;box-shadow:0 24px 60px #101a2e0b}
 .st-key-studio_hero_visual {padding:8px 0 0 24px;border-left:1px solid #acc1ce24}
 .st-key-studio_hero_grid {container-type:inline-size}
 @container (max-width:831px) {.st-key-studio_hero_visual {padding:20px 0 0;border-left:0;border-top:1px solid #acc1ce24}}
@@ -38,9 +38,6 @@
 [class*="st-key-answer_summary_"]> [data-testid="stElementContainer"] p {font-size:20px}
 [class*="st-key-answer_actions_"] {padding:13px 0;border-top:1px solid #dedfd9}
 [class*="st-key-answer_actions_"] button {border-radius:7px;min-height:40px;text-align:left;font-size:13px}
-[class*="st-key-guided_picker_"] {border-bottom:1px solid #ccd5dc;padding-bottom:8px}
-[class*="st-key-guided_picker_"] [class*="st-key-guided_card_"] button {border-radius:0;border:0;border-bottom:2px solid transparent;background:transparent;min-height:40px;padding:9px 12px;color:#536477}
-[class*="st-key-guided_picker_"] [class*="st-key-guided_card_"] button[kind="primary"], [class*="st-key-guided_picker_"] [class*="st-key-guided_card_"] button[kind="primary"]:hover {background:transparent!important;color:#2454b5!important;border:0!important;border-bottom:2px solid #2454b5!important}
 .st-key-workspace_verification_context {background:transparent;border:0;border-radius:0;padding:8px 0}
 .st-key-workspace_features [class*="st-key-guided_card_"] button {background:transparent;border:0;border-top:2px solid #2454b5;border-radius:0;padding:22px 0;min-height:140px;align-items:flex-start;box-shadow:none}
 .st-key-workspace_features .st-key-guided_card_workspace_feature_1 button {border-color:#08766e;color:#08766e}.st-key-workspace_features .st-key-guided_card_workspace_feature_2 button {border-color:#6d49b1;color:#6d49b1}

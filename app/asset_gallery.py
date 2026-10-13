@@ -37,7 +37,7 @@ def filter_gallery_records(reports, company=ALL_COMPANIES, year=ALL_YEARS, order
     return records
 
 
-def _render_index(reports):
+def _render_index(reports, *, include_search=False):
     incoming = sha256('|'.join(sorted(str(row['id']) for row in reports)).encode()).hexdigest()[:16]
     stored = st.session_state.get('library_index_saved') or {}
     changed = st.session_state.get('library_index_input') != incoming
@@ -51,10 +51,20 @@ def _render_index(reports):
     companies = sorted({cover_metadata(row)['company'] for row in reports})
     if st.session_state.library_index_company not in [ALL_COMPANIES] + companies:
         st.session_state.library_index_company = ALL_COMPANIES
+    st.html('<style>' + Path(__file__).with_name('asset_filters.css').read_text(encoding='utf-8') + '</style>')
+    keyword, selected_type = '', '全部'
     with st.container(key='asset_gallery_facets'):
         st.markdown('<div class="asset-index-label"><span>COLLECTION INDEX</span>'
-                    '<strong>企业 × 年度</strong><small>从已接入资料定位原件</small></div>', unsafe_allow_html=True)
-        company_column, year_column, order_column = st.columns([1.35, 1, 1], gap='medium')
+                    '<strong>定位一份资料</strong><small>企业 · 年度 · 原始来源</small></div>', unsafe_allow_html=True)
+        if include_search:
+            search_column, type_column, company_column, year_column, order_column = st.columns([2.1, 1, 1.7, 1.15, 1.2], gap='small')
+            keyword = search_column.text_input('搜索文档或企业', placeholder='名称或企业关键词', key='library_keyword')
+            types = ['全部'] + sorted({row.get('file_type') or '未分类' for row in reports})
+            if st.session_state.get('library_type') not in types:
+                st.session_state.library_type = '全部'
+            selected_type = type_column.selectbox('资料类型', types, key='library_type')
+        else:
+            company_column, year_column, order_column = st.columns([1.35, 1, 1], gap='small')
         counts = {name: sum(cover_metadata(row)['company'] == name for row in reports) for name in companies}
         company = company_column.selectbox('企业索引', [ALL_COMPANIES] + companies, key='library_index_company',
             format_func=lambda value: f'{value} · {len(reports) if value == ALL_COMPANIES else counts[value]} 份')
@@ -70,7 +80,7 @@ def _render_index(reports):
             format_func=lambda value: f'{value} · {len(company_records) if value == ALL_YEARS else year_counts[value]} 份')
         if st.session_state.library_index_order not in GALLERY_ORDERS:
             st.session_state.library_index_order = GALLERY_ORDERS[0]
-        order = order_column.selectbox('展柜排序', GALLERY_ORDERS, key='library_index_order')
+        order = order_column.selectbox('排列顺序', GALLERY_ORDERS, key='library_index_order')
         # A bounded, factual shelf index complements the native searchable selectors.
         timeline = ''.join(f'<span class="asset-year-token{" is-active" if value == year else ""}">'
                            f'<b>{escape(value)}</b><small>{year_counts[value]} 份</small></span>' for value in years[:8])
@@ -78,7 +88,18 @@ def _render_index(reports):
         st.html('<div class="asset-year-index" aria-label="当前企业的年度资料分布">' + timeline + suffix + '</div>')
     st.session_state.library_index_saved = {key: st.session_state[key] for key in
         ('library_index_company', 'library_index_year', 'library_index_order')}
-    return filter_gallery_records(reports, company, year, order)
+    filtered = filter_gallery_records(reports, company, year, order)
+    if include_search:
+        needle = str(keyword).casefold().strip()
+        filtered = [row for row in filtered if
+                    (selected_type == '全部' or (row.get('file_type') or '未分类') == selected_type)
+                    and (not needle or needle in f'{row.get("file_name", "")} {row.get("company_name") or ""}'.casefold())]
+    return filtered
+
+
+def render_library_filters(reports):
+    """One compact native toolbar; keep all five persisted filter keys."""
+    return _render_index([dict(row) for row in reports], include_search=True)
 
 
 def document_choice(report):

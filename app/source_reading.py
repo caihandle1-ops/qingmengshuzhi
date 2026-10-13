@@ -6,14 +6,16 @@ from hashlib import sha256
 from html import escape
 from io import BytesIO, StringIO
 import csv
+import base64
 import json
 import math
-from pathlib import Path, PureWindowsPath
+from pathlib import Path
 import re
 
 import streamlit as st
 
 from core.analysis import METRIC_LABELS, METRIC_UNITS
+from core.evidence_focus import source_entry_identity
 
 
 def _text(value, missing='未保存'):
@@ -126,13 +128,32 @@ def render_linked_reading(result, entries, key, verdict, viewer):
                 with st.expander('回答保存的引用摘录'):
                     st.write(source['snippet'])
         with original:
-            name = PureWindowsPath(str(source.get('file_name') or '来源文件未标注')).name
-            st.html(f'<div class="source-reading-document"><span>原件阅读</span><h3>{_e(name)}</h3></div>')
+            st.html('<div class="source-reading-document"><span>原件阅读</span></div>')
             if not source.get('file_path'):
                 st.warning('本次引用未保存可访问原文件的路径，不能从当前资料目录补配来源。')
                 return
+            identity = source_entry_identity(entry)
+            focus = st.session_state.get(f'answer_sources_focus_{key}') or {}
             viewer(source, f'answer_direct_source_{key}_{selected}', preview_on_open=True,
-                   allow_download=False, focus_location=True)
+                   allow_download=False, focus_location=True, source_identity=identity,
+                   focus_token=focus.get('token') if focus.get('source_id') == identity else None)
+
+
+def pdf_focus_html(image, context, name, *, animate=False):
+    """Overlay real page coordinates; never alter the original document bytes."""
+    rectangles = ''.join('<rect class="source-pdf-highlight" '
+        + ' '.join(f'{field}="{rectangle[field]:.6f}{"%" if field in ("x", "y", "width", "height") else ""}"'
+                   for field in ('x', 'y', 'width', 'height')) + '/>'
+        for rectangle in context.get('rectangles', []))
+    page = context['page']
+    alt = _e(f'{name} · PDF 第 {page} 页；按冻结摘录唯一定位，仍需核验数值与口径')
+    animation = ' is-arriving' if animate else ''
+    return (f'<figure class="source-pdf-focus{animation}" data-evidence-focus="located">'
+            '<div class="source-pdf-canvas">'
+            f'<img src="data:image/png;base64,{base64.b64encode(image).decode()}" alt="{alt}"/>'
+            f'<svg class="source-pdf-overlay" aria-hidden="true" focusable="false">{rectangles}</svg>'
+            '</div>'
+            f'<figcaption>{_e(name)} · 第 {page} 页 · 冻结摘录定位</figcaption></figure>')
 
 
 def _column(index):

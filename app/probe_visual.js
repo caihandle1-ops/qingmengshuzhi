@@ -1,6 +1,7 @@
 (() => {
   'use strict';
-  const VERSION = '2026-10-04.probe.1';
+  const quiet = () => reduced.matches || document.documentElement.dataset.qmMotionMode === 'research';
+  const VERSION = '2026-10-04.probe.1-global-2-body-ready20';
   if (window.__qmProbeVisual?.version === VERSION) { window.__qmProbeVisual.refresh(); return; }
   window.__qmProbeVisual?.dispose();
   const controller = new AbortController();
@@ -12,7 +13,7 @@
   function finish(root) { cancel(root); root.dataset.phase = 'final'; root.dataset.playing = 'false'; }
   function play(root) {
     finish(root);
-    if (reduced.matches || document.hidden || root.dataset.canAnimate !== 'true') return;
+    if (quiet() || document.hidden || root.dataset.canAnimate !== 'true') return;
     root.dataset.playing = 'true'; root.dataset.phase = 'first';
     const timers = [setTimeout(() => { if (root.isConnected) root.dataset.phase = 'second'; }, 420),
                     setTimeout(() => finish(root), 840)];
@@ -22,13 +23,13 @@
   function refresh() {
     document.querySelectorAll('.qm-probe-visual').forEach(root => {
       const button = root.querySelector('.qm-pv-replay');
-      if (button) { button.disabled = reduced.matches; button.title = reduced.matches ? '已按系统减少动态效果设置显示静态比较' : '只重播视觉过程，不重新查询'; }
+      if (button) { button.disabled = quiet(); button.title = quiet() ? '研究模式或系统偏好已减少动态效果' : '只重播视觉过程，不重新查询'; }
       if (!known.has(root)) { known.add(root); play(root); }
     });
     for (const root of jobs.keys()) if (!root.isConnected) cancel(root);
   }
   const observer = new MutationObserver(() => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; refresh(); }); });
-  observer.observe(document.body, {childList:true, subtree:true});
+  observer.observe(document, {childList:true, subtree:true});
   document.addEventListener('click', event => {
     const button = event.target.closest?.('.qm-pv-replay');
     if (button) { const root = button.closest('.qm-probe-visual'); if (root) play(root); }
@@ -36,6 +37,7 @@
   function onReduced() { for (const root of jobs.keys()) finish(root); refresh(); }
   reduced.addEventListener('change', onReduced);
   document.addEventListener('visibilitychange', () => { if (document.hidden) for (const root of jobs.keys()) finish(root); }, {signal:controller.signal});
+  window.addEventListener('qm-motion-preference-change', onReduced, {signal: controller.signal});
   window.__qmProbeVisual = {version:VERSION, refresh, dispose() {
     controller.abort(); observer.disconnect(); reduced.removeEventListener('change', onReduced);
     if (raf) cancelAnimationFrame(raf); for (const root of jobs.keys()) finish(root);

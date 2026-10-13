@@ -1,0 +1,102 @@
+/* Four native workflow entrances. Geometry belongs to the inert artwork only. */
+[data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) {padding:8px 0 22px;border-bottom:0}
+[data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [data-testid="stHorizontalBlock"] {gap:18px;align-items:stretch}
+[data-testid="stMain"] [class*="st-key-tool_entry_"] {position:relative;isolation:isolate;min-width:0;--entry-paper:#eff3ee;--entry-ink:#132b3c;--entry-accent:#dbf39c;--entry-surface:#132b3c;--entry-outline:#576c79}
+[data-testid="stMain"] :is(.st-key-tool_entry_scope_enter_probe,.st-key-tool_entry_replay_enter_import) {--entry-surface:#244be7;--entry-outline:#7391f3}
+[data-testid="stMain"] .st-key-tool_entry_replay_enter_generate {--entry-surface:#302242;--entry-outline:#776584;--entry-accent:#eadbfc}
+[data-testid="stMain"] .st-key-tool_entry_replay_enter_import {--entry-surface:#4b2a71;--entry-outline:#9472b8;--entry-accent:#eadbfc}
+[data-testid="stMain"] [class*="st-key-tool_entry_"] [data-testid="stElementContainer"]:has(.tool-entry-art) {height:0;min-height:0;margin:0;position:static}
+[data-testid="stMain"] [class*="st-key-tool_entry_"] > [data-testid="stVerticalBlock"],
+[data-testid="stMain"] [class*="st-key-tool_entry_"] {gap:0}
+[data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] [class*="st-key-guided_card_"] button {
+  position:relative;min-height:194px;box-sizing:border-box;display:flex;justify-content:flex-start;align-items:flex-start;gap:0;
+  padding:69px 182px 28px 26px;border:1px solid var(--entry-outline);border-radius:9px;background:var(--entry-surface);color:var(--entry-paper);
+  box-shadow:none;text-align:left;transform:none!important;translate:none;transition:background-color .24s,border-color .24s;overflow:hidden;
+}
+[data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] [class*="st-key-guided_card_"] button:is(:hover:not(:disabled),:active,[kind="primary"],[data-testid="stBaseButton-primary"]) {background:var(--entry-surface);color:var(--entry-paper);border:1px solid var(--entry-accent);box-shadow:inset 0 0 0 1px var(--entry-accent);transform:none!important}
+[data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] [class*="st-key-guided_card_"] button:focus-visible {outline:3px solid #294cd1;outline-offset:4px;border-color:var(--entry-accent)}
+[data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] button [data-testid="stMarkdownContainer"] {flex:1;min-width:0;text-align:left;position:relative;z-index:2}
+/* Streamlit 1.64 adds a centered flex row and shortcut span around Markdown.
+   Align those native wrappers too; button padding still reserves the artwork. */
+[data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] button > div {justify-content:flex-start!important;text-align:left;min-width:0;width:100%}
+[data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] button [data-has-shortcut] {justify-content:flex-start!important;text-align:left;min-width:0;width:100%;flex:1 1 0;gap:0}
+[data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] button [data-testid="stIconMaterial"] {display:none}
+[data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] button [data-has-shortcut] > span:has([data-testid="stIconMaterial"]) {display:none}
+[data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] button strong {display:block;color:var(--entry-paper);font-size:clamp(22px,1.75vw,29px);font-weight:650;letter-spacing:-.035em;line-height:1.32}
+[data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] button p {color:var(--entry-paper);font-size:13px;line-height:1.7;margin:0 0 9px}
+[data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] button p:last-child {color:#d4dfee;margin:0;max-width:none}
+[data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] button::after {position:absolute;right:24px;top:19px;content:"↗";font-size:27px;line-height:1;color:var(--entry-accent);transform:none!important;transition:none}
+.tool-entry-art {position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;border-radius:9px;--tool-enter:1;--tool-hover:0}
+.tool-entry-meta {position:absolute;top:22px;left:27px;right:62px;display:flex;align-items:center;justify-content:space-between;gap:15px;color:#becddd;font-size:10px;line-height:1.5;font-weight:500;letter-spacing:.08em}
+.tool-entry-state {color:var(--entry-accent);font-size:10px;letter-spacing:.03em}
+.tool-entry-object {position:absolute;right:22px;bottom:10px;width:151px;height:140px;transform:translateY(calc((1 - var(--tool-enter))*34px)) rotate(calc((1 - var(--tool-enter))*-14deg));opacity:calc(.4 + var(--tool-enter)*.6)}
+.tool-entry-plane {position:absolute;display:block;left:33px;top:32px;width:75px;height:49px;border:1px solid #d8e5f777;background:#b9d3ec0d;transform-origin:50% 50%;transform:translate(calc(var(--plane)*4px - var(--tool-hover)*(5 - var(--plane))*5px),calc(var(--plane)*8px - var(--tool-hover)*(5 - var(--plane))*4px)) rotate(-24deg) skewY(7deg);opacity:calc(.33 + var(--plane)*.13)}
+.tool-entry-plane:last-of-type {background:var(--entry-accent)}
+.tool-entry-plane:nth-child(6) {background:var(--entry-accent);border-color:var(--entry-accent);opacity:1;box-shadow:0 9px 0 #071e3229}
+.tool-entry-axis {position:absolute;left:19px;right:5px;top:95px;border-top:1px solid #b9d3ec77;transform:rotate(-24deg);transform-origin:center}
+.tool-entry-orbit {position:absolute;left:41px;top:1px;width:93px;height:125px;border:1px solid #bccfea38;border-radius:50%;transform:rotate(35deg) scale(calc(1 + var(--tool-hover)*.13))}
+.tool-entry-art-diverge .tool-entry-plane {left:17px;top:64px;width:104px;height:8px;border:0;border-radius:0;background:#d4dfee;transform-origin:0 50%;transform:rotate(calc(-36deg + var(--plane)*13deg + var(--tool-hover)*(var(--plane) - 2.5)*6deg)) scaleX(calc(.6 + var(--plane)*.075));opacity:calc(.3 + var(--plane)*.13);box-shadow:none}
+.tool-entry-art-diverge .tool-entry-plane:nth-child(6) {background:var(--entry-accent)}
+.tool-entry-art-diverge .tool-entry-axis {left:8px;top:58px;right:auto;width:21px;height:21px;border:0;border-radius:50%;background:var(--entry-accent);transform:scale(calc(1 + var(--tool-hover)*.14));box-shadow:0 0 0 8px #dfefb818}
+.tool-entry-art-diverge .tool-entry-orbit {left:6px;top:9px;width:122px;height:122px;transform:scale(calc(1 + var(--tool-hover)*.12));border-radius:50%;border-color:#d4dfee4d}
+.tool-entry-art-archive .tool-entry-plane {left:32px;top:17px;width:82px;height:92px;border-radius:2px;transform:translate(calc(var(--plane)*3px - var(--tool-hover)*(5 - var(--plane))*6px),calc(var(--plane)*3px)) rotate(calc(-9deg + var(--plane)*2deg));background:#9bafc40f}
+.tool-entry-art-archive .tool-entry-plane:nth-child(6) {background:var(--entry-accent);border:1px solid var(--entry-accent);box-shadow:inset 0 -20px 0 #102b3b1a}
+.tool-entry-art-archive .tool-entry-axis {left:60px;right:23px;top:67px;border-color:#112d3b88;z-index:1;transform:none;box-shadow:0 -9px 0 #112d3b55,0 9px 0 #112d3b55}
+.tool-entry-art-restore .tool-entry-object {transform:translateY(calc((1 - var(--tool-enter))*34px)) rotate(calc((1 - var(--tool-enter))*-14deg + var(--tool-hover)*-10deg))}
+.tool-entry-art-restore .tool-entry-plane {left:54px;top:21px;width:35px;height:56px;transform-origin:50% 52px;transform:rotate(calc(var(--plane)*60deg)) translateY(calc(-7px - var(--tool-hover)*12px));background:#b9d3ec22}
+.tool-entry-art-restore .tool-entry-plane:nth-child(6) {background:var(--entry-accent)}
+.tool-entry-art-restore .tool-entry-axis {left:62px;top:65px;right:auto;width:16px;height:16px;border:0;border-radius:50%;background:var(--entry-accent);transform:none}
+.tool-entry-art-restore .tool-entry-orbit {left:10px;top:12px;width:124px;height:124px;transform:scale(calc(1 + var(--tool-hover)*.13));border-color:#d4dfee55}
+/* Static fallback remains composed before the optional GSAP bootstrap. */
+[data-testid="stMain"] [class*="st-key-tool_entry_"]:not([data-tool-entry-ready]):is(:hover,:focus-within) .tool-entry-art {--tool-hover:1}
+[data-testid="stMain"] [class*="st-key-tool_entry_"] .qm-motion-sheen,
+[data-testid="stMain"] [class*="st-key-tool_entry_"] .qm-motion-ripple {display:none!important}
+@media (max-width:1500px) {
+  [data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] [class*="st-key-guided_card_"] button {padding-left:22px;padding-right:132px;min-height:183px}
+  .tool-entry-meta {left:23px}
+  .tool-entry-object {right:5px;width:130px;transform:scale(.85) translateY(calc((1 - var(--tool-enter))*34px));transform-origin:right bottom}
+  .tool-entry-art-restore .tool-entry-object {transform:scale(.85) translateY(calc((1 - var(--tool-enter))*34px)) rotate(calc(var(--tool-hover)*-10deg))}
+}
+@media (prefers-reduced-motion:reduce) {
+  [data-testid="stMain"] [class*="st-key-tool_entry_"] .tool-entry-art {--tool-hover:0!important;--tool-enter:1!important}
+  [data-testid="stMain"] [class*="st-key-tool_entry_"] button {transition:none!important}
+}
+html[data-qm-motion-mode="research"] [data-testid="stMain"] [class*="st-key-tool_entry_"] .tool-entry-art {--tool-hover:0!important;--tool-enter:1!important}
+@media (forced-colors:active) {
+  [data-testid="stMain"] [class*="st-key-tool_entry_"] .tool-entry-object {display:none}
+  [data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] [class*="st-key-guided_card_"] button {background:ButtonFace;color:ButtonText;border:1px solid ButtonText}
+  [data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] [class*="st-key-guided_card_"] button[kind="primary"] {border:3px solid Highlight}
+  [data-testid="stMain"] [class*="st-key-tool_entry_"] :is(button strong,button p,.tool-entry-meta,.tool-entry-state) {color:ButtonText}
+}
+
+/* V22 editorial wings occupy the reserved art column, never the hit target. */
+.tool-entry-art {border-radius:2px;isolation:isolate}
+.tool-entry-art::before {content:"";position:absolute;right:-14px;top:-1px;bottom:-1px;width:42%;max-width:236px;background:var(--entry-accent);opacity:calc(.08 + var(--tool-hover)*.10);clip-path:polygon(52% 0,100% 0,100% 100%,0 100%);transform:translateX(calc(28px - var(--tool-hover)*44px));z-index:-1;pointer-events:none}
+.tool-entry-art::after {content:"";position:absolute;right:38px;top:0;width:1px;height:125%;background:var(--entry-accent);opacity:calc(.24 + var(--tool-hover)*.3);transform-origin:top;transform:translateX(calc(var(--tool-hover)*-26px)) rotate(27deg);z-index:-1;pointer-events:none}
+.tool-entry-meta {top:21px;font-size:11px;letter-spacing:.055em}
+.tool-entry-meta>span:first-child {border-top:3px solid var(--entry-accent);padding-top:8px}
+.tool-entry-state {padding-top:11px}
+.tool-entry-object {right:20px;bottom:9px;transform-origin:75% 70%;transform:translateY(calc((1 - var(--tool-enter))*46px)) rotate(calc((1 - var(--tool-enter))*-19deg)) scale(calc(1 + var(--tool-hover)*.12))}
+.tool-entry-plane {transform:translate(calc(var(--plane)*4px - var(--tool-hover)*(5 - var(--plane))*8px),calc(var(--plane)*8px - var(--tool-hover)*(5 - var(--plane))*6px)) rotate(calc(-24deg + var(--tool-hover)*9deg)) skewY(7deg)}
+.tool-entry-art-diverge .tool-entry-plane {transform:rotate(calc(-36deg + var(--plane)*13deg + var(--tool-hover)*(var(--plane) - 2.5)*11deg)) scaleX(calc(.6 + var(--plane)*.075 + var(--tool-hover)*.12))}
+.tool-entry-art-archive .tool-entry-plane {transform:translate(calc(var(--plane)*3px - var(--tool-hover)*(5 - var(--plane))*9px),calc(var(--plane)*3px - var(--tool-hover)*(5 - var(--plane))*4px)) rotate(calc(-9deg + var(--plane)*2deg + var(--tool-hover)*(var(--plane) - 2)*3deg))}
+[data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] [class*="st-key-guided_card_"] button {border-radius:2px;padding-top:77px;min-height:207px}
+[data-testid="stMain"] :is(.st-key-guided_actions_scope_tool_view,.st-key-guided_actions_replay_operation) [class*="st-key-tool_entry_"] button strong {font-weight:700;letter-spacing:-.045em}
+/* Two data-asset routes use the same native-button + inert sibling ownership. */
+[data-testid="stMain"] [data-tool-asset] {position:relative;isolation:isolate;min-width:0;--entry-paper:#f2f4e8;--entry-surface:#123f35;--entry-accent:#d5ed98;--entry-outline:#678574}
+[data-testid="stMain"] [data-tool-asset="asset_library_entry"] {--entry-surface:#244be7;--entry-accent:#e7f09c;--entry-outline:#6d8afb}
+[data-testid="stMainBlockContainer"]:has(.feature-scene-assets) [data-tool-asset] button {position:relative;display:flex;align-items:flex-start;justify-content:flex-start;min-height:207px;padding:77px 176px 26px 26px;border:1px solid var(--entry-outline);border-radius:2px;background:var(--entry-surface);color:var(--entry-paper);text-align:left;transform:none!important;translate:none!important;box-shadow:none;overflow:hidden}
+[data-testid="stMainBlockContainer"]:has(.feature-scene-assets) [data-tool-asset] button:is(:hover:not(:disabled),:active) {background:var(--entry-surface);color:var(--entry-paper);border:1px solid var(--entry-accent);box-shadow:inset 0 0 0 1px var(--entry-accent);transform:none!important}
+[data-testid="stMain"] [data-tool-asset] button:focus-visible {outline:3px solid #315ed8;outline-offset:4px}
+[data-testid="stMain"] [data-tool-asset] button>div,[data-testid="stMain"] [data-tool-asset] button [data-has-shortcut] {width:100%;min-width:0;justify-content:flex-start!important;gap:0;text-align:left}
+[data-testid="stMain"] [data-tool-asset] button [data-testid="stMarkdownContainer"] {position:relative;z-index:2;min-width:0;text-align:left}
+[data-testid="stMain"] [data-tool-asset] button strong {font-size:clamp(22px,1.75vw,29px);line-height:1.32;font-weight:700;color:var(--entry-paper);letter-spacing:-.035em}
+[data-testid="stMain"] [data-tool-asset] button p {font-size:13px;line-height:1.7;color:var(--entry-paper);margin:0 0 9px}
+[data-testid="stMain"] [data-tool-asset] button p:last-child {margin:0;color:#d6e7dc}
+[data-testid="stMain"] [data-tool-asset] button [data-testid="stIconMaterial"],[data-testid="stMain"] [data-tool-asset] button [data-has-shortcut]>span:has([data-testid="stIconMaterial"]) {display:none}
+[data-testid="stMain"] [data-tool-asset] button::after {position:absolute;right:24px;top:19px;content:"↗";font-size:27px;color:var(--entry-accent);transform:none!important;transition:none}
+[data-testid="stMain"] [data-tool-asset] :is(.qm-motion-sheen,.qm-motion-ripple) {display:none!important}
+@media (max-width:1500px) {.tool-entry-art::before {max-width:173px}.tool-entry-art::after {right:28px}.tool-entry-object {right:4px;transform:scale(calc(.86 + var(--tool-hover)*.11)) translateY(calc((1 - var(--tool-enter))*34px))}[data-testid="stMainBlockContainer"]:has(.feature-scene-assets) [data-tool-asset] button {padding-left:22px;padding-right:133px}}
+@media (prefers-reduced-motion:reduce) {.tool-entry-art::before,.tool-entry-art::after {transform:none}.tool-entry-art {--tool-hover:0!important;--tool-enter:1!important}}
+html[data-qm-motion-mode="research"] .tool-entry-art {--tool-hover:0!important;--tool-enter:1!important}
+@media (forced-colors:active) {.tool-entry-art::before,.tool-entry-art::after {display:none}[data-testid="stMainBlockContainer"]:has(.feature-scene-assets) [data-tool-asset] button {background:ButtonFace;color:ButtonText;border:1px solid ButtonText}[data-testid="stMain"] [data-tool-asset] :is(button strong,button p,.tool-entry-meta) {color:ButtonText}}

@@ -3,6 +3,7 @@ from inspect import signature
 from pathlib import Path
 
 import streamlit as st
+from app.static_assets import read_asset_text
 
 SCRIPT = Path(__file__).with_suffix('.js')
 STYLES = Path(__file__).with_suffix('.css')
@@ -10,14 +11,14 @@ STYLES = Path(__file__).with_suffix('.css')
 
 def render_evidence_motion():
     try:
-        css = STYLES.read_text(encoding='utf-8')
+        css = read_asset_text(STYLES)
     except OSError:
         css = ''
     st.markdown('<style>' + css + '</style>', unsafe_allow_html=True)
     if 'unsafe_allow_javascript' not in signature(st.html).parameters:
         return False
     try:
-        script = SCRIPT.read_text(encoding='utf-8').replace('</script', '<\\/script')
+        script = read_asset_text(SCRIPT).replace('</script', '<\\/script')
     except OSError:
         return False
     with st.container(key='evidence_motion_bootstrap'):

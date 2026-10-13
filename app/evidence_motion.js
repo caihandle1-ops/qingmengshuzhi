@@ -1,14 +1,15 @@
 /* Presentation only. Never emits financial actions or copies original documents. */
 (() => {
   'use strict';
-  const VERSION='2026-10-05.3',selector='[class*="st-key-answer_sources_panel_"]';
+  const quiet = () => reduced.matches || document.documentElement.dataset.qmMotionMode === 'research';
+  const VERSION='2026-10-05.3-global-2-body-ready20',selector='[class*="st-key-answer_sources_panel_"]';
   if(window.__qmEvidenceStage?.version===VERSION){window.__qmEvidenceStage.refresh();return;}
   window.__qmEvidenceStage?.dispose();
   const abort=new AbortController(),reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const records=new Map(),intents=new Map(),effects=new Set(),decorations=new Set();
   const root=document.documentElement;
   let frame=0,veil=null,disposed=false,lastRoute=null;
-  const enabled=()=>!disposed&&!reduced.matches&&!document.hidden;
+  const enabled=()=>!disposed&&!quiet()&&!document.hidden;
   const panelKey=panel=>Array.from(panel?.classList||[]).find(value=>value.startsWith('st-key-answer_sources_panel_'));
   const keyed=(node,prefix)=>Array.from(node?.classList||[]).find(value=>value.startsWith(prefix));
   const find=key=>key?document.querySelector('.'+CSS.escape(key)):null;
@@ -84,7 +85,8 @@
   }
   function refresh(){if(!frame&&!disposed)frame=requestAnimationFrame(scan);}
   const observer=new MutationObserver(mutations=>{if(mutations.some(change=>change.type==='attributes'||Array.from(change.addedNodes||[]).concat(Array.from(change.removedNodes||[])).some(node=>node.nodeType===1&&!node.matches?.('.qm-evidence-deck,.qm-evidence-veil'))))refresh();});
-  observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['data-studio-location','data-studio-scene']});
+  observer.observe(document,{childList:true,subtree:true,attributes:true,attributeFilter:['data-studio-location','data-studio-scene']});
   const settle=()=>{reset();refresh();};window.addEventListener('resize',settle,{passive:true,signal:abort.signal});document.addEventListener('visibilitychange',settle,{signal:abort.signal});reduced.addEventListener('change',settle);
+  window.addEventListener('qm-motion-preference-change', settle, {signal: abort.signal});
   window.__qmEvidenceStage={version:VERSION,owns,open,close,returnKey,refresh,dispose(){disposed=true;if(frame)cancelAnimationFrame(frame);frame=0;reset();records.clear();observer.disconnect();abort.abort();reduced.removeEventListener('change',settle);}};refresh();
 })();

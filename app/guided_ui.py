@@ -15,14 +15,47 @@ def _icon_name(icon):
     return name if re.fullmatch(r'[a-z][a-z0-9_]*', name) else 'arrow_forward'
 
 
-def page_intro(title, subtitle='', icon='dashboard', step=None, *, scene=None):
+def _selection_context(scene):
+    """Read existing choices; never infer an answer, fiscal period or result."""
+    state = st.session_state
+    company_key = {'qa': 'qa_main', 'scope': 'scope_company', 'counter': 'counter_company'}.get(scene)
+    period_key = {'qa': 'qa_period', 'scope': 'scope_year', 'counter': 'counter_year'}.get(scene)
+    items = []
+    if scene == 'scope' and state.get('scope_tool_view') == 'probe':
+        # Probe selectors are a different native form from six-dimension scope.
+        companies = state.get('probe_companies') or []
+        if isinstance(companies, (list, tuple)):
+            items.extend(company for company in companies if isinstance(company, str) and company)
+        period_key = 'probe_year'
+    elif company_key:
+        company = state.get(company_key)
+        if scene == 'qa' and not company:
+            company = state.get('selected_main')
+        if isinstance(company, str) and company:
+            items.append(company)
+    period = state.get(period_key) if period_key else None
+    if isinstance(period, (str, int)) and not isinstance(period, bool) and str(period).isdigit():
+        items.append(f'{period} 年')
+    elif scene == 'qa':
+        items.append('期间随问题识别')
+    return items
+
+
+def page_intro(title, subtitle='', icon='dashboard', step=None, *, scene=None,
+               context_items=None, action_target=None, action_label=None):
     """Render a native Material heading and safely escaped supporting text."""
     name = _icon_name(icon)
     with st.container(key=f'guided_intro_{name}'):
         if scene is not None:
             from app.feature_scenes import FEATURE_SCENES, render_feature_intro
             if scene in FEATURE_SCENES:
-                render_feature_intro(title, subtitle, name, step, scene)
+                target = action_target or f'qm-action-{scene}'
+                label = action_label or {'qa': '进入提问区', 'scope': '选择核验方式',
+                    'counter': '填写候选条件', 'replay': '选择复演操作', 'assets': '进入资料工作区'}[scene]
+                render_feature_intro(title, subtitle, name, step, scene,
+                    context_items=_selection_context(scene) if context_items is None else context_items,
+                    action_target=target, action_label=label)
+                st.html(f'<div id="{escape(target, quote=True)}" class="qm-feature-action-anchor" tabindex="-1"></div>')
                 return
         if step is not None:
             st.markdown(f'<div class="guided-step">{escape(str(step))}</div>', unsafe_allow_html=True)
@@ -35,15 +68,10 @@ def guide_hint(text):
     st.markdown(f'<div class="guided-hint">{escape(str(text))}</div>', unsafe_allow_html=True)
 
 
-def render_workspace_help():
-    """A small help entry, available after the initial workspace guidance."""
-    with st.container(key='header_help'):
-        with st.popover('指南', icon=':material/help_outline:', help='查看使用指南：选企业、提问、核对来源'):
-            st.markdown('### 三步开始研究')
-            st.markdown('**① 选企业**\n\n搜索并选择企业，再确认研究年度。企业与年度也可以直接写进问题。')
-            st.markdown('**② 提出问题**\n\n输入想了解的财务问题，再点击“开始分析”。营收趋势、利润变化可展开，也可再次点击收起。')
-            st.markdown('**③ 核对来源**\n\n在回答下点击来源标签查看原始文件，点击核验状态查看原因。更多数据和报告在“更多详情”里。')
-            st.caption('顶部搜索用于查找企业、指标和资料；返回上一层保留当前工作，返回首层回到研究工作台。')
+def render_workspace_help(analysis_names=(), data_map=None, reports=None):
+    """A contextual guide whose native actions open existing research views."""
+    from app.workspace_guide import render_workspace_guide
+    render_workspace_guide(analysis_names=analysis_names, data_map=data_map, reports=reports)
 
 
 def action_card(label, detail, key, icon, on_click=None, args=None, type='secondary'):

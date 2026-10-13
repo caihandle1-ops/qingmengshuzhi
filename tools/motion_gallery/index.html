@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>擎梦数智 · 本地动效验收</title><link rel="stylesheet" href="review.css"></head>
+<body><header><div><small>LOCAL MOTION REVIEW</small><h1>擎梦数智 · 动效验收台</h1></div><a href="http://127.0.0.1:8504/" target="_blank" rel="noopener">打开完整系统 ↗</a></header>
+<p class="notice">复用生产装置与场景资源，仅供隔离观察。业务流程与完整页面布局请在主站验收。当前状态：<b>尚未视觉验收</b>。</p>
+<div class="controls"><label>观察场景<select id="scene"><option value="home">研究工作台 · 三幕装置</option><option value="qa">财报问数</option><option value="scope">口径核验</option><option value="counter">反证核验</option><option value="replay">证据复演</option><option value="assets">数据资产</option></select></label>
+<label>内层视口<select id="viewport"><option value="1366x768">1366 × 768</option><option value="1920x1080">1920 × 1080</option></select></label>
+<label>应用动效<select id="mode"><option value="presentation">完整演示</option><option value="research">研究模式</option></select></label>
+<button id="remount">模拟同页更新</button><button id="inspect">查看运行状态</button></div>
+<p id="case-label" class="status" role="status"></p><p class="hint">内层视口保持真实 CSS 像素，不缩放截图；窄窗口可水平滚动。系统“减少动态效果”按真实设置检测，本页不会伪造该设置。状态数据不能替代实际画面和 FPS 测量。</p>
+<div class="viewport-scroll"><iframe id="review-frame" src="frame.html" title="生产动效隔离预览" width="1366" height="768"></iframe></div>
+<details><summary>运行状态（仅诊断，不代表验收通过）</summary><pre id="runtime-state">点击“查看运行状态”。</pre></details>
+<script src="review.js"></script></body></html>

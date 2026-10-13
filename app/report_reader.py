@@ -187,13 +187,13 @@ def report_reader_html(model):
         source_note = _source_note(chapter)
         side = f'<div class="rr-side-notes">{charts}{source_note}</div>' if charts or source_note else ''
         pages.append(f'<section class="rr-chapter" id="{identity}-chapter-{chapter["index"]}" data-report-chapter="{chapter["index"]}" tabindex="-1">'
-                     '<div class="rr-chapter-art" aria-hidden="true"><i></i><i></i><i></i></div>'
+                     '<div class="rr-chapter-art" aria-hidden="true"><i></i><i></i><i></i><b></b></div>'
                      f'<header class="rr-chapter-heading"><span aria-hidden="true">{index + 1:02d}</span><h3>{_safe(chapter["title"])}</h3></header>'
                      f'<div class="rr-chapter-content{" rr-with-notes" if side else ""}"><div class="rr-prose" data-report-original>{_original_lines(chapter["body"])}</div>{side}</div>'
                      f'<div class="rr-chapter-foot"><span>{_safe(model["company"])}</span><span>{index + 1:02d} / {len(chapters):02d}</span></div></section>')
     preface = f'<div class="rr-preface" data-report-original>{_safe(preamble["body"])}</div>' if preamble else ''
     return (f'<article class="report-reader" id="{identity}" data-report-reader="{identity}" data-report-prefix="{model["prefix"]}" aria-label="企业报告全文阅读">'
-            '<header class="rr-cover"><div class="rr-cover-art" aria-hidden="true"><i></i><i></i><b></b></div>'
+            '<header class="rr-cover"><div class="rr-cover-art" aria-hidden="true"><i></i><i></i><b></b><em></em></div>'
             f'<div class="rr-cover-copy"><span class="rr-edition">企业研究 · 全文阅读</span><h2>{_safe(model["company"])}</h2>'
             f'<p class="rr-cover-period">{_safe(period)}<span>已接入年度</span></p>{preface}</div>'
             f'<div class="rr-cover-footer"><span>报告正文与当前导出文字一致</span><span>{len(chapters):02d} 个阅读章节</span></div></header>'

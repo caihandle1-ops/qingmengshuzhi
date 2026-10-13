@@ -8,8 +8,10 @@ from pathlib import Path
 
 import streamlit as st
 import streamlit.components.v1 as components
+from app.motion_preferences import motion_preferences
 
 from core.analysis import METRIC_LABELS, METRIC_UNITS, safe_num
+from core.evidence_focus import source_entry_identity
 
 _chart = components.declare_component('qm_research_chart', path=str(Path(__file__).with_name('chart_frontend')))
 
@@ -43,7 +45,8 @@ def chart_payload(records, metrics, *, mode='bar', target_year=None, sources=())
             source_index = exact[0] if len(exact) == 1 else None
             points.append({'id': f'{company}|{year}|{metric}', 'company': company, 'year': year,
                            'metric': metric, 'value': value, 'source': filename,
-                           'location': str(location), 'source_index': source_index})
+                           'location': str(location), 'source_index': source_index,
+                           'source_id': source_entry_identity(sources[source_index]) if source_index is not None else None})
     points.sort(key=lambda point: (point['year'], point['company'], point['metric']))
     payload = {'points': points, 'metrics': [{'id': metric, 'label': METRIC_LABELS.get(metric, metric),
                                             'unit': METRIC_UNITS.get(metric, '')}
@@ -58,8 +61,12 @@ def consume_source_event(event, payload, answer_key, state):
     if not answer_key or not isinstance(event, dict) or event.get('action') != 'source':
         return False
     index = event.get('index')
-    allowed = {point['source_index'] for point in payload['points'] if point['source_index'] is not None}
-    if type(index) is not int or index not in allowed or event.get('revision') != payload['revision']:
+    matches = [point for point in payload['points'] if point['id'] == event.get('point_id')
+               and point['source_index'] == index and point.get('source_id') == event.get('source_id')]
+    if (type(index) is not int or len(matches) != 1 or not matches[0].get('source_id')
+            or event.get('revision') != payload['revision']
+            or not isinstance(event.get('nonce'), (str, int)) or isinstance(event.get('nonce'), bool)
+            or len(str(event.get('nonce'))) > 128):
         return False
     stamp = (event.get('revision'), event.get('nonce'), index)
     consumed = f'chart_source_consumed_{answer_key}'
@@ -69,6 +76,9 @@ def consume_source_event(event, payload, answer_key, state):
     state[f'answer_sources_open_{answer_key}'] = True
     state[f'answer_check_open_{answer_key}'] = False
     state[f'answer_sources_pick_{answer_key}'] = index
+    state[f'answer_sources_focus_{answer_key}'] = {
+        'source_id': matches[0]['source_id'],
+        'token': hashlib.sha256(repr(stamp).encode()).hexdigest()[:24]}
     return True
 
 
@@ -91,7 +101,8 @@ def consume_focus_event(event, payload, answer_key, state):
 
 
 def render_research_chart(records, metrics, *, key, mode='bar', target_year=None,
-                          result=None, answer_key=None, focus_point=None, on_focus=None):
+                          result=None, answer_key=None, focus_point=None, on_focus=None,
+                          appearance='standard'):
     from app.answer_actions import collect_answer_sources
     sources = collect_answer_sources(result) if result else []
     payload = chart_payload(records, metrics, mode=mode, target_year=target_year, sources=sources)
@@ -101,9 +112,10 @@ def render_research_chart(records, metrics, *, key, mode='bar', target_year=None
     highlight = (st.session_state.get(f'answer_sources_pick_{answer_key}')
                  if answer_key and st.session_state.get(f'answer_sources_open_{answer_key}') else None)
     # Keep a stable identity within this release, remount once after an upgrade.
-    version = 'v20261005_3'
-    event = _chart(payload=payload, source_highlight=highlight, focus_point=focus_point,
-                   focus_events=on_focus is not None, key=f'{version}_{key}', default=None)
+    version = 'v20261011_22'
+    event = _chart(payload=payload, motion=motion_preferences(), source_highlight=highlight, focus_point=focus_point,
+                   focus_events=on_focus is not None, appearance=appearance,
+                   key=f'{version}_{key}', default=None)
     source_opened = consume_source_event(event, payload, answer_key, st.session_state)
     if on_focus is not None:
         point = consume_focus_event(event, payload, answer_key, st.session_state)

@@ -1,0 +1,53 @@
+/* The brand lockup owns only its mark and live Chinese typography. */
+.fu-brand.fu-brand--v24 {
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr);
+  column-gap:11px;
+  row-gap:13px;
+  align-items:center;
+  padding-top:3px;
+}
+.fu-brand--v24 .fu-brand-logo {
+  display:block;
+  width:42px!important;
+  height:42px!important;
+  max-width:42px!important;
+  max-height:none;
+  object-fit:contain;
+  grid-column:1;
+}
+.fu-brand--v24 .fu-brand-text {display:contents}
+.fu-brand--v24 .fu-brand-name {
+  grid-column:2;
+  color:#182235;
+  font-family:"HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:23px;
+  font-weight:800;
+  letter-spacing:.055em;
+  line-height:1.25;
+  white-space:nowrap;
+}
+.fu-brand--v24 .fu-brand-sub {
+  grid-column:1/-1;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:baseline;
+  gap:5px 9px;
+  margin:0;
+  line-height:1.65;
+}
+.fu-brand--v24 .fu-brand-product {
+  color:#315CFF;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.035em;
+}
+.fu-brand--v24 .fu-brand-description {
+  color:#687182;
+  font-size:10px;
+  font-weight:400;
+  letter-spacing:0;
+  white-space:normal;
+}
+.fu-brand--v24:not(:has(.fu-brand-logo)) {grid-template-columns:minmax(0,1fr)}
+.fu-brand--v24:not(:has(.fu-brand-logo)) .fu-brand-name {grid-column:1}

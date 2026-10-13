@@ -55,18 +55,18 @@
     doc.addEventListener('visibilitychange', cancel, {signal: abort.signal});
     win.addEventListener('resize', cancel, {signal: abort.signal});
     const mutations = new env.MutationObserver(refresh);
-    mutations.observe(doc.body, {subtree: true, childList: true, attributes: true,
+    mutations.observe(doc, {subtree: true, childList: true, attributes: true,
       attributeFilter: ['class', 'style', 'data-stale', 'data-studio-scene']});
     const resize = env.ResizeObserver ? new env.ResizeObserver(refresh) : null;
     const content = doc.querySelector('[data-testid="stMainBlockContainer"]');
     if (content) resize?.observe(content);
     const dispose = () => { if (disposed) return; disposed = true; cancel(); abort.abort(); mutations.disconnect(); resize?.disconnect(); };
     win.addEventListener('pagehide', dispose, {signal: abort.signal});
-    return {refresh, cancel, dispose, version: '20261008.1'};
+    return {refresh, cancel, dispose, version: '20261008.1-body-ready20'};
   }
   if (typeof module !== 'undefined' && module.exports) module.exports = {createReadingPosition};
   if (host.document && host.MutationObserver) {
-    if (host.__qmReadingPosition?.version === '20261008.1') { host.__qmReadingPosition.refresh(); return; }
+    if (host.__qmReadingPosition?.version === '20261008.1-body-ready20') { host.__qmReadingPosition.refresh(); return; }
     host.__qmReadingPosition?.dispose();
     host.__qmReadingPosition = createReadingPosition({document: host.document, window: host,
       AbortController: host.AbortController, MutationObserver: host.MutationObserver, ResizeObserver: host.ResizeObserver,

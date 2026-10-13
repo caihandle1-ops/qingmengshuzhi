@@ -11,7 +11,9 @@ from hashlib import sha256
 import json
 from pathlib import Path
 
+import streamlit as st
 import streamlit.components.v1 as components
+from app.motion_preferences import motion_preferences
 
 from app.branding import BRAND_NAME, PRODUCT_NAME, logo_data_uri
 from app.messages import public_message
@@ -171,6 +173,20 @@ def director_payload(company, records, *, snapshots=None, report_text=None, aler
     return payload
 
 
+def consume_motion_event(event, revision, key, state):
+    """Accept one current, explicit frame request without changing financial state."""
+    if (not isinstance(event, dict) or event.get('event') != 'request_motion_mode'
+            or event.get('revision') != revision or event.get('mode') not in ('research', 'presentation')
+            or not isinstance(event.get('nonce'), str) or not 1 <= len(event['nonce']) <= 80):
+        return False
+    consumed = '_qm_director_motion_' + str(key)
+    stamp = (revision, event['nonce'], event['mode'])
+    if state.get(consumed) == stamp:
+        return False
+    state[consumed] = stamp
+    return True
+
+
 def render_director_mode(company, records, *, snapshots=None, report_text=None, alerts=None, score=None, key='research_director'):
     """Return {'event': 'exit', 'revision': str, 'nonce': str} on explicit exit.
 
@@ -178,7 +194,9 @@ def render_director_mode(company, records, *, snapshots=None, report_text=None, 
     a new key/session counter, so the old component value cannot close it again.
     """
     payload = director_payload(company, records, snapshots=snapshots, report_text=report_text, alerts=alerts, score=score)
-    event = _director(payload=payload, height=730, key=key, default=None)
+    event = _director(payload=payload, motion=motion_preferences(), height=730, key=key, default=None)
+    if consume_motion_event(event, payload['revision'], key, st.session_state):
+        return event
     if isinstance(event, dict) and event.get('event') == 'exit' and event.get('revision') == payload['revision']:
         return event
     return None

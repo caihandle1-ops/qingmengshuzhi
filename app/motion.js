@@ -1,7 +1,8 @@
 /* Presentation-only enhancement. Native Streamlit events remain untouched. */
 (() => {
   'use strict';
-  const VERSION = '2026-10-05.5';
+  const quiet = () => reduced.matches || document.documentElement.dataset.qmMotionMode === 'research';
+  const VERSION = '2026-10-09.14-editorial-owner-body-ready20';
   const previous = window.__qingmengMotion;
   if (previous && previous.version === VERSION) {
     previous.refresh();
@@ -62,7 +63,7 @@
   let intersection = null;
   let mutations = null;
 
-  const enabled = () => !disposed && !reduced.matches && !document.hidden;
+  const enabled = () => !disposed && !quiet() && !document.hidden;
   const diagnostic = name => root.setAttribute('data-qm-motion-last', name);
   root.setAttribute('data-qm-motion-version', VERSION);
   root.setAttribute('data-qm-motion-reveals', '0');
@@ -296,6 +297,7 @@
 
   function ripple(button, x, y, measuredRect) {
     if (!enabled()) return;
+    if (button.dataset.qmUiButton === 'true') {if (activeGlass === button) resetGlass();return;}
     const rect = measuredRect || button.getBoundingClientRect();
     if (rect.width < 1 || rect.height < 1) return;
     const size = Math.min(900, Math.hypot(rect.width, rect.height) * 2);
@@ -333,6 +335,7 @@
     if (!enabled() || !finePointer.matches || event.pointerType === 'touch') return;
     const target = event.target instanceof Element ? event.target : null;
     const button = target && target.closest(glassSelector);
+    if (button?.dataset.qmUiButton === 'true') {resetGlass();return;}
     if (!button || button.disabled || !button.closest(mainSelector)) return;
     if (activeGlass !== button) {
       resetGlass();
@@ -352,6 +355,7 @@
       const point = pendingPointer;
       pendingPointer = null;
       if (!point || !enabled() || !finePointer.matches || !point.button.isConnected) return;
+      if (point.button.dataset.qmUiButton === 'true') {resetGlass();return;}
       const rect = point.button.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
       point.button.style.setProperty('--qm-pointer-x',
@@ -442,7 +446,7 @@
         !node.matches('.qm-motion-ripple, .qm-motion-sheen, .qm-motion-exit, script, style')));
     if (changed) { protectDrawers();schedule(); }
   });
-  mutations.observe(document.body, {childList: true, subtree: true});
+  mutations.observe(document, {childList: true, subtree: true});
 
   const options = {capture: true, passive: true, signal: abort.signal};
   document.addEventListener('pointerdown', event => {
@@ -479,6 +483,13 @@
   window.addEventListener?.('resize',discardExits,{passive:true,signal:abort.signal});
   root.setAttribute('data-qm-motion-reduced', reduced.matches ? 'true' : 'false');
 
+  window.addEventListener('qm-motion-preference-change', () => {
+    const header = document.querySelector('[data-studio-location]');
+    const location = header?.getAttribute?.('data-studio-scene') || header?.getAttribute?.('data-studio-location') || '';
+    if (location !== routeKey) { revealedKeys.clear(); routeKey = location; }
+    for (const node of document.querySelectorAll(targetSelector)) claim(node);
+    mediaChange();
+  }, {signal: abort.signal});
   window.__qingmengMotion = {
     version: VERSION,
     refresh: schedule,

@@ -1,0 +1,19 @@
+/* A native search work surface; its inputs and result callbacks stay mounted. */
+[data-testid="stMainBlockContainer"]:has(.st-key-workspace_search_results) .st-key-header_bar > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:has(.st-key-header_search_desktop) {display:none}
+[data-testid="stMain"] .st-key-workspace_search_results {
+  max-width:1080px;margin-inline:auto;padding:30px 34px 32px;
+  border:0;border-top:3px solid #193541;border-bottom:1px solid #b9c8c7;
+  background:#f7f8f2;scroll-margin-top:28px;position:relative;
+}
+.qm-command-head {display:flex;align-items:center;justify-content:space-between;gap:16px;position:relative;padding-bottom:17px;color:#58716f;font:500 10px/1.5 ui-monospace,"Microsoft YaHei",monospace;letter-spacing:.1em}
+.qm-command-head kbd {font:inherit;letter-spacing:0;color:#284b55;border:1px solid #bbc9bf;padding:5px 8px;background:#eef2e9;border-radius:2px}
+.qm-command-rule {position:absolute;bottom:0;left:0;width:100%;height:2px;transform-origin:left;background:#a4bb56;pointer-events:none}
+.st-key-workspace_search_results .st-key-workspace_palette_query [data-testid="stTextInputRootElement"] {min-height:62px;border:0;border-bottom:2px solid #405e65;border-radius:0;background:transparent;box-shadow:none}
+.st-key-workspace_search_results .st-key-workspace_palette_query input {font-size:clamp(19px,1.5vw,24px);line-height:1.6;padding:13px 0;color:#172f3a;background:transparent}
+.st-key-workspace_search_results .st-key-workspace_palette_query input::placeholder {color:#617674;opacity:1}
+.st-key-workspace_search_results .st-key-workspace_palette_query [data-testid="stTextInputRootElement"]:focus-within {border-color:#214f5b;box-shadow:0 2px 0 #d2df84}
+[data-testid="stMain"] .st-key-workspace_search_results [class*="st-key-workspace_search_item_"]:has(button[data-qm-command-active="true"]) {background:#e5eedc;border-bottom-color:#b3c39c}
+[data-testid="stMain"] .st-key-workspace_search_results button[data-qm-command-active="true"] {color:#193e43!important;outline:2px solid #43665a;outline-offset:2px;transform:none!important}
+@media(max-width:900px) {[data-testid="stMain"] .st-key-workspace_search_results{padding:22px 16px}.qm-command-head{letter-spacing:0}}
+@media(prefers-reduced-motion:reduce) {.qm-command-rule{transform:none!important}}
+@media(forced-colors:active) {.qm-command-head kbd{border:1px solid ButtonText}.qm-command-rule{background:Highlight}[data-testid="stMain"] .st-key-workspace_search_results button[data-qm-command-active="true"]{outline:2px solid Highlight}}

@@ -21,7 +21,7 @@ METRICS = ('revenue', 'net_profit', 'operating_cashflow')
 CHAPTERS = ('经营概览', '年度变化', '风险依据', '报告路径')
 
 
-def enterprise_story_model(company, frame, alerts=None, score=None):
+def enterprise_story_model(company, frame, alerts=None, score=None, *, selected_year=None):
     """Copy the exact supplied rows and rule output; never fill absent years."""
     records = []
     for raw in frame.to_dict('records'):
@@ -47,6 +47,9 @@ def enterprise_story_model(company, frame, alerts=None, score=None):
     model = {'company': str(company), 'rows': rows, 'latest': rows[-1] if rows else {},
              'alerts': public_alerts, 'score': score_value, 'score_reason': str(supplied_score.get('reason') or ''),
              'checked': checked, 'missing': missing, 'coverage_complete': coverage}
+    # Reading a prior annual observation does not recalculate or relabel the
+    # supplied current risk/score snapshot. Duplicate years remain ambiguous.
+    model['observation'] = next((row for row in rows if row['year'] == selected_year), model['latest'])
     model['revision'] = sha256(json.dumps(model, ensure_ascii=False, sort_keys=True).encode()).hexdigest()[:24]
     return model
 
@@ -59,7 +62,7 @@ def _amount(value):
     return f'{value:,.2f}' if value is not None else '暂无数据'
 
 
-def _annual_chart(rows):
+def _annual_chart(rows, selected_year=None):
     """Accessible SVG; gaps and ambiguous rows break the line instead of joining."""
     available = [row['revenue'] for row in rows if row['revenue'] is not None]
     if not available:
@@ -87,7 +90,9 @@ def _annual_chart(rows):
         x, y = xpos(year), ypos(value)
         if previous and year - previous[0] == 1:
             pieces.append(f'<path class="es-trend-line" stroke="#2e63c7" stroke-width="3" fill="none" stroke-linecap="round" d="M {previous[1]:.2f} {previous[2]:.2f} L {x:.2f} {y:.2f}"/>')
-        pieces.append(f'<circle class="es-trend-point" fill="#235abe" stroke="#f2f6fd" stroke-width="2" cx="{x:.2f}" cy="{y:.2f}" r="5"><title>{year}年 {_amount(value)}亿元</title></circle>')
+        if year == selected_year:
+            pieces.append(f'<line class="es-reading-year" stroke="#9aaac1" stroke-dasharray="3 5" x1="{x:.2f}" x2="{x:.2f}" y1="25" y2="182"/>')
+        pieces.append(f'<circle class="es-trend-point" fill="#235abe" stroke="{"#d9f36c" if year == selected_year else "#f2f6fd"}" stroke-width="{"5" if year == selected_year else "2"}" cx="{x:.2f}" cy="{y:.2f}" r="5"><title>{year}年 {_amount(value)}亿元</title></circle>')
         if year in {first, last} or len(rows) <= 5:
             pieces.append(f'<text x="{x:.2f}" y="208" text-anchor="middle" class="es-axis" {axis}>{year}</text>')
         previous = (year, x, y)
@@ -99,8 +104,9 @@ def _annual_chart(rows):
 
 def enterprise_story_html(model, key='enterprise'):
     identity = 'enterprise-story-' + sha256(str(key).encode()).hexdigest()[:10] + '-' + model['revision']
-    latest = model['latest']
+    latest = model.get('observation') or model['latest']
     year = str(latest['year']) if latest else '年度未记录'
+    risk_year = str(model['latest']['year']) if model['latest'] else '年度未记录'
     years = [row['year'] for row in model['rows']]
     period = f'{years[0]} 至 {years[-1]}' if len(years) > 1 else str(years[0]) if years else '年度未记录'
     revenue = _amount(latest.get('revenue'))
@@ -112,11 +118,12 @@ def enterprise_story_html(model, key='enterprise'):
     if selected_alert is None:
         selected_alert = model['alerts'][0] if model['alerts'] else {'title': '风险记录未提供', 'message': '进入风险预警，查看当前企业的规则与依据。'}
     missing = '；'.join(model['missing']) or ('本次规则均有数据依据。' if model['coverage_complete'] else '当前未提供完整的规则覆盖记录。')
-    annual_rows = ''.join('<div class="es-year-row"><b>' + str(row['year']) + '</b><span>'
+    annual_rows = ''.join('<div class="es-year-row' + (' is-reading' if row['year'] == latest.get('year') else '') + '"><b>' + str(row['year']) + '</b><span>'
                           + ('同年度多条记录待核对' if row['ambiguous'] else _amount(row['revenue']) + (' 亿元' if row['revenue'] is not None else ''))
                           + '</span></div>' for row in model['rows'])
     metric_lines = ''.join('<div class="es-metric-line"><span>' + METRIC_LABELS[key] + '</span><b>'
                            + _amount(latest.get(key)) + '</b><small>亿元</small></div>' for key in METRICS[1:])
+    observation_note = '同年度多条记录待核对，本栏暂不合并数值。' if latest.get('ambiguous') else '当前阅读年度的已接入财务记录'
     chapter_content = [
         ('从经营规模，进入这家企业。', f'{year} 年的收入、利润与现金流放在同一观察面。先建立规模感，再沿年度展开。',
          f'<span class="es-chapter-fact">{_text(model["company"])}</span><p>缺失指标保留为“暂无数据”。</p>'),
@@ -130,25 +137,27 @@ def enterprise_story_html(model, key='enterprise'):
     nav = ''.join(f'<a href="#{identity}-chapter-{index}" data-es-jump="{index}" aria-label="跳转到{label}"'
                   + (' aria-current="step"' if index == 0 else '') + f'><span>0{index + 1}</span>{label}</a>' for index, label in enumerate(CHAPTERS))
     chapters = ''.join(f'<section id="{identity}-chapter-{index}" class="es-chapter" data-es-chapter="{index}" tabindex="-1">'
-                       f'<div class="es-chapter-index" aria-hidden="true">0{index + 1}</div><h3>{title}</h3><p>{copy}</p>'
+                       f'<div class="es-chapter-index" aria-hidden="true">0{index + 1}</div><span class="es-chapter-rule" aria-hidden="true"></span><h3>{title}</h3><p>{copy}</p>'
                        f'<div class="es-chapter-detail">{detail}</div></section>' for index, (title, copy, detail) in enumerate(chapter_content))
-    return (f'<section class="enterprise-story" id="{identity}" data-enterprise-story="{identity}" aria-label="企业研究滚动叙事">'
+    return (f'<section class="enterprise-story es-report-edition es-editorial-edition" id="{identity}" data-enterprise-story="{identity}" aria-label="企业研究滚动叙事">'
             '<div class="es-story-heading"><span>沿着数据，推进研究</span><p>经营表现 → 年度变化 → 风险依据 → 报告</p></div>'
             f'<nav class="es-chapter-nav" aria-label="企业研究章节">{nav}</nav>'
             f'<div class="es-story-grid"><div class="es-chapters">{chapters}</div>'
-            '<aside class="es-sticky-stage" aria-label="当前章节分析画布">'
+            f'<aside class="es-sticky-stage" aria-label="当前章节分析画布" data-commit-scope="{sha256(model["company"].encode()).hexdigest()[:16]}" data-commit-year="{_text(year)}">'
+            '<div class="qm-annual-turn" aria-hidden="true"><i data-commit-art></i><i data-commit-art></i><i data-commit-art></i></div>'
             '<div class="es-stage-topline"><span>企业研究</span><span class="es-current-chapter">经营概览</span></div>'
             '<div class="es-stage-art" aria-hidden="true"><div class="es-art-band es-band-one"></div>'
             '<div class="es-art-band es-band-two"></div><div class="es-art-orbit"></div><div class="es-art-sheet"></div></div>'
             '<div class="es-stage-panels">'
             '<section class="es-stage-pane is-active" data-es-pane="0" aria-label="经营概览画布">'
-            f'<span class="es-pane-kicker">{_text(year)} 年 / 亿元</span><h4>营业收入</h4><strong class="es-hero-value">{revenue}</strong>'
-            f'<div class="es-metric-lines">{metric_lines}</div><p class="es-pane-note">当前所选企业的已接入财务记录</p></section>'
+            f'<div class="es-observation-mast"><span class="es-pane-kicker">{_text(year)} 年 / 亿元</span><span>经营观察 / 01</span></div>'
+            f'<div class="es-primary-measure"><h4>营业收入</h4><strong class="es-hero-value">{revenue}</strong></div>'
+            f'<div class="es-metric-lines">{metric_lines}</div><p class="es-pane-note">{observation_note}</p></section>'
             '<section class="es-stage-pane" data-es-pane="1" aria-label="年度变化画布">'
-            f'<span class="es-pane-kicker">{_text(period)} / 亿元</span><h4>营业收入年度序列</h4>{_annual_chart(model["rows"])}'
+            f'<span class="es-pane-kicker">{_text(period)} / 亿元</span><h4>营业收入年度序列</h4>{_annual_chart(model["rows"], latest.get("year"))}'
             f'<div class="es-year-ledger" tabindex="0" aria-label="各年度营业收入，可滚动查看">{annual_rows or "暂无年度记录"}</div></section>'
             '<section class="es-stage-pane" data-es-pane="2" aria-label="风险依据画布">'
-            f'<span class="es-pane-kicker">{_text(year)} 年 / 现有规则结果</span><h4>{risk_label}</h4>'
+            f'<span class="es-pane-kicker">截至 {_text(risk_year)} 年 / 现有规则结果</span><h4>{risk_label}</h4>'
             f'<div class="es-risk-score"><span>综合评分</span><strong>{score}</strong></div>'
             f'<div class="es-risk-signal"><b>{_text(selected_alert["title"])}</b><p>{_text(selected_alert["message"])}</p></div>'
             f'<p class="es-risk-coverage">{_text(missing)}</p><p class="es-pane-note">完整信号与来源见“查看风险依据”。</p></section>'
@@ -161,8 +170,8 @@ def enterprise_story_html(model, key='enterprise'):
             '</aside></div></section>')
 
 
-def render_enterprise_story(company, frame, alerts=None, score=None):
-    model = enterprise_story_model(company, frame, alerts, score)
+def render_enterprise_story(company, frame, alerts=None, score=None, *, selected_year=None):
+    model = enterprise_story_model(company, frame, alerts, score, selected_year=selected_year)
     base = Path(__file__)
     st.html('<style>' + base.with_suffix('.css').read_text(encoding='utf-8') + '</style>' + enterprise_story_html(model))
     if 'unsafe_allow_javascript' in signature(st.html).parameters:

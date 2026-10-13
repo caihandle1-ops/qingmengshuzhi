@@ -154,9 +154,9 @@
 .st-key-workspace_hero .st-key-workspace_workflow [data-testid="stVerticalBlock"] {gap:18px}
 .st-key-workspace_hero .st-key-studio_hero_heading {margin:0 0 3px;padding:0}
 .st-key-workspace_hero .studio-hero-eyebrow {font-size:10px;line-height:1.5;letter-spacing:.13em;overflow-wrap:anywhere}
-.st-key-workspace_hero .studio-hero-title {font-size:clamp(38px,4.2vw,60px);line-height:1.14;margin:16px 0 0!important;padding:0!important;letter-spacing:-.045em;text-wrap:balance}
-.st-key-workspace_hero .studio-hero-accent {color:#f4aa7e;box-shadow:0 2px 0 #f4aa7e5c;padding-bottom:3px}
-.st-key-workspace_hero .studio-hero-copy {font-size:15px!important;line-height:1.65!important;margin:16px 0 0!important;padding:0!important;color:#bfcfdb!important}
+.st-key-workspace_hero .studio-hero-title {font-size:clamp(38px,3.5vw,56px);line-height:1.14;margin:16px 0 0!important;padding:0!important;letter-spacing:-.045em;text-wrap:balance;color:#f4efdf!important;font-weight:500}
+.st-key-workspace_hero .studio-hero-accent {color:#f4efdf;box-shadow:none;padding-bottom:3px}
+.st-key-workspace_hero .studio-hero-copy {font-size:15px!important;line-height:1.65!important;margin:16px 0 0!important;padding:0!important;color:#acb9cf!important}
 .st-key-workspace_hero .studio-field-heading {display:flex;align-items:baseline;gap:9px;color:#eef4f8;min-height:21px;line-height:1.5;margin:0!important;padding:0!important}
 .st-key-workspace_hero .studio-field-heading strong {font-size:14px;font-weight:600;line-height:1.5}
 .st-key-workspace_hero .studio-step-label {color:#eaa77e;font-size:10px;letter-spacing:.08em;font-variant-numeric:tabular-nums}
@@ -170,6 +170,28 @@
 .st-key-workspace_hero .st-key-workspace_question_card textarea {font-size:16px!important;line-height:1.6!important;padding:12px 14px!important}
 .st-key-workspace_hero .st-key-studio_company_controls [data-baseweb="select"] {min-width:0}
 .st-key-workspace_hero .st-key-studio_company_controls [data-baseweb="select"]>div {padding-top:2px;padding-bottom:2px;min-height:42px}
+/* .22: a single cobalt action inside a warm paper / ink research spread. */
+.st-key-workspace_hero .studio-hero-eyebrow {color:#aab6cc!important;letter-spacing:.10em;font-size:11px}
+.st-key-workspace_hero .studio-step-label {color:#e67945}
+.st-key-workspace_hero .studio-control-label {font-size:13px;color:#c3c9d4}
+.st-key-workspace_hero .studio-data-coverage {font-size:12px!important;color:#aab6cc!important}
+.st-key-workspace_hero .st-key-studio_company_controls [data-baseweb="select"]>div {background:#17233a;border-color:#556078;border-radius:3px;color:#f4efdf;min-height:44px}
+.st-key-workspace_hero .st-key-workspace_question_card :is([data-baseweb="textarea"],textarea) {background:#f4efdf;color:#101a2e;border-radius:3px}
+.st-key-workspace_hero .st-key-workspace_question_card textarea::placeholder {color:#697080}
+.st-key-workspace_hero .st-key-workspace_question_card button[kind="primary"] {background:#2454ff!important;border-color:#2454ff!important;color:#f4efdf!important;border-radius:3px;min-height:46px;box-shadow:none!important;transform:none!important}
+.st-key-workspace_hero .st-key-workspace_question_card button[kind="primary"]:hover {background:#3c67ff!important;border-color:#3c67ff!important;color:#fff!important}
+.st-key-workspace_hero .st-key-workspace_question_card button[kind="primary"]:focus-visible {outline:2px solid #f4efdf;outline-offset:3px}
+/* Keep the full concluding phrase together on common laptop widths. */
+@media (min-width:1101px) {
+  .st-key-workspace_hero .st-key-studio_hero_grid > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] {flex-wrap:nowrap!important;gap:24px!important}
+  .st-key-workspace_hero .st-key-studio_hero_grid > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child {flex:.95 1 0!important;width:auto!important;min-width:0!important}
+  .st-key-workspace_hero .st-key-studio_hero_grid > [data-testid="stLayoutWrapper"] > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:last-child {flex:1.15 1 0!important;width:auto!important;min-width:0!important}
+}
+@media (min-width:1101px) and (max-width:1599px) {
+  .st-key-workspace_hero .studio-hero-title {font-size:clamp(32px,2.7vw,42px)}
+  .st-key-workspace_hero .st-key-workspace_workflow [data-testid="stVerticalBlock"] {gap:14px}
+  .st-key-workspace_hero .studio-hero-copy {font-size:14px!important;margin-top:12px!important}
+}
 @media (max-width:590px) {
   .st-key-workspace_hero .st-key-workspace_workflow [data-testid="stVerticalBlock"] {gap:18px!important}
   .st-key-workspace_hero .studio-hero-title {font-size:clamp(28px,8vw,35px);line-height:1.2;letter-spacing:-.04em}

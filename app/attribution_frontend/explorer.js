@@ -1,6 +1,8 @@
 /* Frozen values are text nodes. Only a deliberate, revision-bound source selection leaves this frame. */
 (() => {
   'use strict';
+  let presentation = false;
+  const quiet = () => !presentation || reduced.matches || !window.requestAnimationFrame;
   const shell = document.getElementById('explorer'), canvas = document.getElementById('canvas');
   const nodeHost = document.getElementById('nodes'), branches = document.getElementById('branches');
   const detail = document.getElementById('detail'), evidenceButton = document.getElementById('evidence-button');
@@ -125,7 +127,7 @@
     });
     detailFor(payload.nodes[0]);
     motion = window.QMAttributionMotion.createMotion({
-      reduced: reduced.matches || !window.requestAnimationFrame,
+      reduced: quiet(),
       now: () => performance.now(), hidden: () => document.hidden,
       raf: callback => window.requestAnimationFrame ? requestAnimationFrame(callback) : setTimeout(() => callback(performance.now()), 0),
       cancel: id => window.cancelAnimationFrame ? cancelAnimationFrame(id) : clearTimeout(id),
@@ -142,6 +144,8 @@
   function onRender(event) {
     if (disposed || event.source !== window.parent || event.data?.type !== 'streamlit:render') return;
     const args = event.data.args || {}, next = args.payload;
+    const enabled = args.motion?.version === 1 && args.motion.mode === 'presentation';
+    if (presentation !== enabled) { presentation = enabled; motion?.setReduced(quiet()); }
     if (!next || typeof next.revision !== 'string' || !Array.isArray(next.nodes) || !next.nodes.length || next.nodes.length > 4) return;
     const priorEvidence = evidenceNode;
     evidenceNode = next.nodes.some(node => node.id === args.evidence_node && node.has_evidence) ? args.evidence_node : null;
@@ -151,7 +155,7 @@
     height();
   }
   const visibility = () => motion?.syncVisibility();
-  const reduce = () => motion?.setReduced(reduced.matches || !window.requestAnimationFrame);
+  const reduce = () => motion?.setReduced(quiet());
   function dispose() {
     if (disposed) return;
     disposed = true; motion?.dispose(); sizeObserver?.disconnect(); intersection?.disconnect();

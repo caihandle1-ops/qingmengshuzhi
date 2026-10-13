@@ -13,7 +13,7 @@ from streamlit.proto.WidgetStates_pb2 import WidgetState, WidgetStates
 
 from app.fragments import bind_fragment_workspace
 from core.storage import get_data_root
-from ui_navigation import open_enterprise_tool, open_page
+from ui_navigation import ensure_workspace, open_enterprise_tool, open_page
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -98,7 +98,7 @@ def _application(monkeypatch, tmp_path):
     monkeypatch.setattr('requests.sessions.Session.request', offline)
     app = AppTest.from_file(ROOT / 'app/main.py', default_timeout=45).run()
     assert not app.exception
-    return app
+    return ensure_workspace(app)
 
 
 def test_report_reading_download_and_source_are_independent(monkeypatch, tmp_path):
@@ -140,6 +140,7 @@ def test_home_never_claims_model_connected_and_shows_sample_identity(monkeypatch
 
 def test_report_model_failure_refreshes_global_connection_badge(monkeypatch, tmp_path):
     app = _application(monkeypatch, tmp_path)
+    app.button(key='workspace_settings_open').click().run()
     app.selectbox(key='engine_mode').set_value('云端增强模式').run()
     provider = app.session_state['llm_provider']
     app.text_input(key=f'llm_key_{provider}').set_value('synthetic-test-key').run()
@@ -150,6 +151,10 @@ def test_report_model_failure_refreshes_global_connection_badge(monkeypatch, tmp
     app.button(key='check_model_connection').click().run()
     assert not app.exception
     assert app.session_state['_model_connection_observation']['status'] == 'available'
+    app.button(key='workspace_settings_done').click().run()
+    assert not app.exception
+    assert app.session_state.engine_mode == '云端增强模式'
+    assert app.session_state[f'llm_key_{provider}'] == 'synthetic-test-key'
     open_enterprise_tool(app, '分析报告')
     def unavailable(*args, **kwargs):
         raise requests.Timeout('private provider error must not be displayed')

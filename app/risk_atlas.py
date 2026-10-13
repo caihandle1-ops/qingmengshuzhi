@@ -9,6 +9,7 @@ import re
 
 import streamlit as st
 import streamlit.components.v1 as components
+from app.motion_preferences import motion_preferences
 
 from app.messages import public_message
 from core.analysis import METRIC_LABELS, METRIC_UNITS, clean_financial_df, safe_num
@@ -199,7 +200,7 @@ def render_risk_atlas(company, df, alerts, score, key='enterprise'):
         st.session_state[risk_source_state_key(key)] = None
         selected = None
     if all((_FRONTEND / filename).is_file() for filename in ('index.html', 'atlas.css', 'atlas.js', 'motion.js')):
-        event = _atlas(payload=model, source_selection=selected,
+        event = _atlas(payload=model, motion=motion_preferences(), source_selection=selected,
                        return_focus=st.session_state.get(f'risk_atlas_return_focus_{key}'),
                        key=f'qm_risk_atlas_20261005_2_{key}', default=None)
         if consume_risk_event(event, model, key, st.session_state):
