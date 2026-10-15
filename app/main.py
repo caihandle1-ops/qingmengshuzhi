@@ -1010,6 +1010,7 @@ def toggle_qa_section(key):
 def render_qa_page(selected_main, selected_cmp, all_names, data_map, name_to_id, llm_config, *, workspace_revision):
     """A single composer and one selected answer, with a real history control."""
     from app.metric_journey import remember_metric_journey_draft, metric_journey_company_changed
+    from app.workbench_view import revenue_question_example
     context = st.session_state.conversation_context
     messages = st.session_state.chat_messages
     pending = None
@@ -1018,42 +1019,43 @@ def render_qa_page(selected_main, selected_cmp, all_names, data_map, name_to_id,
         st.session_state.qa_quick_view = None
     page_intro('财报问数', '先问一个问题，再把答案、来源与核验连起来。', icon='chat', scene='qa')
     render_research_jobs(data_map, [dict(row) for row in fetch_report_files()], resume_and_save_research)
+    if st.session_state.get('qa_main') not in all_names:
+        st.session_state.qa_main = selected_main
+    selected_main = st.session_state.qa_main
+    years = sorted(set(data_map[selected_main]['year'].astype(int)), reverse=True)
+    period_options = ['自动识别'] + [str(year) for year in years]
+    if st.session_state.get('qa_period') not in period_options:
+        st.session_state.qa_period = '自动识别'
+    example_year = (st.session_state.qa_period if st.session_state.qa_period != '自动识别'
+                    else years[0] if years else None)
+    example_question = revenue_question_example(selected_main, example_year)
     with st.container(key='qa_composer'):
         # Native inputs commit on blur, so navigation can preserve unfinished
         # questions. Only this explicit button runs the financial analysis.
         st.markdown('<div class="studio-composer-label"><span>提出你的问题</span>'
                     '<small>企业、期间与指标，可以直接写进问题</small></div>', unsafe_allow_html=True)
         entry, submit = st.columns([6, 1.2], gap='small', vertical_alignment='bottom')
-        question = entry.text_input('自然语言问题', placeholder='例如：比亚迪2024年营业收入是多少？',
+        question = entry.text_input('自然语言问题', placeholder=example_question,
                                    max_chars=5000, key='qa_input', label_visibility='collapsed',
                                    on_change=remember_metric_journey_draft, kwargs={'reason': 'input'})
         submitted = submit.button('开始分析', key='qa_submit', type='primary', width='stretch',
                                   icon=':material/arrow_outward:')
         if submitted:
-            if question.strip():
-                pending = question.strip()
-                st.session_state.qa_quick_view = None
-            else:
-                st.warning('请输入需要分析的财务问题。')
+            pending = question.strip() or example_question
+            st.session_state.qa_quick_view = None
         with st.container(key='qa_scope_shell'):
             scope_shell = (st.expander('调整研究条件', icon=':material/tune:') if messages
                            else st.container())
             with scope_shell:
                 with st.container(key='qa_scope'):
                     company_col, year_col = st.columns([2, 1.05], gap='medium')
-                    if st.session_state.get('qa_main') not in all_names:
-                        st.session_state.qa_main = selected_main
                     selected_main = company_col.selectbox('当前理解企业', all_names, key='qa_main', on_change=metric_journey_company_changed)
                     st.session_state.selected_main = selected_main
-                    years = sorted(set(data_map[selected_main]['year'].astype(int)), reverse=True)
-                    period_options = ['自动识别'] + [str(year) for year in years]
-                    if st.session_state.get('qa_period') not in period_options:
-                        st.session_state.qa_period = '自动识别'
                     selected_period = year_col.selectbox('当前理解期间', period_options, key='qa_period',
                                                         on_change=remember_metric_journey_draft, kwargs={'reason': 'condition'})
         if not messages:
             with st.container(key='qa_composer_hint'):
-                st.caption(f'试着问：{selected_main.replace("股份有限公司", "")}2024年营业收入是多少？也可以继续追问“那2023年呢？”')
+                st.caption(f'试着问：{example_question}也可以继续追问其他年度。')
     remember_metric_journey_draft()
     render_quick_research(selected_main, data_map[selected_main], selected_period, revision=workspace_revision)
     if not messages:

@@ -4,6 +4,7 @@ import re
 import json
 import sqlite3
 from copy import deepcopy
+from datetime import date
 from time import perf_counter
 from typing import Any
 
@@ -27,6 +28,7 @@ from core.retrieval import retrieve_documents
 from core.retrieval import is_explanation_query
 from core.attribution import build_net_profit_attribution
 from core.execution_budget import budgeted_answer, check_budget
+from core.company_identity import company_mentions, explicit_company_names, strip_known_companies
 
 KEYWORDS = {
     'revenue': ['营业收入', '营收', '收入', 'revenue'],
@@ -39,6 +41,7 @@ KEYWORDS = {
 }
 
 METRIC_FROM_CN = {v: k for k, arr in KEYWORDS.items() for v in arr}
+RECENT_FIVE_YEARS = r'(?:最近|近|过去)\s*(?:五|5)\s*(?:个\s*)?(?:完整\s*)?(?:会计\s*)?年(?:度)?'
 
 
 def _contains_any(text: str, words: list[str]) -> bool:
@@ -52,39 +55,58 @@ def _extract_years(question: str) -> list[int]:
     for start, end in ranges:
         if int(start) <= int(end):
             years.update(range(int(start), int(end) + 1))
+    if not years and re.search(RECENT_FIVE_YEARS, question):
+        # Relative annual scope is explicit: never inherit a selected page year
+        # or include the incomplete current calendar year. Missing years remain
+        # missing data, rather than shifting this request to older observations.
+        latest_complete_year = date.today().year - 1
+        years.update(range(latest_complete_year - 4, latest_complete_year + 1))
     return sorted(years)
 
 
-def normalize_company_references(question: str, companies: list[str]) -> str:
-    """Resolve stock codes from the current database without creating a database.
-
-    Only entities in the caller's freshly loaded company list are eligible. The
-    original question is retained by callers for conversation history/display.
-    """
+def _stock_code_aliases(question: str, companies: list[str]) -> dict[str, list[str]]:
+    """Read imported ticker identities only from the current workspace."""
     if not re.search(r'\d{4,6}', question):
-        return question
+        return {}
     from core.db import get_db_path
 
     path = get_db_path()
-    if not path.is_file():
-        return question
     allowed = set(companies)
-    try:
-        connection = sqlite3.connect(path.resolve().as_uri() + '?mode=ro', uri=True)
+    rows = []
+    if path.is_file():
         try:
-            rows = connection.execute('SELECT name, stock_code FROM companies').fetchall()
-        finally:
-            connection.close()
-    except sqlite3.OperationalError:
-        # Pure parsing remains usable before database initialization.
-        return question
+            connection = sqlite3.connect(path.resolve().as_uri() + '?mode=ro', uri=True)
+            try:
+                rows = connection.execute('SELECT name, stock_code FROM companies').fetchall()
+            finally:
+                connection.close()
+        except sqlite3.OperationalError:
+            # Catalog references also work before database initialization.
+            pass
+    extra_aliases = {}
     for name, code in rows:
         if name not in allowed or not code:
             continue
         code = str(code).strip()
         if not re.fullmatch(r'\d{4,6}', code):
             continue
-        question = re.sub(r'(?<!\d)' + re.escape(code) + r'(?!\d)', lambda _: name, question)
+        extra_aliases.setdefault(name, []).append(code)
+    return extra_aliases
+
+
+def normalize_company_references(question: str, companies: list[str]) -> str:
+    """Resolve unambiguous tickers among the caller's freshly loaded companies.
+
+    Catalog identities work offline; imported identities use the current
+    workspace read-only. No lookup creates a database or crosses sessions.
+    """
+    if not re.search(r'\d{4,6}', question):
+        return question
+    extra_aliases = _stock_code_aliases(question, companies)
+    # Ambiguous codes are left explicit so the parser asks for clarification.
+    for mention in reversed(company_mentions(question, companies, extra_aliases)):
+        if len(mention.names) == 1 and question[mention.start:mention.end].isdigit():
+            question = question[:mention.start] + mention.names[0] + question[mention.end:]
     return question
 
 
@@ -106,12 +128,9 @@ def _unknown_company_mentions(question: str, companies: list[str]) -> list[str]:
     This is a bounded financial-query grammar, not an entity recognizer. Ambiguous
     noun phrases are surfaced for clarification instead of silently mapped.
     """
-    residual = question
-    for name in sorted(companies, key=len, reverse=True):
-        for alias in [name, name.replace('股份有限公司', '').replace('新能源科技', '').replace('有限公司', '')]:
-            residual = residual.replace(alias, ' ')
+    residual = strip_known_companies(question, companies, _stock_code_aliases(question, companies))
     # Company names commonly occur before a year or a financial metric.
-    boundaries = r'上一年|前一年|下一年|后一年|20\d{2}|营业收入|营收|归母净利润|净利润|利润|现金流|资产负债率|毛利率|ROE|roe|年报|风险|近[一二三四五六七八九十\d]+年'
+    boundaries = RECENT_FIVE_YEARS + r'|上一年|前一年|下一年|后一年|20\d{2}|营业收入|营收|归母净利润|净利润|利润|现金流|资产负债率|毛利率|ROE|roe|年报|风险|近[一二三四五六七八九十\d]+年'
     candidates = []
     stop = {'', '它', '这家', '那家', '这家公司', '那家公司', '另一家', '另一家企业', '另一家公司', '上一年', '前一年', '下一年', '后一年', '公司', '企业', '两家', '两家公司', '分别', '同比', '年度', '最新', '今年', '去年', '上半年', '下半年', '一季度', '二季度', '三季度', '四季度', '最近', '近三年', '近两年', '当前', '当前企业', '当前公司', '是什么', '是多少', '多少', '怎么样', '如何', '变化', '变化如何', '有什么', '有哪些', '存在什么', '是否存在', '为什么', '原因', '下降原因', '总额', '数据', '数值', '和', '及', '与', '的', '那么', '那', '呢'}
     # Inspect the leading entity in each company clause, including a company
@@ -145,12 +164,7 @@ def _detect_metrics(question: str) -> list[str]:
 
 
 def _detect_companies(question: str, companies: list[str], default_company: str) -> list[str]:
-    hits = []
-    for name in companies:
-        short = name.replace('股份有限公司', '').replace('新能源科技', '').replace('有限公司', '')
-        if name in question or short in question:
-            hits.append(name)
-    hits.sort(key=lambda name: question.find(name.replace('股份有限公司', '').replace('新能源科技', '').replace('有限公司', '')))
+    hits = explicit_company_names(question, companies, _stock_code_aliases(question, companies))
     if not hits and default_company and not _unknown_company_mentions(question, companies):
         hits = [default_company]
     return hits
@@ -189,7 +203,7 @@ def _local_parse(question: str, companies: list[str], default_company: str, sele
         intent = 'company_compare'
     elif _contains_any(question, ['风险', '预警', '问题', '隐患']):
         intent = 'risk_warning'
-    elif _contains_any(question, ['趋势', '近三年', '变化', '增长', '下降原因', '为什么', '增收不增利', '年化', '同比']):
+    elif re.search(RECENT_FIVE_YEARS, question) or _contains_any(question, ['趋势', '近三年', '变化', '增长', '下降原因', '为什么', '增收不增利', '年化', '同比']):
         intent = 'trend_analysis'
     elif metrics:
         intent = 'finance_query'

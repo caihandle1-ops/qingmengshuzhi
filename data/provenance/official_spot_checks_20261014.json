@@ -1,0 +1,172 @@
+{
+  "scope": "Two issuers, 2021/2022 core figures; 20 field checks. Not a manual verification of all 250 annual reports.",
+  "sources": {
+    "byd2022": "https://static.cninfo.com.cn/finalpage/2023-03-29/1216246589.PDF",
+    "catl2022": "https://static.cninfo.com.cn/finalpage/2023-03-10/1216084559.PDF",
+    "catl2023": "https://static.cninfo.com.cn/finalpage/2024-03-16/1219313048.PDF",
+    "byd2025": "https://static.cninfo.com.cn/finalpage/2026-03-27/1225046995.PDF"
+  },
+  "checks": [
+    {
+      "code": "002594",
+      "year": 2021,
+      "field": "OPERATE_INCOME_PK",
+      "expected": "216142395000",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-29/1216246589.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "002594",
+      "year": 2021,
+      "field": "PARENTNETPROFIT",
+      "expected": "3045188000",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-29/1216246589.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "002594",
+      "year": 2021,
+      "field": "NETCASH_OPERATE_PK",
+      "expected": "65466682000",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-29/1216246589.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "002594",
+      "year": 2021,
+      "field": "ROEJQ",
+      "expected": "3.73",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-29/1216246589.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "002594",
+      "year": 2021,
+      "field": "EPSJB",
+      "expected": "1.06",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-29/1216246589.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "002594",
+      "year": 2022,
+      "field": "OPERATE_INCOME_PK",
+      "expected": "424060635000",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-29/1216246589.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "002594",
+      "year": 2022,
+      "field": "PARENTNETPROFIT",
+      "expected": "16622448000",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-29/1216246589.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "002594",
+      "year": 2022,
+      "field": "NETCASH_OPERATE_PK",
+      "expected": "140837657000",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-29/1216246589.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "002594",
+      "year": 2022,
+      "field": "ROEJQ",
+      "expected": "16.14",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-29/1216246589.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "002594",
+      "year": 2022,
+      "field": "EPSJB",
+      "expected": "5.71",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-29/1216246589.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "300750",
+      "year": 2021,
+      "field": "OPERATE_INCOME_PK",
+      "expected": "130355796400",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-10/1216084559.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "300750",
+      "year": 2021,
+      "field": "PARENTNETPROFIT",
+      "expected": "15931317900",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-10/1216084559.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "300750",
+      "year": 2021,
+      "field": "NETCASH_OPERATE_PK",
+      "expected": "42908008700",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-10/1216084559.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "300750",
+      "year": 2021,
+      "field": "ROEJQ",
+      "expected": "21.52",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-10/1216084559.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "300750",
+      "year": 2021,
+      "field": "EPSJB",
+      "expected": "6.8760",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-10/1216084559.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "300750",
+      "year": 2022,
+      "field": "OPERATE_INCOME_PK",
+      "expected": "328593987500",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-10/1216084559.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "300750",
+      "year": 2022,
+      "field": "PARENTNETPROFIT",
+      "expected": "30729163500",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-10/1216084559.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "300750",
+      "year": 2022,
+      "field": "NETCASH_OPERATE_PK",
+      "expected": "61208843300",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-10/1216084559.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "300750",
+      "year": 2022,
+      "field": "ROEJQ",
+      "expected": "24.67",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2023-03-10/1216084559.PDF",
+      "status": "pass"
+    },
+    {
+      "code": "300750",
+      "year": 2022,
+      "field": "EPSJB",
+      "expected": "7.1766",
+      "source_url": "https://static.cninfo.com.cn/finalpage/2024-03-16/1219313048.PDF",
+      "status": "pass",
+      "note": "2023 annual report comparison after share capitalization; originally 12.9178 in 2022 annual report"
+    }
+  ]
+}

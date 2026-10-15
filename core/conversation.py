@@ -3,7 +3,9 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from core.qa_engine import KEYWORDS, parse_question, _extract_years, _detect_period, _detect_metrics, normalize_company_references
+from core.qa_engine import (KEYWORDS, parse_question, _extract_years, _detect_period, _detect_metrics,
+                            normalize_company_references, _stock_code_aliases)
+from core.company_identity import ambiguous_company_names, explicit_company_names
 
 
 PRONOUNS = ['它', '那家公司', '这家公司', '另一家', '那个', '那家']
@@ -50,15 +52,13 @@ def _company_alias(name: str) -> str:
 
 def _explicit_companies(question: str, companies: list[str]) -> list[str]:
     question = normalize_company_references(question, companies)
-    matches = []
-    for name in companies:
-        alias = _company_alias(name)
-        if name in question or alias in question:
-            matches.append(name)
-    return sorted(matches, key=lambda name: question.find(_company_alias(name)))
+    return explicit_company_names(question, companies, _stock_code_aliases(question, companies))
 
 
 def _ambiguous_company_candidates(question: str, companies: list[str]) -> list[str]:
+    ambiguous = ambiguous_company_names(question, companies, _stock_code_aliases(question, companies))
+    if ambiguous:
+        return ambiguous
     exact = _explicit_companies(question, companies)
     if exact:
         return exact
@@ -114,11 +114,12 @@ def resolve_turn(
     context = dict(context or new_conversation_context())
     explicit_companies = _explicit_companies(question, companies)
     candidate_companies = _ambiguous_company_candidates(question, companies)
+    ambiguous_reference = bool(ambiguous_company_names(question, companies, _stock_code_aliases(question, companies)))
     explicit_years = _explicit_years(normalize_company_references(question, companies))
     explicit_metrics = _explicit_metrics(question)
     parsed = parse_question(question, companies, '', profile, None)
     unknown = parsed.get('unknown_companies') or []
-    if unknown and not (not explicit_companies and len(candidate_companies) > 1):
+    if unknown and not (ambiguous_reference or (not explicit_companies and len(candidate_companies) > 1)):
         return {
             'status': 'ready', 'question': question, 'context': context,
             'resolved': {**parsed, 'companies': explicit_companies + unknown,
@@ -140,7 +141,7 @@ def resolve_turn(
     if inherited_intent == 'unknown' and follow_up and context.get('intent'):
         inherited_intent = context['intent']
 
-    if not explicit_companies and len(candidate_companies) > 1:
+    if ambiguous_reference or (not explicit_companies and len(candidate_companies) > 1):
         pending = {
             'question': question, 'intent': inherited_intent, 'companies': [], 'years': inherited_years,
             'metrics': inherited_metrics, 'page_company': page_company, 'page_compare': page_compare,

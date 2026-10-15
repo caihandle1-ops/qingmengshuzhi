@@ -61,8 +61,10 @@ def runtime_paths(root: Path) -> list[Path]:
              and '__pycache__' not in path.parts]
     paths += list((root / 'data').glob('sample_*.csv'))
     paths += [root / name for name in ('requirements.txt', '.streamlit/config.toml',
-              'data/evaluation/benchmark_v1.json', 'data/examples/翻转探针演示数据_模拟.csv')
+              'data/evaluation/benchmark_v1.json', 'data/examples/翻转探针演示数据_模拟.csv',
+              'data/builtin_companies.json')
               if (root / name).is_file()]
+    paths += list((root / 'data' / 'provenance').glob('*.json'))
     return sorted(set(paths), key=lambda path: path.relative_to(root).as_posix())
 
 

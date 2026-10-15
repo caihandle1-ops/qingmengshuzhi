@@ -30,17 +30,23 @@ def _select_more_company():
     choose_company(st.session_state.workspace_more_company)
 
 
-def _submit_workspace():
-    question = str(st.session_state.get('workspace_question') or '').strip()
+def _submit_workspace(example_question, year):
+    # Callback arguments capture the example shown beside this exact button.
+    question = str(st.session_state.get('workspace_question') or '').strip() or example_question
     if question:
-        st.session_state.workbench_pending = {'question': question, 'year': st.session_state.get('workspace_year')}
+        st.session_state.workbench_pending = {'question': question, 'year': year}
         st.session_state.qa_input = question
-        st.session_state.qa_period = str(st.session_state.get('workspace_year') or '自动识别')
+        st.session_state.qa_period = str(year or '自动识别')
         navigate('财报问数')
 
 
 def short_name(name):
     return name.replace('股份有限公司', '').replace('新能源科技', '').replace('有限公司', '')
+
+
+def revenue_question_example(company, year=None):
+    period = f'{year}年' if year else ''
+    return f'{short_name(company)}{period}营业收入是多少？'
 
 
 def company_option_labels(companies, names=()):
@@ -158,13 +164,14 @@ def render_workbench(analysis_names, companies, data_map, selected_main, selecte
                 st.markdown('<div class="studio-field-heading studio-composer-label">'
                             '<span class="studio-step-label">02</span><strong>财报问数</strong></div>',
                             unsafe_allow_html=True)
+                example_question = revenue_question_example(selected_main, year)
                 st.text_area('工作台财务问题', key='workspace_question', height=90,
-                             placeholder=f'{short_name(selected_main)}{year or ""}年营业收入是多少？',
+                             placeholder=example_question,
                              label_visibility='collapsed')
                 hint, submit = st.columns([1.55, 1], gap='small')
                 hint.caption('也可直接在问题中指定企业与年度。')
                 submit.button('开始分析 →', key='workspace_submit', type='primary',
-                              width='stretch', on_click=_submit_workspace)
+                              width='stretch', on_click=_submit_workspace, args=(example_question, year))
         from app.workspace_portal import handle_workspace_action
         with st.container(key='workspace_resource_links'):
             for col, (action, label) in zip(st.columns(3), [

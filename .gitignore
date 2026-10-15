@@ -23,6 +23,13 @@ outputs/
 work/
 /data/*
 !/data/sample_*.csv
+!/data/builtin_companies.json
+!/data/BUILTIN_DATA_SOURCES.md
+!/data/provenance/
+/data/provenance/*
+!/data/provenance/builtin_public_financials_20261014.json
+!/data/provenance/official_spot_checks_20261014.json
+!/data/provenance/build_validation_20261014.json
 !/data/evaluation/
 /data/evaluation/*
 !/data/evaluation/benchmark_v1.json

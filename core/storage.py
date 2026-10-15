@@ -126,10 +126,8 @@ def resolve_stored_file(value: str) -> Path | None:
     raw = Path(value)
     candidates = [raw] if raw.is_absolute() else [get_data_root() / raw, ROOT / raw]
     current = get_data_root().resolve()
-    packaged = {(ROOT / 'data' / name).resolve() for name in (
-        'sample_byd.csv', 'sample_catl.csv', 'sample_changan.csv', 'sample_eve.csv',
-        'sample_ganfeng.csv', 'sample_gotion.csv', 'sample_huayou.csv',
-        'sample_new_energy_extended.csv', 'sample_saic.csv', 'sample_sunwoda.csv', 'sample_tianqi.csv')}
+    from core.builtin_catalog import packaged_sample_paths
+    packaged = packaged_sample_paths()
     for candidate in candidates:
         path = candidate.resolve()
         if path.is_file() and (path.is_relative_to(current) or path in packaged):

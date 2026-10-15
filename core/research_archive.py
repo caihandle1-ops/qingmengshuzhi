@@ -153,10 +153,11 @@ def _secrets(state):
 
 
 def _builtins():
-    # Only explicitly shipped seed files are eligible for the builtin identity.
-    from core.seed import _sample_files
+    # Current seed files and immutable V25 originals can prove builtin identity.
+    # Legacy originals are evidence only and must never seed a fresh library.
+    from core.seed import _archive_sample_files
     return {path.name: (name, code, path.resolve(), rows)
-            for name, code, _, path, rows in _sample_files()}
+            for name, code, _, path, rows in _archive_sample_files()}
 
 
 class _Encoder:
@@ -426,7 +427,9 @@ def _validate_records(workspace, research, files):
             name, code, _, records = builtins[entry['name']]
             company = companies[source['company_ref']]
             expected = next((r.get(source['metric']) for r in records if int(r['year']) == source['year']), None)
-            if company['name'] != name or company.get('stock_code') != code or value != expected:
+            company_code = str(company.get('stock_code') or '').strip().upper()
+            same_company = company_code == code if company_code else company['name'] == name
+            if not same_company or value != expected:
                 raise ArchiveError('内置样本记录与随应用提供的文件不符。')
     for row in workspace['scope_probe_facts']:
         if (row.get('metric') not in {'parent_net_profit', 'consolidated_net_profit'}

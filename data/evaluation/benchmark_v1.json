@@ -1,6 +1,6 @@
 {
   "suite_id": "financial_qa_reliability_v2",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Isolated offline regression of query scope, import integrity, evidence, analysis and cloud fact guards",
   "cases": [
     {
@@ -218,7 +218,7 @@
           {
             "company": "比亚迪股份有限公司",
             "year": 2024,
-            "revenue": 7771.02
+            "revenue": 7771.02455
           }
         ]
       }
@@ -243,7 +243,7 @@
           {
             "company": "比亚迪股份有限公司",
             "year": 2024,
-            "net_profit": 402.54
+            "net_profit": 402.54346
           }
         ]
       }
@@ -269,12 +269,12 @@
           {
             "company": "比亚迪股份有限公司",
             "year": 2023,
-            "revenue": 6023.15
+            "revenue": 6023.15354
           },
           {
             "company": "比亚迪股份有限公司",
             "year": 2024,
-            "revenue": 7771.02
+            "revenue": 7771.02455
           }
         ]
       }
@@ -301,9 +301,9 @@
           {
             "company": "比亚迪股份有限公司",
             "year": 2024,
-            "revenue": 7771.02,
-            "net_profit": 402.54,
-            "operating_cashflow": 1334.54
+            "revenue": 7771.02455,
+            "net_profit": 402.54346,
+            "operating_cashflow": 1334.53873
           }
         ]
       }
@@ -327,16 +327,16 @@
           {
             "company": "比亚迪股份有限公司",
             "year": 2024,
-            "revenue": 7771.02,
-            "net_profit": 402.54,
-            "operating_cashflow": 1334.54
+            "revenue": 7771.02455,
+            "net_profit": 402.54346,
+            "operating_cashflow": 1334.53873
           },
           {
             "company": "宁德时代新能源科技股份有限公司",
             "year": 2024,
-            "revenue": 3620.13,
-            "net_profit": 507.45,
-            "operating_cashflow": 969.9
+            "revenue": 3620.12554,
+            "net_profit": 507.44682,
+            "operating_cashflow": 969.90345
           }
         ]
       }
@@ -518,7 +518,7 @@
         "status": "unknown_company",
         "sql_status": "not_applicable"
       },
-      "question": "贵州茅台2024年营收多少"
+      "question": "未接入测试科技2024年营收多少"
     },
     {
       "id": "integrity_half_year",
@@ -834,5 +834,41 @@
         "fact_checked": true
       }
     }
-  ]
+  ],
+  "expected_data_revision": {
+    "checked_at": "2026-10-14",
+    "reason": "五年快照保留原始精度，更新原两位小数的 SQL 数值预期；继续精确比较，不放宽断言。",
+    "unknown_company_fixture": "贵州茅台已接入，未知企业负例改为未接入测试科技。",
+    "sources": [
+      {
+        "company": "比亚迪股份有限公司",
+        "report": "2025年年度报告",
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-27/1225046995.PDF",
+        "pdf_page": 12,
+        "printed_page": 11,
+        "table": "六、主要会计数据和财务指标",
+        "unit": "元",
+        "values": {
+          "2023.revenue": 602315354000,
+          "2024.revenue": 777102455000,
+          "2024.net_profit": 40254346000,
+          "2024.operating_cashflow": 133453873000
+        }
+      },
+      {
+        "company": "宁德时代新能源科技股份有限公司",
+        "report": "2025年年度报告",
+        "url": "https://static.cninfo.com.cn/finalpage/2026-03-10/1225002214.PDF",
+        "pdf_page": 11,
+        "printed_page": 11,
+        "table": "五、主要会计数据和财务指标",
+        "unit": "千元",
+        "values": {
+          "2024.revenue": 362012554,
+          "2024.net_profit": 50744682,
+          "2024.operating_cashflow": 96990345
+        }
+      }
+    ]
+  }
 }

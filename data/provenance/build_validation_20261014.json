@@ -1,0 +1,41 @@
+{
+  "status": "pass",
+  "companies": 50,
+  "years": [
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "annual_rows": 250,
+  "required_metric_values": 1750,
+  "missing_required_values": 0,
+  "duplicate_rows": 0,
+  "cross_table_pairs_checked": 250,
+  "official_field_spot_checks": 20,
+  "snapshot_sha256": "1c1b70dae158f1332f021491a054184197427bfe8a312570cbf594662fea5383",
+  "net_profit_identity_rounding_residuals": [
+    {
+      "code": "300750",
+      "year": 2024,
+      "residual_yuan": "1000"
+    },
+    {
+      "code": "300750",
+      "year": 2022,
+      "residual_yuan": "100"
+    },
+    {
+      "code": "300750",
+      "year": 2021,
+      "residual_yuan": "100"
+    }
+  ],
+  "amount_unit": "亿元 CNY",
+  "ratio_unit": "percentage points",
+  "eps_unit": "CNY/share",
+  "version_policy": "截至2026-10-14东方财富各历史报告期披露版本；不统一追溯至同一报告版本或股本基础",
+  "audit_opinion_policy": "Unverified audit opinions left blank",
+  "manual_review_scope": "Official report spot-checks only; not all 250 annual reports manually verified"
+}

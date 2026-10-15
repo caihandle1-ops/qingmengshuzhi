@@ -152,7 +152,8 @@ def test_samples_allowed_but_user_workspace_never_overwritten(public):
     new_session()
     from core.seed import seed_sample_data
     seed_sample_data()
-    assert len(db.fetch_companies()) == 10
+    from core.builtin_catalog import get_builtin_companies
+    assert len(db.fetch_companies()) == len(get_builtin_companies())
     restore(package)
     assert [row['name'] for row in db.fetch_companies()] == [COMPANY]
 
@@ -162,7 +163,8 @@ def test_builtins_roundtrip_does_not_relabel_samples(public):
     seed_sample_data()
     package = archive.build_research_archive({})['zip_bytes']
     checked = archive.validate_research_archive(package)
-    assert checked['summary']['企业'] == 10 and checked['summary']['原件'] == 0
+    from core.builtin_catalog import get_builtin_companies
+    assert checked['summary']['企业'] == len(get_builtin_companies()) and checked['summary']['原件'] == 0
     new_session()
     restore(package)
     assert all(row['import_id'] == 'builtin-v1' for company in db.fetch_companies() for row in db.fetch_metric_sources(company['id']))

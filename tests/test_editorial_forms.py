@@ -7,9 +7,16 @@ and Streamlit reruns are the production implementations.
 from copy import deepcopy
 from pathlib import Path
 
+import pytest
 from streamlit.testing.v1 import AppTest
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+@pytest.fixture(autouse=True)
+def isolated_local_forms(monkeypatch, tmp_path):
+    monkeypatch.setenv('FINANCIAL_DEPLOYMENT', 'local')
+    monkeypatch.setenv('FINANCIAL_DATA_DIR', str(tmp_path))
 
 
 def _composer_page(source_path, history=False):
@@ -18,7 +25,7 @@ def _composer_page(source_path, history=False):
 
     import pandas as pd
     import streamlit as st
-    from app.quick_preview import toggle_quick_preview, render_quick_preview
+    from app.quick_preview import render_quick_research
 
     if 'active_session_id' not in st.session_state:
         st.session_state.update(active_session_id='editorial-form-test', page='财报问数',
@@ -37,13 +44,13 @@ def _composer_page(source_path, history=False):
     namespace = {'st': st, 'page_intro': noop, 'fetch_report_files': lambda: [],
                  'render_research_jobs': noop, 'resume_and_save_research': noop,
                  'render_answer_card': noop, 'run_question': run_question,
-                 'toggle_quick_preview': toggle_quick_preview, 'render_quick_preview': render_quick_preview}
+                 'render_quick_research': lambda *args, **kwargs: render_quick_research(*args)}
     tree = ast.parse(Path(source_path).read_text(encoding='utf-8'))
     functions = [node for node in tree.body if isinstance(node, ast.FunctionDef)
                  and node.name in {'render_qa_page', 'toggle_qa_section'}]
     assert len(functions) == 2
     exec(compile(ast.Module(body=functions, type_ignores=[]), source_path, 'exec'), namespace)
-    namespace['render_qa_page']('甲企业', '乙企业', names, data, {}, {})
+    namespace['render_qa_page']('甲企业', '乙企业', names, data, {}, {}, workspace_revision=None)
 
 
 def _composer(history=False):
@@ -76,12 +83,14 @@ def test_composer_blur_and_condition_changes_preserve_draft_without_execution():
     assert len(page.session_state.editorial_submissions) == 1
 
 
-def test_empty_submit_and_shortcut_reversal_do_not_execute_or_erase_question(monkeypatch):
+def test_example_submit_and_shortcut_reversal_preserve_explicit_execution(monkeypatch):
     # Chart rendering is independent of this native input/reversal behavior.
     monkeypatch.setattr('app.quick_preview.render_research_chart', lambda *args, **kwargs: None)
     page = _composer()
+    example = page.text_input(key='qa_input').proto.placeholder
     page.button(key='qa_submit').click().run()
-    assert any('请输入需要分析' in item.value for item in page.warning)
+    assert page.session_state.editorial_submissions == [(example, '甲企业', '乙企业', '自动识别')]
+    assert not page.warning
     draft = '保留未提交的草稿'
     page.text_input(key='qa_input').set_value(draft).run()
     page.button(key='recommended_0').click().run()
@@ -96,7 +105,7 @@ def test_empty_submit_and_shortcut_reversal_do_not_execute_or_erase_question(mon
     page.button(key='qa_more_examples').click().run()
     assert not page.exception
     assert page.text_input(key='qa_input').value == draft
-    assert 'editorial_submissions' not in page.session_state
+    assert page.session_state.editorial_submissions == [(example, '甲企业', '乙企业', '自动识别')]
 
 
 def test_existing_answer_retains_collapsed_research_conditions_and_input():
